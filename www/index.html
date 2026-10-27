@@ -8,49 +8,51 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>VYRO | Cinema</title>
 <style>
-:root{color-scheme:dark;--bg:#08090d;--panel:#12141b;--panel2:#191c25;--line:#292d39;--white:#f7f7fb;--muted:#a0a4b1;--red:#e50914;--red2:#ff3540;--safeT:env(safe-area-inset-top,0px);--safeB:env(safe-area-inset-bottom,0px)}
+:root{color-scheme:dark;--bg:#07090e;--bg2:#0e1219;--panel:#121923;--panel2:#171e2d;--line:rgba(255,255,255,.09);--white:#f5f7ff;--muted:#a9afbf;--red:#ff2d55;--red2:#ff546f;--safeT:env(safe-area-inset-top,0px);--safeB:env(safe-area-inset-bottom,0px);--shadow:0 20px 45px rgba(0,0,0,.42)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html{background:var(--bg);scroll-behavior:smooth;scroll-padding-top:80px}
-body{margin:0;background:var(--bg);color:var(--white);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;min-height:100vh;padding-bottom:calc(78px + var(--safeB));overflow-x:hidden}
+html{background:var(--bg);scroll-behavior:smooth;scroll-padding-top:90px}
+body{margin:0;background:radial-gradient(circle at top,#151d29 0%,#090c12 28%,#07090e 100%);color:var(--white);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;min-height:100vh;padding-bottom:calc(78px + var(--safeB));overflow-x:hidden}
 button,input,select{font:inherit}button{cursor:pointer;touch-action:manipulation;color:inherit}
-button:focus-visible,input:focus-visible{outline:2px solid white;outline-offset:3px}
-.topbar{height:auto;min-height:62px;position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:22px;padding:calc(var(--safeT) + 10px) 18px 11px;background:linear-gradient(180deg,#08090df7,#08090de8);backdrop-filter:blur(20px);border-bottom:1px solid #ffffff0a}
-.brand{font-size:25px;letter-spacing:4px;font-weight:950;line-height:1;flex-shrink:0}.brand span{color:var(--red)}
-.desktoplinks{display:flex;gap:20px;align-items:center;flex:1}.navlink{background:none;border:0;color:#b9bbc5;padding:8px 0;font-size:13px}.navlink.active,.navlink:hover{color:white;font-weight:750}
-.topactions{display:flex;gap:9px;margin-left:auto}.roundbtn{width:38px;height:38px;display:grid;place-items:center;border:1px solid #ffffff18;border-radius:50%;background:#ffffff0b;font-size:17px}
+button:focus-visible,input:focus-visible{outline:2px solid rgba(255,255,255,.92);outline-offset:3px}
+.topbar{height:auto;min-height:64px;position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:22px;padding:calc(var(--safeT) + 10px) 18px 12px;background:rgba(8,9,13,.78);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,.04)}
+.brand{font-size:27px;letter-spacing:4px;font-weight:950;line-height:1;flex-shrink:0;text-transform:uppercase}.brand span{color:var(--red)}
+.desktoplinks{display:flex;gap:12px;align-items:center;flex:1}.navlink{background:rgba(255,255,255,.03);border:1px solid transparent;color:#c5c9d7;padding:9px 12px;border-radius:999px;font-size:12px;font-weight:700;transition:all .18s ease}.navlink.active,.navlink:hover{color:white;background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.08)}
+.topactions{display:flex;gap:9px;margin-left:auto}.roundbtn{width:40px;height:40px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.12);border-radius:14px;background:rgba(255,255,255,.05);font-size:18px;box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
 main{max-width:1450px;margin:0 auto;overflow:hidden}
-.page{display:none}.page.active{display:block;animation:appear .22s ease}@keyframes appear{from{opacity:.55}to{opacity:1}}
-.hero{position:relative;min-height:520px;display:flex;align-items:flex-end;isolation:isolate;padding:38px 22px 34px;overflow:hidden;background:#15151d}
-.hero-bg{position:absolute;inset:0;z-index:-3;background:linear-gradient(90deg,#08090df7 0%,#08090dce 35%,#08090d30 75%),linear-gradient(0deg,#08090d 0%,transparent 55%),radial-gradient(ellipse at 72% 25%,#6b2730,#1c1b25 70%);background-position:center;background-size:cover;transition:background-image .3s}
-.hero:after{content:"";position:absolute;inset:0;z-index:-2;background:linear-gradient(90deg,#08090d 0%,transparent 65%),linear-gradient(0deg,#08090d 0%,transparent 35%);pointer-events:none}
-.hero-content{max-width:580px;width:100%;padding-bottom:6px}.kicker{display:flex;align-items:center;gap:9px;text-transform:uppercase;letter-spacing:2.8px;font-size:10px;font-weight:850;color:#f0c4c6}.kicker:before{content:"";width:3px;height:16px;background:var(--red);border-radius:4px}
-.hero h1{font-size:clamp(37px,8vw,70px);letter-spacing:-2px;line-height:.98;margin:18px 0 12px;max-width:600px;text-wrap:balance;text-shadow:0 3px 25px #0009}
-.meta{display:flex;align-items:center;gap:9px;flex-wrap:wrap;font-size:12px;color:#d3d4db;margin:12px 0}.match{color:#63d9a2;font-weight:800}.rated{border:1px solid #ffffff55;padding:2px 6px;border-radius:3px;font-size:10px}
-.hero-desc{font-size:14px;line-height:1.65;color:#dedfe6;max-width:480px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;margin:12px 0 20px}
+.page{display:none}.page.active{display:block;animation:appear .22s ease}@keyframes appear{from{opacity:.5}to{opacity:1}}
+.hero{position:relative;min-height:540px;display:flex;align-items:flex-end;isolation:isolate;padding:38px 22px 32px;overflow:hidden;background:linear-gradient(90deg,#11151f 0%,#0d1218 30%,#0d1218 100%);border:1px solid rgba(255,255,255,.05);border-radius:26px;margin:16px 18px 0;box-shadow:var(--shadow)}
+.hero-bg{position:absolute;inset:0;z-index:-3;background:linear-gradient(90deg,#08090df7 0%,#08090dce 35%,#08090d30 75%),linear-gradient(0deg,#08090d 0%,transparent 55%),radial-gradient(ellipse at 70% 20%,rgba(255,45,85,.26),transparent 35%),url('https://image.tmdb.org/t/p/original//5qHKGqF8ZB5X0E0GF9Zlpg5JrK6.jpg') center/cover no-repeat}
+.hero:after{content:"";position:absolute;inset:0;z-index:-2;background:linear-gradient(90deg,#08090d 0%,transparent 55%),linear-gradient(0deg,#08090d 0%,transparent 35%);pointer-events:none}
+.hero-content{max-width:600px;width:100%;padding-bottom:6px}.kicker{display:flex;align-items:center;gap:9px;text-transform:uppercase;letter-spacing:3px;font-size:10px;font-weight:850;color:#ffc2cd}.kicker:before{content:"";display:block;width:8px;height:8px;border-radius:50%;background:var(--red);box-shadow:0 0 14px rgba(255,45,85,.85)}
+.hero h1{font-size:clamp(40px,7vw,72px);letter-spacing:-2px;line-height:.96;margin:16px 0 12px;max-width:620px;text-wrap:balance;text-shadow:0 6px 30px rgba(0,0,0,.6)}
+.meta{display:flex;align-items:center;gap:9px;flex-wrap:wrap;font-size:12px;color:#dfe2ee;margin:12px 0}.match{color:#7cf3b3;font-weight:800}.rated{border:1px solid rgba(255,255,255,.4);padding:3px 7px;border-radius:6px;background:rgba(255,255,255,.03);font-weight:700}
+.hero-desc{font-size:14px;line-height:1.7;color:#e0e4f2;max-width:490px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;margin:12px 0 20px}
 .actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;border:1px solid transparent;border-radius:5px;min-height:43px;padding:11px 17px;font-size:13px;font-weight:800}
-.btn-red{background:var(--red);color:#fff}.btn-red:active{background:#b70710}.btn-light{background:#f4f4f5;color:#111}.btn-glass{background:#ffffff20;color:white;border-color:#ffffff24}.btn-quiet{background:var(--panel);border-color:var(--line)}
-.page-pad{padding:4px 18px 26px}.section{margin:24px 0 29px}.section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:13px}.section h2,.section-head h2{font-size:18px;letter-spacing:-.3px;margin:0;font-weight:800}.section-sub{font-size:11px;color:var(--muted);margin-top:5px}.seeall{background:none;border:0;color:#c8cbd3;font-size:12px}
-.rail{display:grid;grid-auto-flow:column;grid-auto-columns:39%;gap:11px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;padding:2px 1px 13px;scrollbar-width:none}.rail::-webkit-scrollbar{display:none}
-.poster-card{min-width:0;scroll-snap-align:start;cursor:pointer;position:relative}.poster{position:relative;aspect-ratio:2/3;overflow:hidden;background:linear-gradient(145deg,#292d38,#111219);border-radius:8px;border:1px solid #ffffff12}.poster img{width:100%;height:100%;display:block;object-fit:cover;transition:transform .3s}.poster-card:active .poster img{transform:scale(1.04)}
-.poster-placeholder{position:absolute;inset:0;display:grid;place-items:center;background:radial-gradient(ellipse at 50% 30%,#43303b,#14151c 70%);color:#ffb4b9;font-size:28px;font-weight:950;letter-spacing:4px}
-.poster-rank{position:absolute;left:7px;top:7px;background:#08090de8;border:1px solid #ffffff21;border-radius:4px;padding:5px 7px;font-size:10px;font-weight:800}
-.poster-info{padding:8px 1px 0}.poster-title{font-size:12px;font-weight:750;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.poster-sub{font-size:11px;color:var(--muted);margin-top:4px}
-.landscape-rail{display:grid;grid-auto-flow:column;grid-auto-columns:78%;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;padding-bottom:8px}.landscape-card{position:relative;aspect-ratio:16/9;border-radius:8px;overflow:hidden;background:var(--panel);scroll-snap-align:start;cursor:pointer}.landscape-card img{width:100%;height:100%;object-fit:cover;display:block;opacity:.85;transition:transform .3s}.landscape-card:after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,#08090df2,transparent 75%)}.landscape-card:active img{transform:scale(1.03)}.landscape-copy{position:absolute;z-index:1;left:13px;right:13px;bottom:12px}.landscape-copy strong{display:block;font-size:15px}.landscape-copy small{display:block;color:#d4d5dd;margin-top:4px;font-size:11px}
-.empty{border:1px solid #ffffff10;background:var(--panel);border-radius:9px;padding:22px 16px;text-align:center;color:var(--muted);line-height:1.55;grid-column:1/-1}.empty strong{display:block;color:white;margin-bottom:5px}
-.search-wrap{position:relative;margin:19px 0 14px}.search-wrap span{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#9da2b0}.search{width:100%;border:1px solid #303441;background:#11131a;color:white;border-radius:7px;min-height:48px;padding:13px 14px 13px 43px;outline:none}.search:focus{border-color:#a4a7b2}
-.chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:2px 0 12px}.chip{flex-shrink:0;border:1px solid #343744;background:#14161e;border-radius:30px;padding:9px 15px;color:#d7d8df;font-size:12px}.chip.active{background:white;color:#101116;border-color:white;font-weight:800}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;border:1px solid transparent;border-radius:14px;min-height:46px;padding:13px 18px;font-size:13px;font-weight:800;letter-spacing:.02em;transition:transform .18s ease,filter .18s ease}.btn:active{transform:scale(.98)}.btn-red{background:linear-gradient(180deg,#ff2d55,#d81238);color:#fff;box-shadow:0 10px 24px rgba(255,45,85,.28)}.btn-light{background:#f4f5f7;color:#111318;box-shadow:0 10px 24px rgba(255,255,255,.1)}.btn-glass{background:rgba(255,255,255,.08);color:white;border-color:rgba(255,255,255,.12)}.btn-quiet{background:rgba(255,255,255,.04);color:#ebedf9;border-color:rgba(255,255,255,.08)}
+.page-pad{padding:4px 18px 26px}.section{margin:24px 0 30px}.section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}.section h2,.section-head h2{font-size:clamp(20px,4vw,28px);letter-spacing:-.6px;margin:0}.section-sub{font-size:11px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-top:4px}.seeall{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:999px;padding:8px 12px;color:#dfe5f6;font-size:11px;font-weight:700}
+.rail{display:grid;grid-auto-flow:column;grid-auto-columns:39%;gap:12px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;padding:2px 1px 13px;scrollbar-width:none}.rail::-webkit-scrollbar{display:none}
+.poster-card{min-width:0;scroll-snap-align:start;cursor:pointer;position:relative;border-radius:18px;overflow:hidden;background:rgba(255,255,255,.02);padding:0;border:1px solid rgba(255,255,255,.04);transition:transform .18s ease}.poster-card:hover{transform:translateY(-2px)}
+.poster{position:relative;aspect-ratio:2/3;overflow:hidden;background:linear-gradient(140deg,#2c313d,#11141d);border-radius:18px 18px 0 0}
+.poster img{display:block;width:100%;height:100%;object-fit:cover}
+.poster-placeholder{position:absolute;inset:0;display:grid;place-items:center;background:radial-gradient(circle at 50% 30%,rgba(255,88,114,.4),#121621 68%);color:#ffcad2;font-size:28px;font-weight:950;letter-spacing:2px}
+.poster-rank{position:absolute;left:8px;top:8px;background:rgba(8,9,13,.86);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:5px 7px;font-size:10px;font-weight:800;letter-spacing:.08em}
+.poster-info{padding:10px 10px 12px;background:rgba(15,18,26,.9)}
+.poster-title{font-size:12px;font-weight:750;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.poster-sub{font-size:11px;color:var(--muted);margin-top:3px}
+.landscape-rail{display:grid;grid-auto-flow:column;grid-auto-columns:78%;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;padding-bottom:8px}.landscape-card{position:relative;overflow:hidden;scroll-snap-align:start;border-radius:18px;border:1px solid rgba(255,255,255,.06);background:linear-gradient(180deg,#202634,#0e1117);min-height:170px;box-shadow:var(--shadow)}.landscape-card img{display:block;width:100%;height:100%;object-fit:cover}.landscape-card .landscape-overlay{position:absolute;inset:0;background:linear-gradient(180deg,transparent 45%,rgba(6,8,12,.82) 100%)}.landscape-meta{position:absolute;left:12px;right:12px;bottom:12px;display:flex;justify-content:space-between;align-items:flex-end;gap:8px}.landscape-title{font-size:14px;font-weight:800;max-width:70%}.landscape-pill{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.08);border-radius:999px;padding:5px 8px;font-size:10px}
+.empty{border:1px solid rgba(255,255,255,.06);background:rgba(17,21,30,.8);border-radius:16px;padding:22px 16px;text-align:center;color:var(--muted);line-height:1.55;grid-column:1/-1}.empty strong{display:block;color:var(--white);margin-bottom:6px}
+.search-wrap{position:relative;margin:18px 0 14px}.search-wrap span{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:#b6bbc9;font-size:17px}.search{width:100%;border:1px solid rgba(255,255,255,.08);background:rgba(17,21,30,.9);border-radius:16px;padding:14px 16px 14px 42px;color:var(--white);font-size:15px}.search::placeholder{color:#9aa3b6}
+.chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:2px 0 12px}.chip{flex-shrink:0;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);border-radius:999px;padding:9px 14px;color:#dfe4f8;font-size:12px;font-weight:700}.chip.active{background:linear-gradient(180deg,#ff2d55,#d81238);color:#fff;border-color:rgba(255,45,85,.4);box-shadow:0 10px 24px rgba(255,45,85,.22)}
 .catalog-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px 10px;padding-bottom:25px}
-.field{margin:17px 0}.field label{display:block;font-size:12px;color:#e0e1e7;margin-bottom:8px}.field input,.field select{width:100%;min-height:45px;border-radius:7px;background:#11131a;border:1px solid #303441;padding:12px;color:white}.field p{font-size:11px;color:var(--muted);line-height:1.5}
-.settings-wrap{padding:23px 18px;max-width:720px;margin:auto}.settings-wrap h1{font-size:30px;letter-spacing:-1px}.settings-card{padding:16px;border:1px solid #ffffff12;background:#101219;border-radius:10px;margin:18px 0}.status{background:#0b0d12;border:1px solid #292d39;border-radius:7px;padding:12px;white-space:pre-wrap;overflow-wrap:anywhere;color:#bfc3ce;font-size:12px;line-height:1.55}.settings-actions{display:flex;gap:9px;flex-wrap:wrap}
-.bottomnav{position:fixed;bottom:0;left:0;right:0;z-index:25;display:flex;justify-content:space-around;gap:2px;padding:8px 5px calc(7px + var(--safeB));background:#0c0e13f5;border-top:1px solid #ffffff13;backdrop-filter:blur(22px)}
-.bottomnav button{border:0;background:transparent;color:#9297a4;flex:1;min-width:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px;font-size:10px;padding:5px 0}.bottomnav button b{font-size:19px;line-height:1;font-weight:500}.bottomnav button.active{color:white}.bottomnav button.active b{color:var(--red)}
-.detail{display:none;position:fixed;inset:0;z-index:40;overflow-y:auto;overscroll-behavior:contain;background:#08090d;padding:calc(var(--safeT) + 12px) 0 calc(26px + var(--safeB));-webkit-overflow-scrolling:touch}.detail.open{display:block}.detail-top{position:sticky;top:0;z-index:3;display:flex;justify-content:flex-end;padding:0 16px 10px;pointer-events:none}.detail-top button{pointer-events:auto}
-.detail-hero{position:relative;min-height:390px;display:flex;align-items:flex-end;padding:26px 18px 24px;isolation:isolate;background:linear-gradient(0deg,#08090d 0%,#08090d80 55%,#08090d22),#161820;background-size:cover;background-position:center}.detail-hero:after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,#08090db8,transparent)}.detail-body{padding:0 18px;max-width:950px;margin:0 auto}.detail h1{font-size:clamp(28px,7vw,48px);line-height:1.02;letter-spacing:-1.3px;margin:12px 0}.detail-overview{font-size:13px;color:#c1c4ce;line-height:1.75;max-width:750px}.detail-meta{font-size:12px;color:#c4c7d0;line-height:1.8}.detail-section{margin-top:24px}.detail-section h2{font-size:17px;margin:0 0 11px}
-.streamsPanel{padding:15px;background:#11131a;border:1px solid #292d39;border-radius:10px;margin-top:14px}.streamChoice{display:block;text-align:left;width:100%;margin:8px 0;padding:12px;border-radius:7px;border:1px solid #343846;background:#191c25;color:white;overflow-wrap:anywhere;word-break:break-word}.streamChoice small{display:block;color:#a4a8b5;font-size:11px;margin-top:5px;line-height:1.45}.streamChoice:active{border-color:#e50914}.player-shell{background:#000;border-radius:8px;overflow:hidden;margin-top:14px}.player-shell video{display:block;width:100%;max-height:65vh;aspect-ratio:16/9;background:#000;object-fit:contain}.player-message{font-size:12px;color:#b9bdc9;line-height:1.55;margin:10px 0}.spinner{width:23px;height:23px;border:2px solid #414550;border-top-color:var(--red);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 11px}@keyframes spin{to{transform:rotate(360deg)}}
-footer{text-align:center;color:#6c707d;font-size:10px;letter-spacing:2px;padding:18px}
-@media(min-width:520px){.hero{min-height:600px;padding:45px 32px}.page-pad{padding-left:28px;padding-right:28px}.rail{grid-auto-columns:25%;gap:14px}.landscape-rail{grid-auto-columns:48%}.catalog-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:22px 14px}.detail-hero{min-height:500px;padding-left:32px}.detail-body{padding:0 32px}}
-@media(min-width:900px){body{padding-bottom:15px}.topbar{padding-left:35px;padding-right:35px}.hero{min-height:650px;padding:55px}.page-pad{padding-left:40px;padding-right:40px}.rail{grid-auto-columns:16%;gap:17px}.landscape-rail{grid-auto-columns:32%}.catalog-grid{grid-template-columns:repeat(6,minmax(0,1fr))}.bottomnav{display:none}.detail-hero{min-height:600px;padding-left:55px}.detail-body{padding:0 55px}}
+.field{margin:17px 0}.field label{display:block;font-size:12px;color:#e0e3ef;margin-bottom:8px}.field input,.field select{width:100%;min-height:45px;border-radius:12px;background:#10161f;border:1px solid rgba(255,255,255,.09);padding:12px 13px;color:var(--white)}
+.settings-wrap{padding:23px 18px;max-width:720px;margin:auto}.settings-wrap h1{font-size:30px;letter-spacing:-1px;margin:0 0 8px}.settings-card{padding:18px 16px;border:1px solid rgba(255,255,255,.07);background:rgba(16,18,25,.86);border-radius:18px;margin-top:16px;box-shadow:inset 0 1px 0 rgba(255,255,255,.03)}.settings-card h2{font-size:18px;margin:0 0 12px}.settings-card p{color:var(--muted);font-size:13px;line-height:1.6;margin:12px 0 0}.settings-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+.bottomnav{position:fixed;bottom:0;left:0;right:0;z-index:25;display:flex;justify-content:space-around;gap:2px;padding:8px 5px calc(7px + var(--safeB));background:rgba(12,14,19,.95);border-top:1px solid rgba(255,255,255,.07);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.bottomnav button{border:0;background:transparent;color:#a9afbf;flex:1;min-width:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px;font-size:10px;padding:5px 0;border-radius:12px}.bottomnav button b{font-size:18px;font-weight:700}.bottomnav button.active{color:#fff;background:rgba(255,255,255,.04)}
+.detail{display:none;position:fixed;inset:0;z-index:40;overflow-y:auto;overscroll-behavior:contain;background:rgba(7,9,14,.96);padding:calc(var(--safeT) + 12px) 0 calc(26px + var(--safeB));-webkit-overflow-scrolling:touch}.detail.open{display:block}
+.detail-hero{position:relative;min-height:390px;display:flex;align-items:flex-end;padding:26px 18px 24px;isolation:isolate;background:linear-gradient(0deg,#08090d 0%,#08090d80 55%,#08090d22),#16181f}.detail-hero:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 55%,#08090d 100%);z-index:-1}
+.streamsPanel{padding:15px;background:#11151d;border:1px solid rgba(255,255,255,.06);border-radius:16px;margin-top:14px}.streamChoice{display:block;text-align:left;width:100%;margin:8px 0;padding:12px;border-radius:14px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);color:var(--white)}.streamChoice small{display:block;margin-top:6px;color:var(--muted);font-size:11px}.streamChoice:active{transform:scale(.99)}
+footer{text-align:center;color:#6d7586;font-size:10px;letter-spacing:2px;padding:18px;text-transform:uppercase}
+@media(min-width:520px){.hero{min-height:600px;padding:45px 32px 34px}.page-pad{padding-left:28px;padding-right:28px}.rail{grid-auto-columns:25%;gap:14px}.landscape-rail{grid-auto-columns:48%}.catalog-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(min-width:900px){body{padding-bottom:15px}.topbar{padding-left:35px;padding-right:35px}.hero{min-height:650px;padding:56px 42px 40px;margin-left:20px;margin-right:20px}.page-pad{padding-left:40px;padding-right:40px}.rail{grid-auto-columns:19%;gap:16px}.landscape-rail{grid-auto-columns:34%}.catalog-grid{grid-template-columns:repeat(5,minmax(0,1fr))}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;scroll-behavior:auto!important;transition:none!important}}
 </style>
 </head>
@@ -137,7 +139,7 @@ footer{text-align:center;color:#6c707d;font-size:10px;letter-spacing:2px;padding
       <div class="settings-actions"><button class="btn btn-red" onclick="saveSettings()">Save settings</button><button class="btn btn-quiet" onclick="testAio()">Test AIOStreams</button></div>
     </div>
     <div class="settings-card"><h2>Connection status</h2><div id="connectionStatus" class="status" role="status" aria-live="polite">Not tested yet.</div></div>
-    <div class="settings-card"><h2>Playback compatibility</h2><p>VYRO tries direct HTTP(S) streams in the iOS video player and offers external links when a source provides one. HLS is generally best supported by Safari/iOS. Some sources use DRM, specialised headers, DASH or server-side restrictions and may not play in a basic web player.</p></div>
+    <div class="settings-card"><h2>Playback compatibility</h2><p>VYRO tries direct HTTP(S) streams in the iOS video player and offers external links when a source provides one. HLS is generally best supported, while DRM or protected streams may require another provider.</p></div>
   </div>
 </section>
 <footer>VYRO · YOUR CINEMA</footer>
@@ -169,386 +171,380 @@ const key=()=>localStorage.getItem("vyro_tmdb_key")||"";
 function setStatus(message){$("connectionStatus").textContent=message}
 function loading(message){return '<div class="empty"><div class="spinner"></div>'+escapeHTML(message)+'</div>'}
 async function tmdb(path){
- if(!key())throw Error("Add your TMDB API key in Settings first.");
- const url=new URL("https://api.themoviedb.org/3"+path);
- url.searchParams.set("api_key",key());
- const response=await fetch(url.toString(),{headers:{Accept:"application/json"}});
- if(!response.ok)throw Error(response.status===401?"TMDB rejected the API key. Check Settings.":"TMDB request failed (HTTP "+response.status+").");
- return response.json();
+  if(!key())throw Error("Add your TMDB API key in Settings first.");
+  const url=new URL("https://api.themoviedb.org/3"+path);
+  url.searchParams.set("api_key",key());
+  const response=await fetch(url.toString(),{headers:{Accept:"application/json"}});
+  if(!response.ok)throw Error(response.status===401?"TMDB rejected the API key. Check Settings.":"TMDB request failed (HTTP "+response.status+").");
+  return response.json();
 }
 function placeholder(){return '<div class="poster-placeholder">V</div>'}
 function posterCard(item,rank){
- const type=typeOf(item),title=titleOf(item),path=posterURL(item.poster_path);
- const img=path?'<img loading="lazy" decoding="async" src="'+path+'" alt="'+escapeHTML(title)+' poster" onerror="this.remove();this.parentElement.insertAdjacentHTML(\'afterbegin\',\''+placeholder()+'\')">':placeholder();
- return '<article class="poster-card" role="button" tabindex="0" aria-label="View '+escapeHTML(title)+'" onclick="openDetail(\''+type+'\','+Number(item.id)+')" onkeydown="if(event.key===\'Enter\'){openDetail(\''+type+'\','+Number(item.id)+')}"><div class="poster">'+img+(rank?'<span class="poster-rank">#'+rank+'</span>':"")+'</div><div class="poster-info"><div class="poster-title">'+escapeHTML(title)+'</div><div class="poster-sub">'+escapeHTML(yearOf(item)||"Featured")+' · ★ '+Number(item.vote_average||0).toFixed(1)+'</div></div></article>';
+  const type=typeOf(item),title=titleOf(item),path=posterURL(item.poster_path);
+  const img=path?'<img loading="lazy" decoding="async" src="'+path+'" alt="'+escapeHTML(title)+' poster" onerror="this.remove();this.parentElement.insertAdjacentHTML(\'afterbegin\',\''+placeholder().replace(/'/g,"\\'")+ '\');">':placeholder();
+  return '<article class="poster-card" role="button" tabindex="0" aria-label="View '+escapeHTML(title)+'" onclick="openDetail(\''+type+'\','+Number(item.id)+')" onkeydown="if(event.key===\'Enter\')openDetail(\''+type+'\','+Number(item.id)+')">'+(rank?'<div class="poster-rank">#'+rank+'</div>':'')+'<div class="poster">'+img+'</div><div class="poster-info"><div class="poster-title">'+escapeHTML(title)+'</div><div class="poster-sub">'+escapeHTML(yearOf(item)||"New")+'</div></div></article>';
 }
 function landscapeCard(item){
- const type=typeOf(item),title=titleOf(item),art=posterURL(item.backdrop_path,"w780")||posterURL(item.poster_path);
- return '<article class="landscape-card" role="button" tabindex="0" onclick="openDetail(\''+type+'\','+Number(item.id)+')">'+(art?'<img loading="lazy" src="'+art+'" alt="">':"")+'<div class="landscape-copy"><strong>'+escapeHTML(title)+'</strong><small>'+escapeHTML(yearOf(item))+' · Continue exploring</small></div></article>';
-}function renderRail(id,items,message="No titles found."){
- const el=$(id);if(!items||!items.length){el.innerHTML='<div class="empty">'+escapeHTML(message)+'</div>';return}
- el.innerHTML=items.map((x,i)=>posterCard(x,id==="trending"?i+1:null)).join("");
+  const type=typeOf(item),title=titleOf(item),art=posterURL(item.backdrop_path,"w780")||posterURL(item.poster_path);
+  return '<article class="landscape-card" role="button" tabindex="0" onclick="openDetail(\''+type+'\','+Number(item.id)+')">'+(art?'<img loading="lazy" src="'+art+'" alt="">':'')+'<div class="landscape-overlay"></div><div class="landscape-meta"><div class="landscape-title">'+escapeHTML(title)+'</div><div class="landscape-pill">'+escapeHTML(yearOf(item)||"Now")+'</div></div></article>';
+}
+function renderRail(id,items,message="No titles found."){
+  const el=$(id);if(!items||!items.length){el.innerHTML='<div class="empty">'+escapeHTML(message)+'</div>';return}
+  el.innerHTML=items.map((x,i)=>posterCard(x,id==="trending"?i+1:null)).join("");
 }
 function renderGrid(id,items,message="No matching titles."){
- const el=$(id);if(!items||!items.length){el.innerHTML='<div class="empty">'+escapeHTML(message)+'</div>';return}
- el.innerHTML=items.map(x=>posterCard(x,null)).join("");
- el.classList.add("catalog-grid");
+  const el=$(id);if(!items||!items.length){el.innerHTML='<div class="empty">'+escapeHTML(message)+'</div>';return}
+  el.innerHTML=items.map(x=>posterCard(x,null)).join("");
+  el.classList.add("catalog-grid");
 }
 function showPage(name){
- const target=$(name);if(!target)return;
- document.querySelectorAll(".page").forEach(x=>x.classList.toggle("active",x.id===name));
- document.querySelectorAll("[data-page]").forEach(x=>x.classList.toggle("active",x.dataset.page===name));
- if(name==="mylist")renderSaved();
- if(name==="discover"&&!$("discoverResults").dataset.loaded)loadDiscover();
- window.scrollTo({top:0,behavior:"auto"});
+  const target=$(name);if(!target)return;
+  document.querySelectorAll(".page").forEach(x=>x.classList.toggle("active",x.id===name));
+  document.querySelectorAll("[data-page]").forEach(x=>x.classList.toggle("active",x.dataset.page===name));
+  if(name==="mylist")renderSaved();
+  if(name==="discover"&&!$("discoverResults").dataset.loaded)loadDiscover();
+  window.scrollTo({top:0,behavior:"auto"});
 }
 async function loadHome(){
- if(!key())return;
- ["trending","popularMovies","popularTV"].forEach(id=>$(id).innerHTML=loading("Curating your cinema…"));
- try{
-  const [trending,movies,tv]=await Promise.all([
-   tmdb("/trending/all/week"),tmdb("/movie/popular"),tmdb("/tv/popular")
-  ]);
-  const trend=(trending.results||[]).filter(x=>x.media_type!=="person").slice(0,18);
-  renderRail("trending",trend);
-  renderRail("popularMovies",(movies.results||[]).slice(0,18).map(x=>({...x,_kind:"movie"})));
-  renderRail("popularTV",(tv.results||[]).slice(0,18).map(x=>({...x,_kind:"tv"})));
-  const featured=trend.find(x=>x.backdrop_path)||trend[0];
-  if(featured)setFeatured(featured);
- }catch(e){
-  ["trending","popularMovies","popularTV"].forEach(id=>$(id).innerHTML='<div class="empty">'+escapeHTML(e.message)+'</div>');
- }
+  if(!key())return;
+  ["trending","popularMovies","popularTV"].forEach(id=>$(id).innerHTML=loading("Curating your cinema…"));
+  try{
+   const [trending,movies,tv]=await Promise.all([
+    tmdb("/trending/all/week"),tmdb("/movie/popular"),tmdb("/tv/popular")
+   ]);
+   const trend=(trending.results||[]).filter(x=>x.media_type!=="person").slice(0,18);
+   renderRail("trending",trend);
+   renderRail("popularMovies",(movies.results||[]).slice(0,18).map(x=>({...x,_kind:"movie"})));
+   renderRail("popularTV",(tv.results||[]).slice(0,18).map(x=>({...x,_kind:"tv"})));
+   const featured=trend.find(x=>x.backdrop_path)||trend[0];
+   if(featured)setFeatured(featured);
+  }catch(e){
+   ["trending","popularMovies","popularTV"].forEach(id=>$(id).innerHTML='<div class="empty">'+escapeHTML(e.message)+'</div>');
+  }
 }
 function setFeatured(item){
- featuredItem=item;
- const title=titleOf(item);
- const backdrop=posterURL(item.backdrop_path,"original")||posterURL(item.poster_path,"w780");
- $("heroTitle").textContent=title;
- $("heroDesc").textContent=item.overview||"Discover your next favourite story.";
- $("heroMeta").innerHTML='<span class="match">'+(item.vote_average?"Recommended":"Featured")+'</span><span>'+escapeHTML(yearOf(item)||"Now streaming")+'</span><span>★ '+Number(item.vote_average||0).toFixed(1)+'</span><span class="rated">HD</span>';
- if(backdrop)$("heroBg").style.backgroundImage='linear-gradient(90deg,#08090df7 0%,#08090dce 35%,#08090d30 75%),linear-gradient(0deg,#08090d 0%,transparent 55%),url("'+backdrop+'")';
+  featuredItem=item;
+  const title=titleOf(item);
+  const backdrop=posterURL(item.backdrop_path,"original")||posterURL(item.poster_path,"w780");
+  $("heroTitle").textContent=title;
+  $("heroDesc").textContent=item.overview||"Discover your next favourite story.";
+  $("heroMeta").innerHTML='<span class="match">'+(item.vote_average?"Recommended":"Featured")+'</span><span>'+escapeHTML(yearOf(item)||"Now streaming")+'</span><span>★ '+Number(item.vote_average||0).toFixed(1)+'</span><span class="rated">HD</span>';
+  if(backdrop)$("heroBg").style.backgroundImage='linear-gradient(90deg,#08090df7 0%,#08090dce 35%,#08090d30 75%),linear-gradient(0deg,#08090d 0%,transparent 55%),url("'+backdrop+'")';
 }
 function openFeatured(){if(featuredItem)openDetail(typeOf(featuredItem),featuredItem.id)}
 function playFeatured(){openFeatured();setTimeout(()=>{if(activeDetail)watchTitle()},500)}
 function browseTrending(){
- showPage("discover");currentKind="trending";
- document.querySelectorAll(".chip").forEach(x=>x.classList.toggle("active",x.dataset.kind==="trending"));
- $("searchInput").value="";loadDiscover();
+  showPage("discover");currentKind="trending";
+  document.querySelectorAll(".chip").forEach(x=>x.classList.toggle("active",x.dataset.kind==="trending"));
+  $("searchInput").value="";loadDiscover();
 }
 function browseKind(kind){
- showPage("discover");currentKind=kind;
- document.querySelectorAll(".chip").forEach(x=>x.classList.toggle("active",x.dataset.kind===kind));
- $("searchInput").value="";loadDiscover();
+  showPage("discover");currentKind=kind;
+  document.querySelectorAll(".chip").forEach(x=>x.classList.toggle("active",x.dataset.kind===kind));
+  $("searchInput").value="";loadDiscover();
 }
 function setKind(kind,button){
- currentKind=kind;
- document.querySelectorAll(".chip").forEach(x=>x.classList.toggle("active",x===button));
- if($("searchInput").value.trim())searchTitles();else loadDiscover();
+  currentKind=kind;
+  document.querySelectorAll(".chip").forEach(x=>x.classList.toggle("active",x===button));
+  if($("searchInput").value.trim())searchTitles();else loadDiscover();
 }
 async function loadDiscover(){
- const el=$("discoverResults");el.innerHTML=loading("Finding something good…");
- try{
-  let items=[];
-  if(currentKind==="trending"){
-   const d=await tmdb("/trending/all/week");
-   items=(d.results||[]).filter(x=>x.media_type!=="person");
-  }else if(currentKind==="tv"){
-   const d=await tmdb("/tv/popular");
-   items=(d.results||[]).map(x=>({...x,_kind:"tv"}));
-  }else{
-   const d=await tmdb("/movie/popular");
-   items=(d.results||[]).map(x=>({...x,_kind:"movie"}));
+  const el=$("discoverResults");el.innerHTML=loading("Finding something good…");
+  try{
+   let items=[];
+   if(currentKind==="trending"){
+    const d=await tmdb("/trending/all/week");
+    items=(d.results||[]).filter(x=>x.media_type!=="person");
+   }else if(currentKind==="tv"){
+    const d=await tmdb("/tv/popular");
+    items=(d.results||[]).map(x=>({...x,_kind:"tv"}));
+   }else{
+    const d=await tmdb("/movie/popular");
+    items=(d.results||[]).map(x=>({...x,_kind:"movie"}));
+   }
+   renderGrid("discoverResults",items);el.dataset.loaded="1";
+  }catch(e){
+   el.innerHTML='<div class="empty">'+escapeHTML(e.message)+'</div>';
   }
-  renderGrid("discoverResults",items);el.dataset.loaded="1";
- }catch(e){
-  el.innerHTML='<div class="empty">'+escapeHTML(e.message)+'</div>';
- }
 }
 $("searchInput").addEventListener("input",()=>{
- clearTimeout(searchTimer);searchTimer=setTimeout(searchTitles,300);
+  clearTimeout(searchTimer);searchTimer=setTimeout(searchTitles,300);
 });
 async function searchTitles(){
- const seq=++searchSeq,q=$("searchInput").value.trim();
- if(!q)return loadDiscover();
- $("discoverResults").innerHTML=loading("Searching titles…");
- try{
-  const endpoint=currentKind==="movie"?"/search/movie":currentKind==="tv"?"/search/tv":"/search/multi";
-  const d=await tmdb(endpoint+"?query="+encodeURIComponent(q));
-  if(seq!==searchSeq)return;
-  const items=(d.results||[]).filter(x=>x.media_type!=="person").map(x=>({...x,_kind:x.media_type||currentKind}));
-  renderGrid("discoverResults",items,"No titles matched that search.");
- }catch(e){
-  if(seq===searchSeq)$("discoverResults").innerHTML='<div class="empty">'+escapeHTML(e.message)+'</div>';
- }
+  const seq=++searchSeq,q=$("searchInput").value.trim();
+  if(!q)return loadDiscover();
+  $("discoverResults").innerHTML=loading("Searching titles…");
+  try{
+   const endpoint=currentKind==="movie"?"/search/movie":currentKind==="tv"?"/search/tv":"/search/multi";
+   const d=await tmdb(endpoint+"?query="+encodeURIComponent(q));
+   if(seq!==searchSeq)return;
+   const items=(d.results||[]).filter(x=>x.media_type!=="person").map(x=>({...x,_kind:x.media_type||currentKind}));
+   renderGrid("discoverResults",items,"No titles matched that search.");
+  }catch(e){
+   if(seq===searchSeq)$("discoverResults").innerHTML='<div class="empty">'+escapeHTML(e.message)+'</div>';
+  }
 }
 function savedItems(){
- const x=readJSON("vyro_saved",[]);
- return Array.isArray(x)?x:[];
+  const x=readJSON("vyro_saved",[]);
+  return Array.isArray(x)?x:[];
 }
 function isSaved(type,id){
- return savedItems().some(x=>x.type===type&&Number(x.id)===Number(id));
+  return savedItems().some(x=>x.type===type&&Number(x.id)===Number(id));
 }
 function renderSaved(){
- const items=savedItems();
- renderGrid("savedResults",items.map(x=>({...x,_kind:x.type||"movie"})),"Your list is empty. Open a title and tap Add to My List.");
+  const items=savedItems();
+  renderGrid("savedResults",items.map(x=>({...x,_kind:x.type||"movie"})),"Your list is empty. Open a title and tap Add to My List.");
 }
 function toggleSaved(item,type){
- let list=savedItems(),exists=isSaved(type,item.id);
- list=exists?list.filter(x=>!(x.type===type&&Number(x.id)===Number(item.id))):[{...item,type},...list];
- try{localStorage.setItem("vyro_saved",JSON.stringify(list))}
- catch(e){alert("Could not save this title on this device.");return null}
- renderSaved();return !exists;
+  let list=savedItems(),exists=isSaved(type,item.id);
+  list=exists?list.filter(x=>!(x.type===type&&Number(x.id)===Number(item.id))):[{...item,type},...list];
+  try{localStorage.setItem("vyro_saved",JSON.stringify(list))}
+  catch(e){alert("Could not save this title on this device.");return null}
+  renderSaved();return !exists;
 }
 async function openDetail(type,id){
- lastFocus=document.activeElement;
- const seq=++detailSeq;
- activeDetail={type,id,item:null};currentStreams=[];
- $("detail").classList.add("open");
- $("detail").scrollTop=0;
- $("detailContent").innerHTML=loading("Loading title…");
- try{
-  const d=await tmdb("/"+type+"/"+Number(id));
-  if(seq!==detailSeq)return;
-  activeDetail.item=d;
-  const backdrop=posterURL(d.backdrop_path,"original")||posterURL(d.poster_path,"w780");
-  const title=titleOf(d);
-  const genres=(d.genres||[]).map(x=>x.name).join(" · ");
-  const runtime=d.runtime?d.runtime+" min":(d.episode_run_time&&d.episode_run_time[0]?d.episode_run_time[0]+" min/ep":"");
-  $("detailContent").innerHTML=
-   '<div class="detail-hero" style="'+(backdrop?'background-image:linear-gradient(0deg,#08090d 0%,#08090d80 55%,#08090d22),url(&quot;'+backdrop+'&quot;)':'')+'"><div><div class="kicker">'+(type==="tv"?"SERIES":"MOVIE")+' · VYRO CINEMA</div><h1>'+escapeHTML(title)+'</h1><div class="meta"><span class="match">★ '+Number(d.vote_average||0).toFixed(1)+'</span><span>'+escapeHTML(yearOf(d))+'</span>'+(runtime?'<span>'+escapeHTML(runtime)+'</span>':"")+'<span class="rated">HD</span></div><div class="actions"><button class="btn btn-red" onclick="watchTitle()">▶ &nbsp; Watch now</button><button class="btn btn-glass" onclick="saveCurrent()">'+(isSaved(type,id)?"✓ &nbsp; In My List":"＋ &nbsp; My List")+'</button></div></div></div><div class="detail-body"><div class="detail-section"><div class="detail-meta">'+escapeHTML(genres||"Featured title")+'</div><p class="detail-overview">'+escapeHTML(d.overview||"No synopsis is available for this title.")+'</p></div>'+
-   (type==="tv"?'<div class="detail-section"><h2>Choose an episode</h2><div class="field"><label for="streamSeason">Season</label><input id="streamSeason" type="number" min="1" max="99" value="1"></div><div class="field"><label for="streamEpisode">Episode</label><input id="streamEpisode" type="number" min="1" max="999" value="1"></div><button class="btn btn-quiet" onclick="loadAioEpisode()">Find episode streams</button></div>':"")+
-   '<div class="detail-section"><h2>Available to watch</h2><div id="streamPanel" class="streamsPanel"><p class="player-message">Select Watch now to search your configured AIOStreams sources.</p></div></div></div>';
+  lastFocus=document.activeElement;
+  const seq=++detailSeq;
+  activeDetail={type,id,item:null};currentStreams=[];
+  $("detail").classList.add("open");
   $("detail").scrollTop=0;
- }catch(e){
-  if(seq!==detailSeq)return;
-  $("detailContent").innerHTML='<div class="empty">'+escapeHTML(e.message)+'</div>';
- }
+  $("detailContent").innerHTML=loading("Loading title…");
+  try{
+   const d=await tmdb("/"+type+"/"+Number(id));
+   if(seq!==detailSeq)return;
+   activeDetail.item=d;
+   const backdrop=posterURL(d.backdrop_path,"original")||posterURL(d.poster_path,"w780");
+   const title=titleOf(d);
+   const genres=(d.genres||[]).map(x=>x.name).join(" · ");
+   const runtime=d.runtime?d.runtime+" min":(d.episode_run_time&&d.episode_run_time[0]?d.episode_run_time[0]+" min/ep":"");
+   $("detailContent").innerHTML=
+    '<div class="detail-hero" style="'+(backdrop?'background-image:linear-gradient(0deg,#08090d 0%,#08090d80 55%,#08090d22),url(&quot;'+backdrop+'&quot;)':'')+'"><div><div class="kicker">'+(type==="tv"?"Series":"Feature film")+'</div><h1>'+escapeHTML(title)+'</h1><div class="meta"><span>'+escapeHTML(yearOf(d)||"Now")+'</span><span>★ '+Number(d.vote_average||0).toFixed(1)+'</span>'+(runtime?'<span>'+escapeHTML(runtime)+'</span>':'')+'</div></div></div>'+
+    '<div class="page-pad" style="padding-top:18px;padding-bottom:32px"><div class="section"><p style="color:#dfe5f6;line-height:1.7">'+escapeHTML(d.overview||"No synopsis available.")+'</p><div class="meta" style="margin-top:10px">'+(genres?'<span>'+escapeHTML(genres)+'</span>':'')+'</div>'+ (type==="tv"?'<div class="detail-section"><h2>Choose an episode</h2><div class="field"><label for="streamSeason">Season</label><input id="streamSeason" type="number" min="1" max="99" value="1" /></div><div class="field"><label for="streamEpisode">Episode</label><input id="streamEpisode" type="number" min="1" max="999" value="1" /></div></div>':'') +
+    '<div class="actions" style="margin-top:16px"><button class="btn btn-red" onclick="watchTitle()">▶ Watch now</button><button class="btn btn-quiet" onclick="saveCurrent()">'+(isSaved(type,id)?'✓ In My List':'+ My List')+'</button></div>' +
+    '<div class="streamsPanel"><div id="streamPanel"><p class="player-message">Select Watch now to search your configured AIOStreams sources.</p></div></div></div></div>';
+   $("detail").scrollTop=0;
+  }catch(e){
+   if(seq!==detailSeq)return;
+   $("detailContent").innerHTML='<div class="empty">'+escapeHTML(e.message)+'</div>';
+  }
 }
 function closeDetail(){
- detailSeq++;$("detail").classList.remove("open");
- currentStreams=[];activeDetail=null;
- if(lastFocus&&lastFocus.focus)lastFocus.focus({preventScroll:true});
+  detailSeq++;$("detail").classList.remove("open");
+  currentStreams=[];activeDetail=null;
+  if(lastFocus&&lastFocus.focus)lastFocus.focus({preventScroll:true});
 }
 window.addEventListener("keydown",e=>{
- if(e.key==="Escape"&&$("detail").classList.contains("open"))closeDetail();
+  if(e.key==="Escape"&&$("detail").classList.contains("open"))closeDetail();
 });
 function saveCurrent(){
- if(!activeDetail||!activeDetail.item)return;
- const result=toggleSaved(activeDetail.item,activeDetail.type);
- if(result===null)return;
- const b=$("detailContent").querySelector('button[onclick="saveCurrent()"]');
- if(b)b.textContent=result?"✓  In My List":"＋  My List";
-}function aioManifest(){
- return (localStorage.getItem("vyro_aio_url")||"").trim();
+  if(!activeDetail||!activeDetail.item)return;
+  const result=toggleSaved(activeDetail.item,activeDetail.type);
+  if(result===null)return;
+  const b=$("detailContent").querySelector('button[onclick="saveCurrent()"]');
+  if(b)b.textContent=result?"✓  In My List":"＋  My List";
 }
-
+function aioManifest(){
+  return (localStorage.getItem("vyro_aio_url")||"").trim();
+}
 function aioBase(){
- const manifest=aioManifest();
- const base=manifest.replace(/\/manifest\.json(?:\?.*)?$/i,"");
- if(!manifest||base===manifest){
-  throw Error("Enter an AIOStreams manifest URL ending in /manifest.json in Settings.");
- }
- return base;
+  const manifest=aioManifest();
+  const base=manifest.replace(/\/manifest\.json(?:\?.*)?$/i,"");
+  if(!manifest||base===manifest){
+   throw Error("Enter an AIOStreams manifest URL ending in /manifest.json in Settings.");
+  }
+  return base;
 }
-
 async function watchTitle(){
- if(!activeDetail||!activeDetail.item)return;
- const panel=$("streamPanel");
- if(!panel)return;
- panel.innerHTML=loading("Connecting to your streaming sources…");
- try{
-  const ids=await tmdb("/"+activeDetail.type+"/"+activeDetail.id+"/external_ids");
-  if(!ids.imdb_id)throw Error("No IMDb ID was returned for this title.");
-  if(activeDetail.type==="tv"){
-   currentEpisodeImdb=ids.imdb_id;
-   await loadAioEpisode(true);
-  }else{
-   await requestStreams("movie",ids.imdb_id);
-  }
- }catch(e){
-  panel.innerHTML='<p class="player-message"><strong>Could not find streams</strong><br>'+
-   escapeHTML(e.message)+
-   '</p><p class="player-message">If the request fails in the iOS app but works elsewhere, the add-on may block web requests (CORS).</p>';
- }
-}
-
-async function loadAioEpisode(alreadyHaveId=false){
- try{
-  if(!alreadyHaveId){
-   if(!activeDetail||!activeDetail.item)throw Error("Open a series first.");
-   const ids=await tmdb("/tv/"+activeDetail.id+"/external_ids");
-   currentEpisodeImdb=ids.imdb_id;
-   if(!currentEpisodeImdb)throw Error("No IMDb ID was returned for this series.");
-  }
-
-  const season=Math.max(1,Math.min(99,Number($("streamSeason")?.value)||1));
-  const episode=Math.max(1,Math.min(999,Number($("streamEpisode")?.value)||1));
-
-  await requestStreams(
-   "series",
-   currentEpisodeImdb+":"+season+":"+episode
-  );
- }catch(e){
+  if(!activeDetail||!activeDetail.item)return;
   const panel=$("streamPanel");
-  if(panel)panel.innerHTML='<p class="player-message">'+escapeHTML(e.message)+'</p>';
- }
+  if(!panel)return;
+  panel.innerHTML=loading("Connecting to your streaming sources…");
+  try{
+   const ids=await tmdb("/"+activeDetail.type+"/"+activeDetail.id+"/external_ids");
+   if(!ids.imdb_id)throw Error("No IMDb ID was returned for this title.");
+   if(activeDetail.type==="tv"){
+    currentEpisodeImdb=ids.imdb_id;
+    await loadAioEpisode(true);
+   }else{
+    await requestStreams("movie",ids.imdb_id);
+   }
+  }catch(e){
+   panel.innerHTML='<p class="player-message"><strong>Could not find streams</strong><br>'+
+    escapeHTML(e.message)+
+    '</p><p class="player-message">If the request fails in the iOS app but works elsewhere, the add-on may block web requests (CORS).</p>';
+  }
 }
+async function loadAioEpisode(alreadyHaveId=false){
+  try{
+   if(!alreadyHaveId){
+    if(!activeDetail||!activeDetail.item)throw Error("Open a series first.");
+    const ids=await tmdb("/tv/"+activeDetail.id+"/external_ids");
+    currentEpisodeImdb=ids.imdb_id;
+    if(!currentEpisodeImdb)throw Error("No IMDb ID was returned for this series.");
+   }
 
+   const season=Math.max(1,Math.min(99,Number($("streamSeason")?.value)||1));
+   const episode=Math.max(1,Math.min(999,Number($("streamEpisode")?.value)||1));
+
+   await requestStreams(
+    "series",
+    currentEpisodeImdb+":"+season+":"+episode
+   );
+  }catch(e){
+   const panel=$("streamPanel");
+   if(panel)panel.innerHTML='<p class="player-message">'+escapeHTML(e.message)+'</p>';
+  }
+}
 async function requestStreams(type,id){
- const panel=$("streamPanel");
- panel.innerHTML=loading("Looking for available sources…");
+  const panel=$("streamPanel");
+  panel.innerHTML=loading("Looking for available sources…");
 
- const url=aioBase()+"/stream/"+type+"/"+encodeURIComponent(id)+".json";
- const response=await fetch(url,{headers:{Accept:"application/json"}});
-
- if(!response.ok){
-  throw Error("AIOStreams returned HTTP "+response.status+".");
- }
-
- const data=await response.json();
- const streams=Array.isArray(data.streams)?data.streams:[];
-
- if(!streams.length){
-  panel.innerHTML='<p class="player-message"><strong>No sources found.</strong><br>Try another title or check your AIOStreams add-on configuration.</p>';
-  return;
- }
-
- currentStreams=streams;
-
- panel.innerHTML=
-  '<p class="player-message">'+streams.length+
-  ' source'+(streams.length===1?"":"s")+
-  ' found. Select a source to try playback.</p>'+
-  '<div id="streamChoices"></div><div id="playerArea"></div>';
-
- $("streamChoices").innerHTML=streams.map((s,i)=>{
-  const name=escapeHTML(s.name||s.title||("Source "+(i+1)));
-  const details=escapeHTML(
-   s.title||s.description||
-   (s.behaviorHints&&s.behaviorHints.filename)||""
-  );
-
-  if(typeof s.url==="string"&&/^https?:\/\//i.test(s.url)){
-   return '<button class="streamChoice" onclick="playStream('+i+')">▶ &nbsp; '+
-    name+'<small>'+(details||"Direct stream · Tap to play")+
-    '</small></button>';
-  }
-
-  if(typeof s.externalUrl==="string"&&/^https?:\/\//i.test(s.externalUrl)){
-   return '<button class="streamChoice" onclick="openExternal('+i+')">↗ &nbsp; '+
-    name+'<small>Open in external player or browser</small></button>';
-  }
-
-  return '<div class="streamChoice">'+name+
-   '<small>Not a direct HTTP video URL. Try an external source or another stream.</small></div>';
- }).join("");
-}
-
-function playStream(index){
- const stream=currentStreams[index];
- const area=$("playerArea");
-
- if(!stream||!stream.url||!area)return;
-
- let url;
- try{
-  url=new URL(stream.url);
-  if(!["http:","https:"].includes(url.protocol))throw Error();
- }catch{
-  area.innerHTML='<p class="player-message">This source has an invalid video URL.</p>';
-  return;
- }
-
- const shell=document.createElement("div");
- shell.className="player-shell";
-
- const video=document.createElement("video");
- video.controls=true;
- video.playsInline=true;
- video.setAttribute("playsinline","");
- video.setAttribute("webkit-playsinline","");
- video.preload="metadata";
- video.src=url.href;
-
- const message=document.createElement("p");
- message.className="player-message";
- message.textContent=
-  "If playback fails, try another source. iOS generally supports HLS (.m3u8) and common MP4 files; DRM, DASH or sources requiring special headers may not work in this player.";
-
- video.addEventListener("error",()=>{
-  message.textContent=
-   "Playback failed for this source. Try another stream or use its external link if available.";
- },{once:true});
-
- shell.appendChild(video);
- area.replaceChildren(shell,message);
-
- video.play().catch(()=>{
-  message.textContent=
-   "Tap Play on the video to start. If it still fails, try another source or an external player.";
- });
-}
-
-function openExternal(index){
- const stream=currentStreams[index];
- if(!stream||!stream.externalUrl)return;
-
- try{
-  const u=new URL(stream.externalUrl);
-  if(["https:","http:"].includes(u.protocol)){
-   window.open(u.href,"_blank","noopener,noreferrer");
-  }
- }catch{}
-}
-
-function loadSettings(){
- $("tmdbKey").value=localStorage.getItem("vyro_tmdb_key")||"";
- $("aioUrl").value=localStorage.getItem("vyro_aio_url")||"";
- $("aioMetaUrl").value=localStorage.getItem("vyro_aiometa_url")||"";
-}
-
-function saveSettings(){
- try{
-  localStorage.setItem("vyro_tmdb_key",$("tmdbKey").value.trim());
-  localStorage.setItem("vyro_aio_url",$("aioUrl").value.trim());
-  localStorage.setItem("vyro_aiometa_url",$("aioMetaUrl").value.trim());
-
-  setStatus("Settings saved on this device.");
-  $("discoverResults").dataset.loaded="";
-  loadHome();
- }catch(e){
-  setStatus("Could not save settings: "+e.message);
- }
-}
-
-async function testAio(){
- const url=$("aioUrl").value.trim();
-
- if(!url){
-  setStatus("Enter your AIOStreams manifest URL first.");
-  return;
- }
-
- setStatus("Testing manifest…");
-
- try{
+  const url=aioBase()+"/stream/"+type+"/"+encodeURIComponent(id)+".json";
   const response=await fetch(url,{headers:{Accept:"application/json"}});
-  if(!response.ok)throw Error("HTTP "+response.status);
+
+  if(!response.ok){
+   throw Error("AIOStreams returned HTTP "+response.status+".");
+  }
 
   const data=await response.json();
+  const streams=Array.isArray(data.streams)?data.streams:[];
 
-  setStatus(
-   "Manifest reachable.\n"+
-   "Name: "+(data.name||data.title||"Not specified")+"\n"+
-   "ID: "+(data.id||"Not specified")+"\n"+
-   "A reachable manifest does not guarantee each stream will play."
-  );
- }catch(e){
-  setStatus(
-   "Could not read manifest: "+e.message+
-   "\nThe server may block browser requests (CORS)."
-  );
- }
+  if(!streams.length){
+   panel.innerHTML='<p class="player-message"><strong>No sources found.</strong><br>Try another title or check your AIOStreams add-on configuration.</p>';
+   return;
+  }
+
+  currentStreams=streams;
+
+  panel.innerHTML=
+   '<p class="player-message">'+streams.length+
+   ' source'+(streams.length===1?"":"s")+
+   ' found. Select a source to try playback.</p>'+
+   '<div id="streamChoices"></div><div id="playerArea"></div>';
+
+  $("streamChoices").innerHTML=streams.map((s,i)=>{
+   const name=escapeHTML(s.name||s.title||("Source "+(i+1)));
+   const details=escapeHTML(
+    s.title||s.description||
+    (s.behaviorHints&&s.behaviorHints.filename)||""
+   );
+
+   if(typeof s.url==="string"&&/^https?:\/\//i.test(s.url)){
+    return '<button class="streamChoice" onclick="playStream('+i+')">▶ &nbsp; '+
+     name+'<small>'+(details||"Direct stream · Tap to play")+
+     '</small></button>';
+   }
+
+   if(typeof s.externalUrl==="string"&&/^https?:\/\//i.test(s.externalUrl)){
+    return '<button class="streamChoice" onclick="openExternal('+i+')">↗ &nbsp; '+
+     name+'<small>Open in external player or browser</small></button>';
+   }
+
+   return '<div class="streamChoice">'+name+
+    '<small>Not a direct HTTP video URL. Try an external source or another stream.</small></div>';
+  }).join("");
+}
+function playStream(index){
+  const stream=currentStreams[index];
+  const area=$("playerArea");
+
+  if(!stream||!stream.url||!area)return;
+
+  let url;
+  try{
+   url=new URL(stream.url);
+   if (!["http:","https:"].includes(url.protocol))throw Error();
+  }catch{
+   area.innerHTML='<p class="player-message">This source has an invalid video URL.</p>';
+   return;
+  }
+
+  const shell=document.createElement("div");
+  shell.className="player-shell";
+
+  const video=document.createElement("video");
+  video.controls=true;
+  video.playsInline=true;
+  video.setAttribute("playsinline","");
+  video.setAttribute("webkit-playsinline","");
+  video.preload="metadata";
+  video.src=url.href;
+
+  const message=document.createElement("p");
+  message.className="player-message";
+  message.textContent=
+   "If playback fails, try another source. iOS generally supports HLS (.m3u8) and common MP4 files; DRM, DASH or sources requiring special headers may not work in this player.";
+
+  video.addEventListener("error",()=>{
+   message.textContent=
+    "Playback failed for this source. Try another stream or use its external link if available.";
+  },{once:true});
+
+  shell.appendChild(video);
+  area.replaceChildren(shell,message);
+
+  video.play().catch(()=>{
+   message.textContent=
+    "Tap Play on the video to start. If it still fails, try another source or an external player.";
+  });
+}
+function openExternal(index){
+  const stream=currentStreams[index];
+  if(!stream||!stream.externalUrl)return;
+
+  try{
+   const u=new URL(stream.externalUrl);
+   if(["https:","http:"].includes(u.protocol)){
+    window.open(u.href,"_blank","noopener,noreferrer");
+   }
+  }catch{}
+}
+function loadSettings(){
+  $("tmdbKey").value=localStorage.getItem("vyro_tmdb_key")||"";
+  $("aioUrl").value=localStorage.getItem("vyro_aio_url")||"";
+  $("aioMetaUrl").value=localStorage.getItem("vyro_aiometa_url")||"";
+}
+function saveSettings(){
+  try{
+   localStorage.setItem("vyro_tmdb_key",$("tmdbKey").value.trim());
+   localStorage.setItem("vyro_aio_url",$("aioUrl").value.trim());
+   localStorage.setItem("vyro_aiometa_url",$("aioMetaUrl").value.trim());
+
+   setStatus("Settings saved on this device.");
+   $("discoverResults").dataset.loaded="";
+   loadHome();
+  }catch(e){
+   setStatus("Could not save settings: "+e.message);
+  }
+}
+async function testAio(){
+  const url=$("aioUrl").value.trim();
+
+  if(!url){
+   setStatus("Enter your AIOStreams manifest URL first.");
+   return;
+  }
+
+  setStatus("Testing manifest…");
+
+  try{
+   const response=await fetch(url,{headers:{Accept:"application/json"}});
+   if(!response.ok)throw Error("HTTP "+response.status);
+
+   const data=await response.json();
+
+   setStatus(
+    "Manifest reachable.\n"+
+    "Name: "+(data.name||data.title||"Not specified")+"\n"+
+    "ID: "+(data.id||"Not specified")+"\n"+
+    "A reachable manifest does not guarantee each stream will play."
+   );
+  }catch(e){
+   setStatus(
+    "Could not read manifest: "+e.message+
+    "\nThe server may block browser requests (CORS)."
+   );
+  }
 }
 
 loadSettings();
