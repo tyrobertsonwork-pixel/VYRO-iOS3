@@ -1,378 +1,277 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#08090d">
-<title>VYRO</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#09090f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>VYRO — Your Cinema</title>
 <style>
-:root{color-scheme:dark;--bg:#08090d;--panel:#11131b;--muted:#9296a7;--text:#f6f6fb;--accent:#a78bfa;--line:#252735}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding-bottom:100px}
-button,input{font:inherit}button{cursor:pointer}
-header{position:sticky;top:0;z-index:10;background:#08090def;backdrop-filter:blur(18px);padding:calc(env(safe-area-inset-top) + 14px) 18px 14px;border-bottom:1px solid #ffffff0c}
-.top{display:flex;align-items:center;justify-content:space-between}
-.logo{font-size:26px;font-weight:900;letter-spacing:5px}.logo span{color:var(--accent)}
-.pill{border:1px solid #343443;border-radius:22px;padding:8px 12px;background:#151620;color:white}
-main{padding:18px}h1{font-size:27px;margin:10px 0 7px;letter-spacing:-.8px}h2{font-size:20px;margin:26px 0 13px}
-p{color:var(--muted);line-height:1.5}
-.hero{min-height:340px;border-radius:25px;padding:24px;display:flex;flex-direction:column;justify-content:flex-end;position:relative;overflow:hidden;background:linear-gradient(0deg,#090a10 2%,#090a1070 58%,#17152a),radial-gradient(ellipse at 70% 25%,#7c3aed 0,#302054 25%,#10121f 66%);border:1px solid #ffffff14}
-.hero:before{content:"V";position:absolute;right:5px;top:-70px;font-size:330px;font-weight:900;color:#ffffff08;line-height:1}
-.hero>*{position:relative}.eyebrow{font-size:11px;letter-spacing:3px;color:#c4b5fd;font-weight:800}
-.hero h1{font-size:36px;max-width:270px;margin:12px 0}
-.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
-.primary,.secondary{border:0;border-radius:12px;padding:12px 17px;font-weight:750}
-.primary{background:#a78bfa;color:#100d1b}.secondary{background:#ffffff18;color:white;border:1px solid #ffffff20}
-.search{width:100%;border:1px solid var(--line);background:#12141c;color:white;padding:14px 15px;border-radius:13px;outline:none}
-.search:focus{border-color:var(--accent)}
-.chips{display:flex;gap:8px;overflow:auto;margin:15px 0}
-.chip{white-space:nowrap;background:#14151e;border:1px solid #292a39;color:#c9c9d6;padding:9px 14px;border-radius:30px}
-.chip.active{background:#a78bfa;color:#100d1b;border-color:#a78bfa}
-.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
-.card{min-width:0;cursor:pointer}.poster{aspect-ratio:2/3;border-radius:14px;background:linear-gradient(145deg,#29243e,#12131b 75%);overflow:hidden;position:relative;border:1px solid #ffffff10}
-.poster img{width:100%;height:100%;object-fit:cover;display:block}
-.poster .fallback{height:100%;display:flex;align-items:center;justify-content:center;font-size:35px;color:#a78bfa;font-weight:900}
-.rating{position:absolute;top:8px;left:8px;background:#09090dd9;border-radius:7px;padding:5px 7px;font-size:11px}
-.card h3{font-size:14px;margin:9px 0 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.card small{color:var(--muted)}
-.empty{padding:28px 15px;text-align:center;background:var(--panel);border-radius:16px;color:var(--muted);grid-column:1/-1}
-.page{display:none}.page.active{display:block}
-nav{position:fixed;z-index:20;bottom:0;left:0;right:0;padding:10px 8px calc(env(safe-area-inset-bottom) + 8px);display:flex;justify-content:space-around;background:#101118f5;border-top:1px solid #ffffff12;backdrop-filter:blur(20px)}
-nav button{background:none;border:0;color:#888b9d;display:flex;flex-direction:column;gap:5px;align-items:center;font-size:10px;min-width:55px}
-nav button b{font-size:19px;font-weight:500}nav button.active{color:#c4b5fd}
-.field{margin:18px 0}.field label{display:block;font-size:13px;margin-bottom:8px;color:#d6d5e1}
-.field input{width:100%;padding:13px;background:#12141c;border:1px solid var(--line);border-radius:11px;color:white}
-.note{font-size:12px;color:var(--muted)}
-.detail{position:fixed;inset:0;z-index:30;background:#08090d;overflow:auto;display:none;padding:20px;padding-top:calc(env(safe-area-inset-top) + 20px);padding-bottom:45px}
-.detail.open{display:block}.detail img{width:100%;max-height:45vh;object-fit:cover;border-radius:18px}
-.close{float:right;margin-bottom:14px}.status{padding:12px;background:#151620;border-radius:10px;font-size:13px;white-space:pre-wrap;overflow-wrap:anywhere}
-.streamsPanel{margin-top:22px;padding:15px;background:#11131b;border:1px solid #252735;border-radius:15px}
-.streamChoice{display:block;width:100%;text-align:left;padding:13px;margin:9px 0;border-radius:10px;border:1px solid #343443;background:#191b26;color:white;overflow-wrap:anywhere}
-.streamChoice small{display:block;color:#a5a8b7;margin-top:5px}
-.playerWrap{margin-top:14px}.playerWrap video{width:100%;max-height:55vh;background:#000;border-radius:12px}
-footer{text-align:center;padding:25px 0;color:#555869;font-size:11px}
+:root{color-scheme:dark;--bg:#09090f;--panel:#12121c;--panel2:#191925;--text:#f7f6fc;--muted:#9999ad;--accent:#b69cff;--line:#29283a;--safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth;scroll-padding-top:90px}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding-bottom:calc(95px + var(--safe-bottom));overflow-x:hidden}
+button,input,select,video{font:inherit}button{cursor:pointer;touch-action:manipulation}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+header{position:sticky;top:0;z-index:15;padding:calc(var(--safe-top) + 12px) 18px 12px;background:#09090ff2;border-bottom:1px solid #ffffff0c;backdrop-filter:blur(22px)}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px}.logo{font-size:25px;font-weight:950;letter-spacing:5px}.logo span{color:var(--accent)}
+.pill,.icon-btn{border:1px solid var(--line);border-radius:22px;padding:9px 12px;background:var(--panel);color:var(--text)}
+main{padding:18px;max-width:1150px;margin:0 auto;overflow-x:clip}
+.page{display:none;min-height:50vh}.page.active{display:block;animation:fadein .2s ease}
+@keyframes fadein{from{opacity:.6}to{opacity:1}}
+h1{font-size:29px;letter-spacing:-.8px;margin:9px 0}h2{font-size:20px;letter-spacing:-.3px;margin:27px 0 13px}
+p{color:var(--muted);line-height:1.55}
+button{border-radius:12px}
+.hero{position:relative;isolation:isolate;overflow:hidden;min-height:390px;border-radius:25px;padding:25px;display:flex;flex-direction:column;justify-content:flex-end;border:1px solid #ffffff16;background:linear-gradient(0deg,#09090f 0%,#09090fba 35%,#09090f18 100%),radial-gradient(ellipse at 70% 22%,#7250bd 0%,#30204d 28%,#141320 68%)}
+.hero:before{content:"V";position:absolute;z-index:-1;right:-8px;top:-75px;font-size:330px;font-weight:950;line-height:1;color:#ffffff09}
+.eyebrow{font-size:10px;font-weight:850;letter-spacing:3px;color:#d3c3ff}
+.hero h1{font-size:39px;line-height:1.04;max-width:300px;margin:13px 0}.hero p{max-width:290px;color:#d0cddc;margin:0}
+.actions{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin-top:18px}
+.primary,.secondary{min-height:44px;border-radius:13px;padding:12px 16px;font-weight:800;border:1px solid transparent}
+.primary{background:var(--accent);color:#171020}.secondary{background:#ffffff12;color:white;border-color:#ffffff1c}
+.search{display:block;width:100%;min-height:48px;padding:13px 15px;color:white;background:var(--panel);border:1px solid var(--line);border-radius:14px;outline:none}.search:focus{border-color:var(--accent)}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:3px 0 8px;margin:12px 0 10px;scrollbar-width:none}.chips::-webkit-scrollbar{display:none}
+.chip{flex:0 0 auto;white-space:nowrap;background:var(--panel);border:1px solid var(--line);color:#d1cede;border-radius:30px;padding:10px 15px}.chip.active{background:var(--accent);border-color:var(--accent);color:#171020;font-weight:800}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:17px 12px}
+.card{min-width:0;cursor:pointer;outline:none}.card:focus-visible .poster{outline:2px solid var(--accent);outline-offset:3px}
+.poster{aspect-ratio:2/3;position:relative;isolation:isolate;overflow:hidden;border-radius:14px;background:linear-gradient(145deg,#302744,#15151e);border:1px solid #ffffff12}
+.poster img{display:block;width:100%;height:100%;object-fit:cover;object-position:center;transition:transform .2s ease}.card:active .poster img{transform:scale(1.025)}
+.poster img.broken{display:none}.poster-fallback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 30%,#4b356a,#15151f 72%);color:#c7b4ff;font-size:40px;font-weight:950;letter-spacing:4px}
+.rating{position:absolute;top:8px;left:8px;z-index:2;background:#09090fe8;border:1px solid #ffffff12;border-radius:7px;padding:5px 7px;font-size:11px;font-weight:750}
+.card h3{font-size:14px;line-height:1.35;margin:9px 0 4px;font-weight:750;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.card small{color:var(--muted);font-size:12px}
+.empty{padding:27px 17px;text-align:center;background:var(--panel);border:1px solid #ffffff0a;border-radius:16px;color:var(--muted);grid-column:1/-1;line-height:1.55}.empty strong{display:block;color:var(--text);margin-bottom:6px}
+nav{position:fixed;z-index:25;left:0;right:0;bottom:0;display:flex;justify-content:space-around;gap:2px;padding:9px 7px calc(7px + var(--safe-bottom));background:#11111bf5;border-top:1px solid #ffffff13;backdrop-filter:blur(24px)}
+nav button{flex:1;min-width:0;min-height:48px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px;border:0;background:transparent;color:#8e8da2;font-size:10px;font-weight:650}
+nav button b{font-size:20px;line-height:1;font-weight:500}nav button.active{color:var(--accent)}
+.field{margin:18px 0}.field label{display:block;color:#e0dcea;font-size:13px;margin-bottom:8px}.field input,.field select{display:block;width:100%;min-height:46px;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--panel);color:white}
+.note{font-size:12px;color:var(--muted)}.status{padding:13px;background:var(--panel);border:1px solid var(--line);border-radius:12px;font-size:13px;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere}
+.detail{position:fixed;inset:0;z-index:40;background:var(--bg);overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;display:none;padding:calc(var(--safe-top) + 15px) 18px calc(32px + var(--safe-bottom))}
+.detail.open{display:block}.detail-inner{max-width:760px;margin:0 auto}.detail-top{display:flex;justify-content:flex-end;margin-bottom:12px}
+.detail-art{display:block;width:100%;max-height:38vh;object-fit:cover;object-position:center 25%;border-radius:19px;background:var(--panel)}
+.detail h1{font-size:32px;line-height:1.1;margin:17px 0 9px}.detail-meta{font-size:13px;color:#d0c5e7;line-height:1.6}.detail-overview{font-size:14px;line-height:1.7;color:#b8b5c6}
+.streamsPanel{margin-top:23px;padding:15px;background:var(--panel);border:1px solid var(--line);border-radius:17px;overflow-wrap:anywhere}
+.streamChoice{display:block;width:100%;text-align:left;padding:13px;margin:9px 0;border-radius:12px;border:1px solid #39364c;background:var(--panel2);color:white;overflow-wrap:anywhere;word-break:break-word}
+.streamChoice:active{border-color:var(--accent)}.streamChoice small{display:block;color:var(--muted);margin-top:5px;line-height:1.4}
+.playerWrap{margin-top:14px;scroll-margin-top:15px}.playerWrap video{display:block;width:100%;max-width:100%;max-height:65vh;aspect-ratio:16/9;object-fit:contain;background:#000;border-radius:12px}
+.player-note{font-size:12px;color:var(--muted);margin-top:9px;line-height:1.5}
+.spinner{width:24px;height:24px;border:2px solid #494258;border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px}@keyframes spin{to{transform:rotate(360deg)}}
+footer{text-align:center;padding:28px 0 8px;color:#646174;font-size:10px;letter-spacing:2px}[hidden]{display:none!important}
+@media(min-width:520px){.grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:20px 15px}.hero{min-height:430px}}
+@media(min-width:800px){main{padding:25px 28px}.grid{grid-template-columns:repeat(5,minmax(0,1fr));gap:24px 17px}.hero{min-height:470px;padding:34px}.hero h1{font-size:50px;max-width:420px}.detail{padding-left:28px;padding-right:28px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
-<header>
-  <div class="top">
-    <div class="logo">VYR<span>O</span></div>
-    <button class="pill" onclick="showPage('settings')">⚙ Settings</button>
-  </div>
-</header>
+<header><div class="top"><div class="logo">VYR<span>O</span></div><button class="pill" onclick="showPage('settings')">⚙ Settings</button></div></header>
 <main>
 <section id="home" class="page active">
-  <div class="hero">
-    <div class="eyebrow">YOUR NEXT OBSESSION</div>
-    <h1>A universe of stories.</h1>
-    <p>Discover films and series worth staying up for.</p>
-    <div class="actions">
-      <button class="primary" onclick="showPage('discover')">Explore titles ↗</button>
-      <button class="secondary" onclick="showPage('mylist')">＋ My List</button>
-    </div>
-  </div>
-  <h2>Trending now</h2>
-  <div id="trending" class="grid"><div class="empty">Add your TMDB API key in Settings to load titles.</div></div>
-  <h2>Popular series</h2>
-  <div id="popular" class="grid"><div class="empty">Your next series awaits.</div></div>
+<div class="hero"><div class="eyebrow">YOUR NEXT OBSESSION</div><h1>A universe of stories.</h1><p>Discover films and series worth staying up for.</p><div class="actions"><button class="primary" onclick="showPage('discover')">Explore titles ↗</button><button class="secondary" onclick="showPage('mylist')">＋ My List</button></div></div>
+<h2>Trending now</h2><div id="trending" class="grid"><div class="empty">Add your TMDB API key in Settings to load titles.</div></div>
+<h2>Popular series</h2><div id="popular" class="grid"><div class="empty">Your next series awaits.</div></div>
 </section>
 <section id="discover" class="page">
-  <h1>Discover</h1><p>Find your next film or series.</p>
-  <input id="searchInput" class="search" placeholder="Search movies and series…" autocomplete="off">
-  <div class="chips">
-    <button class="chip active" data-kind="movie" onclick="setKind('movie',this)">Movies</button>
-    <button class="chip" data-kind="tv" onclick="setKind('tv',this)">Series</button>
-    <button class="chip" data-kind="trending" onclick="setKind('trending',this)">Trending</button>
-  </div>
-  <div id="discoverResults" class="grid"><div class="empty">Enter a search or browse trending titles.</div></div>
+<h1>Discover</h1><p>Find your next film or series.</p>
+<input id="searchInput" class="search" placeholder="Search movies and series…" autocomplete="off" aria-label="Search movies and series">
+<div class="chips"><button class="chip active" onclick="setKind('movie',this)">Movies</button><button class="chip" onclick="setKind('tv',this)">Series</button><button class="chip" onclick="setKind('trending',this)">Trending</button></div>
+<div id="discoverResults" class="grid"><div class="empty">Enter a search or browse trending titles.</div></div>
 </section>
-<section id="mylist" class="page">
-  <h1>My List</h1><p>Your saved movies and series, stored on this device.</p>
-  <div id="savedResults" class="grid"></div>
-</section>
-<section id="series" class="page">
-  <h1>Series</h1><p>Find your next binge-worthy show.</p>
-  <div id="seriesResults" class="grid"></div>
-</section>
+<section id="mylist" class="page"><h1>My List</h1><p>Your saved titles, stored on this device.</p><div id="savedResults" class="grid"></div></section>
+<section id="series" class="page"><h1>Series</h1><p>Find your next binge-worthy show.</p><div id="seriesResults" class="grid"></div></section>
 <section id="settings" class="page">
-  <h1>Settings</h1><p>Configure VYRO's catalogue and streaming integration.</p>
-  <div class="field">
-    <label for="tmdbKey">TMDB API key</label>
-    <input id="tmdbKey" type="password" placeholder="Enter your TMDB API key">
-    <p class="note">Your key is saved locally on this device.</p>
-  </div>
-  <div class="field">
-    <label for="aioUrl">AIOStreams manifest URL</label>
-    <input id="aioUrl" type="url" placeholder="https://your-config.example/manifest.json">
-    <p class="note">Keep this personal configuration URL private.</p>
-  </div>
-  <div class="field">
-    <label for="aioMetaUrl">AIOMetadata manifest URL (optional)</label>
-    <input id="aioMetaUrl" type="url" placeholder="Paste your AIOMetadata manifest URL">
-  </div>
-  <div class="actions">
-    <button class="primary" onclick="saveSettings()">Save settings</button>
-    <button class="secondary" onclick="testAio()">Test manifest</button>
-  </div>
-  <h2>Connection status</h2><div id="connectionStatus" class="status">Not tested.</div>
-  <h2>About VYRO</h2><p>VYRO is a cinematic catalogue prototype with TMDB discovery and AIOStreams integration.</p>
+<h1>Settings</h1><p>Configure your catalogue and streaming sources.</p>
+<div class="field"><label for="tmdbKey">TMDB API key</label><input id="tmdbKey" type="password" autocomplete="off" placeholder="Enter your TMDB API key"><p class="note">Stored locally on this device.</p></div>
+<div class="field"><label for="aioUrl">AIOStreams manifest URL</label><input id="aioUrl" type="url" autocomplete="off" placeholder="https://…/manifest.json"><p class="note">Keep your personal configuration URL private.</p></div>
+<div class="field"><label for="aioMetaUrl">AIOMetadata manifest URL (optional)</label><input id="aioMetaUrl" type="url" autocomplete="off" placeholder="Paste your AIOMetadata manifest URL"><p class="note">Saved for future integration; not used to enrich titles in this version.</p></div>
+<div class="actions"><button class="primary" onclick="saveSettings()">Save settings</button><button class="secondary" onclick="testAio()">Test manifest</button></div>
+<h2>Connection status</h2><div id="connectionStatus" class="status" role="status" aria-live="polite">Not tested yet.</div>
+<h2>About VYRO</h2><p>VYRO brings film and series discovery into one cinematic interface.</p><p class="note">Playback depends on source format, network permissions and iOS compatibility.</p>
 </section>
 <footer>VYRO · YOUR CINEMA, REIMAGINED</footer>
 </main>
-<nav>
-  <button class="active" data-page="home" onclick="showPage('home')"><b>⌂</b>Home</button>
-  <button data-page="discover" onclick="showPage('discover')"><b>⌕</b>Discover</button>
-  <button data-page="mylist" onclick="showPage('mylist')"><b>♡</b>My List</button>
-  <button data-page="series" onclick="showPage('series')"><b>▤</b>Series</button>
-  <button data-page="settings" onclick="showPage('settings')"><b>⚙</b>Settings</button>
+<nav aria-label="Main navigation">
+<button class="active" data-page="home" onclick="showPage('home')"><b>⌂</b>Home</button>
+<button data-page="discover" onclick="showPage('discover')"><b>⌕</b>Discover</button>
+<button data-page="mylist" onclick="showPage('mylist')"><b>♡</b>My List</button>
+<button data-page="series" onclick="showPage('series')"><b>▤</b>Series</button>
+<button data-page="settings" onclick="showPage('settings')"><b>⚙</b>Settings</button>
 </nav>
-<div id="detail" class="detail">
-  <button class="secondary close" onclick="closeDetail()">✕ Close</button>
-  <div id="detailContent"></div>
-</div>
+<div id="detail" class="detail" role="dialog" aria-modal="true" aria-label="Title details"><div class="detail-inner"><div class="detail-top"><button class="secondary" onclick="closeDetail()">✕ Close</button></div><div id="detailContent"></div></div></div>
 <script>
+"use strict";
 const $ = id => document.getElementById(id);
-const read = (key, fallback) => {
-  try { return JSON.parse(localStorage.getItem(key)) ?? fallback; }
-  catch { return fallback; }
-};
-let currentKind = "movie";
-let activeDetail = null;
-window.vyroStreams = [];
-
-function showPage(name) {
-  document.querySelectorAll(".page").forEach(p => p.classList.toggle("active", p.id === name));
-  document.querySelectorAll("nav button").forEach(b => b.classList.toggle("active", b.dataset.page === name));
-  if (name === "mylist") renderSaved();
-  if (name === "series") loadSeries();
-  if (name === "discover" && !$("discoverResults").dataset.loaded) loadTrending("discoverResults");
-  window.scrollTo(0,0);
-}
+const safeRead = (key, fallback) => { try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; } };
+let currentKind="movie",activeDetail=null,searchTimer=null,searchSequence=0,requestSequence=0,currentStreams=[],currentEpisodeImdb="",lastFocusedElement=null;
+function escapeHTML(value){return String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
 function getKey(){return localStorage.getItem("vyro_tmdb_key")||"";}
-async function api(path) {
-  const key=getKey();
-  if(!key) throw new Error("Add your TMDB API key in Settings first.");
-  const response=await fetch("https://api.themoviedb.org/3"+path+(path.includes("?")?"&":"?")+"api_key="+encodeURIComponent(key));
-  if(!response.ok) throw new Error("TMDB request failed ("+response.status+"). Check your API key.");
-  return response.json();
-}
-function posterUrl(path){return path?"https://image.tmdb.org/t/p/w500"+path:"";}
-function titleOf(item){return item.title||item.name||"Untitled";}
+function titleOf(item){return item.title||item.name||item.original_title||item.original_name||"Untitled";}
 function yearOf(item){return (item.release_date||item.first_air_date||"").slice(0,4)||"Year unknown";}
-function esc(value){return String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
-function cardHtml(item) {
-  const type=item.media_type||item._kind||currentKind;
-  const poster=posterUrl(item.poster_path);
-  return `<article class="card" onclick="openDetail('${type}',${Number(item.id)})">
-    <div class="poster">${poster?`<img loading="lazy" src="${poster}" alt="${esc(titleOf(item))}" onerror="this.remove()">`:`<div class="fallback">V</div>`}
-    <span class="rating">★ ${Number(item.vote_average||0).toFixed(1)}</span></div>
-    <h3>${esc(titleOf(item))}</h3><small>${esc(yearOf(item))}</small>
-  </article>`;
+function posterUrl(path,size="w500"){return path&&typeof path==="string"?"https://image.tmdb.org/t/p/"+size+path:"";}
+function mediaType(item){const type=item.media_type||item._kind||item.type||currentKind;return type==="tv"||type==="series"?"tv":"movie";}
+function loadingHTML(message){return '<div class="empty"><div class="spinner"></div>'+escapeHTML(message)+'</div>';}
+async function api(path){
+const key=getKey();if(!key)throw new Error("Add your TMDB API key in Settings first.");
+const sep=path.includes("?")?"&":"?";
+const response=await fetch("https://api.themoviedb.org/3"+path+sep+"api_key="+encodeURIComponent(key),{headers:{Accept:"application/json"}});
+if(!response.ok){if(response.status===401)throw new Error("TMDB rejected the API key. Check Settings.");throw new Error("TMDB request failed (HTTP "+response.status+").");}
+return response.json();
 }
-function renderCards(target,items) {
-  $(target).innerHTML=items.length?items.map(cardHtml).join(""):`<div class="empty">Nothing to show yet.</div>`;
+function cardHtml(item){
+const type=mediaType(item),id=Number(item.id),title=titleOf(item),poster=posterUrl(item.poster_path),rating=Number(item.vote_average||0);
+const image=poster?'<img loading="lazy" decoding="async" src="'+poster+'" alt="Poster for '+escapeHTML(title)+'" onerror="this.classList.add(\'broken\');const f=this.parentElement.querySelector(\'.poster-fallback\');if(f)f.hidden=false"><div class="poster-fallback" hidden>V</div>':'<div class="poster-fallback">V</div>';
+return '<article class="card" role="button" tabindex="0" aria-label="Open '+escapeHTML(title)+'" onclick="openDetail(\''+type+'\','+id+')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();openDetail(\''+type+'\','+id+')}"><div class="poster">'+image+'<span class="rating">★ '+(Number.isFinite(rating)?rating.toFixed(1):"—")+'</span></div><h3>'+escapeHTML(title)+'</h3><small>'+escapeHTML(yearOf(item))+'</small></article>';
 }
-async function loadTrending(target) {
-  $(target).innerHTML='<div class="empty">Loading titles…</div>';
-  try {
-    const data=await api("/trending/all/week");
-    renderCards(target,data.results.filter(x=>x.media_type!=="person").slice(0,12));
-    if(target==="discoverResults") $("discoverResults").dataset.loaded="1";
-  } catch(e) {$(target).innerHTML=`<div class="empty">${esc(e.message)}</div>`;}
+function renderCards(target,items,emptyMessage="Nothing to show yet."){const el=$(target);if(!el)return;if(!items||!items.length){el.innerHTML='<div class="empty">'+escapeHTML(emptyMessage)+'</div>';return;}el.innerHTML=items.map(cardHtml).join("");}
+function showPage(name){
+if(!$(name))return;
+document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active",p.id===name));
+document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===name));
+if(name==="mylist")renderSaved();
+if(name==="series"&&!$("seriesResults").dataset.loaded)loadSeries();
+if(name==="discover"&&!$("discoverResults").dataset.loaded)loadTrending("discoverResults");
+window.scrollTo({top:0,behavior:"auto"});
 }
-async function loadHome() {
-  if(!getKey()) return;
-  try {
-    const data=await api("/trending/movie/week");
-    renderCards("trending",data.results.slice(0,6).map(x=>({...x,_kind:"movie"})));
-  } catch(e) { $("trending").innerHTML=`<div class="empty">${esc(e.message)}</div>`; }
-  try {
-    const data=await api("/tv/popular");
-    renderCards("popular",data.results.slice(0,6).map(x=>({...x,_kind:"tv"})));
-  } catch(e) {}
+async function loadTrending(target){
+const el=$(target);el.innerHTML=loadingHTML("Loading trending titles…");
+try{const data=await api("/trending/all/week");renderCards(target,(data.results||[]).filter(x=>x.media_type!=="person").slice(0,target==="discoverResults"?30:12),"No trending titles were returned.");if(target==="discoverResults")el.dataset.loaded="1";}
+catch(e){el.innerHTML='<div class="empty"><strong>Could not load titles</strong>'+escapeHTML(e.message)+'</div>';}
 }
-async function loadSeries() {
-  $("seriesResults").innerHTML='<div class="empty">Loading series…</div>';
-  try {
-    const data=await api("/tv/popular");
-    renderCards("seriesResults",data.results.slice(0,20).map(x=>({...x,_kind:"tv"})));
-  } catch(e) {$("seriesResults").innerHTML=`<div class="empty">${esc(e.message)}</div>`;}
+async function loadHome(){
+if(!getKey())return;
+$("trending").innerHTML=loadingHTML("Loading films…");$("popular").innerHTML=loadingHTML("Loading series…");
+try{const d=await api("/trending/movie/week");renderCards("trending",(d.results||[]).slice(0,6).map(x=>({...x,_kind:"movie"})));}
+catch(e){$("trending").innerHTML='<div class="empty">'+escapeHTML(e.message)+'</div>';}
+try{const d=await api("/tv/popular");renderCards("popular",(d.results||[]).slice(0,6).map(x=>({...x,_kind:"tv"})));}
+catch(e){$("popular").innerHTML='<div class="empty">'+escapeHTML(e.message)+'</div>';}
 }
-function setKind(kind,button) {
-  currentKind=kind;
-  document.querySelectorAll(".chip").forEach(c=>c.classList.toggle("active",c===button));
-  if(kind==="trending") loadTrending("discoverResults");
-  else if($("searchInput").value.trim()) searchTitles();
-  else $("discoverResults").innerHTML=`<div class="empty">Search for a ${kind==="tv"?"series":"movie"} above.</div>`;
+async function loadSeries(){
+const el=$("seriesResults");el.innerHTML=loadingHTML("Loading popular series…");
+try{const d=await api("/tv/popular");renderCards("seriesResults",(d.results||[]).slice(0,30).map(x=>({...x,_kind:"tv"})),"No series found.");el.dataset.loaded="1";}
+catch(e){el.innerHTML='<div class="empty"><strong>Could not load series</strong>'+escapeHTML(e.message)+'</div>';}
 }
-let searchTimer;
+function setKind(kind,button){
+currentKind=kind;document.querySelectorAll(".chip").forEach(c=>c.classList.toggle("active",c===button));$("discoverResults").dataset.loaded="";
+if(kind==="trending"&&!$("searchInput").value.trim())loadTrending("discoverResults");
+else if($("searchInput").value.trim())searchTitles();
+else $("discoverResults").innerHTML='<div class="empty">Search for a '+(kind==="tv"?"series":"movie")+' above.</div>';
+}
 $("searchInput").addEventListener("input",()=>{clearTimeout(searchTimer);searchTimer=setTimeout(searchTitles,350);});
-async function searchTitles() {
-  const query=$("searchInput").value.trim();
-  if(currentKind==="trending"&&!query) return loadTrending("discoverResults");
-  if(!query){$("discoverResults").innerHTML='<div class="empty">Enter a title to search.</div>';return;}
-  $("discoverResults").innerHTML='<div class="empty">Searching…</div>';
-  try {
-    const endpoint=currentKind==="tv"?"/search/tv":currentKind==="movie"?"/search/movie":"/search/multi";
-    const data=await api(endpoint+"?query="+encodeURIComponent(query));
-    const items=data.results.filter(x=>x.media_type!=="person").slice(0,30).map(x=>({...x,_kind:x.media_type||currentKind}));
-    renderCards("discoverResults",items);
-  } catch(e) {$("discoverResults").innerHTML=`<div class="empty">${esc(e.message)}</div>`;}
+async function searchTitles(){
+const seq=++searchSequence,q=$("searchInput").value.trim();
+if(!q){if(currentKind==="trending")return loadTrending("discoverResults");$("discoverResults").innerHTML='<div class="empty">Enter a title to search.</div>';return;}
+$("discoverResults").innerHTML=loadingHTML("Searching…");
+try{
+const endpoint=currentKind==="tv"?"/search/tv":currentKind==="movie"?"/search/movie":"/search/multi";
+const d=await api(endpoint+"?query="+encodeURIComponent(q));if(seq!==searchSequence)return;
+const items=(d.results||[]).filter(x=>x.media_type!=="person").slice(0,40).map(x=>({...x,_kind:x.media_type||currentKind}));
+renderCards("discoverResults",items,"No matching titles found.");$("discoverResults").dataset.loaded="1";
+}catch(e){if(seq!==searchSequence)return;$("discoverResults").innerHTML='<div class="empty"><strong>Search failed</strong>'+escapeHTML(e.message)+'</div>';}
 }
-function savedItems(){return read("vyro_saved",[]);}
-function isSaved(type,id){return savedItems().some(x=>x.id===id&&x.type===type);}
-function toggleSaved(item,type) {
-  let list=savedItems();
-  if(list.some(x=>x.id===item.id&&x.type===type)) list=list.filter(x=>!(x.id===item.id&&x.type===type));
-  else list.unshift({...item,type});
-  localStorage.setItem("vyro_saved",JSON.stringify(list));renderSaved();
+function savedItems(){const x=safeRead("vyro_saved",[]);return Array.isArray(x)?x:[];}
+function isSaved(type,id){return savedItems().some(x=>Number(x.id)===Number(id)&&x.type===type);}
+function toggleSaved(item,type){
+let list=savedItems();const exists=list.some(x=>Number(x.id)===Number(item.id)&&x.type===type);
+if(exists)list=list.filter(x=>!(Number(x.id)===Number(item.id)&&x.type===type));else list.unshift({...item,type});
+try{localStorage.setItem("vyro_saved",JSON.stringify(list));}catch(e){alert("VYRO couldn't save this title on your device.");return null;}
+renderSaved();return !exists;
 }
-function renderSaved() {
-  const items=savedItems();
-  $("savedResults").innerHTML=items.length?items.map(item=>cardHtml({...item,media_type:item.type})).join(""):`<div class="empty">Your list is empty.<br><br>Open a title and tap “Add to My List”.</div>`;
+function renderSaved(){
+const items=savedItems();
+if(!items.length){$("savedResults").innerHTML='<div class="empty"><strong>Your list is waiting</strong>Open a title and add it to My List to keep it here.</div>';return;}
+$("savedResults").innerHTML=items.map(x=>cardHtml({...x,media_type:x.type||"movie"})).join("");
 }
-async function openDetail(type,id) {
-  activeDetail={type,id};
-  $("detail").classList.add("open");
-  $("detailContent").innerHTML='<div class="empty">Loading title…</div>';
-  try {
-    const data=await api(`/${type}/${id}`);
-    activeDetail.item=data;
-    const poster=posterUrl(data.backdrop_path||data.poster_path);
-    $("detailContent").innerHTML=`
-      ${poster?`<img src="${poster}" alt="">`:""}
-      <div class="eyebrow">${type==="tv"?"SERIES":"MOVIE"} · ${esc(yearOf(data))}</div>
-      <h1>${esc(titleOf(data))}</h1>
-      <p>★ ${Number(data.vote_average||0).toFixed(1)} · ${esc((data.genres||[]).map(g=>g.name).join(" · "))}</p>
-      <p>${esc(data.overview||"No description available.")}</p>
-      <div class="actions">
-        <button class="primary" onclick="watchPlaceholder()">▶ Watch now</button>
-        <button class="secondary" onclick="saveCurrent()">＋ Add to My List</button>
-      </div>
-      <div id="streamPanel" class="streamsPanel"><p class="note">Tap Watch Now to find available streams.</p></div>`;
-  } catch(e) {$("detailContent").innerHTML=`<div class="empty">${esc(e.message)}</div>`;}
+async function openDetail(type,id){
+lastFocusedElement=document.activeElement;const seq=++requestSequence;activeDetail={type,id,item:null};currentStreams=[];
+$("detail").classList.add("open");$("detail").scrollTop=0;$("detailContent").innerHTML=loadingHTML("Loading title details…");
+try{
+const d=await api("/"+type+"/"+Number(id));if(seq!==requestSequence)return;activeDetail.item=d;
+const art=posterUrl(d.backdrop_path||d.poster_path,"w780"),title=titleOf(d),genres=(d.genres||[]).map(x=>x.name).join(" · "),saved=isSaved(type,id);
+$("detailContent").innerHTML=(art?'<img class="detail-art" src="'+art+'" alt="Artwork for '+escapeHTML(title)+'" onerror="this.style.display=\'none\'">':"")+
+'<div class="eyebrow" style="margin-top:18px">'+(type==="tv"?"SERIES":"MOVIE")+' · '+escapeHTML(yearOf(d))+'</div>'+
+'<h1>'+escapeHTML(title)+'</h1><div class="detail-meta">★ '+Number(d.vote_average||0).toFixed(1)+(genres?' &nbsp;·&nbsp; '+escapeHTML(genres):"")+'</div>'+
+'<p class="detail-overview">'+escapeHTML(d.overview||"No description available.")+'</p>'+
+'<div class="actions"><button class="primary" onclick="watchTitle()">▶ Watch now</button><button class="secondary" onclick="saveCurrent()">'+(saved?"✓ In My List":"＋ Add to My List")+'</button></div>'+
+'<div id="streamPanel" class="streamsPanel"><p class="note">Tap Watch now to search your configured streaming sources.</p></div>';
+$("detail").scrollTop=0;
+}catch(e){if(seq!==requestSequence)return;$("detailContent").innerHTML='<div class="empty"><strong>Could not open this title</strong>'+escapeHTML(e.message)+'</div>';}
 }
-function closeDetail(){$("detail").classList.remove("open");}
-function saveCurrent() {
-  if(!activeDetail||!activeDetail.item)return;
-  const wasSaved=isSaved(activeDetail.type,activeDetail.id);
-  toggleSaved(activeDetail.item,activeDetail.type);
-  alert(wasSaved?"Removed from My List.":"Saved to My List.");
+function closeDetail(){requestSequence++;$("detail").classList.remove("open");currentStreams=[];activeDetail=null;if(lastFocusedElement&&typeof lastFocusedElement.focus==="function")lastFocusedElement.focus({preventScroll:true});}
+window.addEventListener("keydown",e=>{if(e.key==="Escape"&&$("detail").classList.contains("open"))closeDetail();});
+function saveCurrent(){
+if(!activeDetail||!activeDetail.item)return;
+const saved=toggleSaved(activeDetail.item,activeDetail.type);if(saved===null)return;
+const b=$("detailContent").querySelector("button[onclick='saveCurrent()']");if(b)b.textContent=saved?"✓ In My List":"＋ Add to My List";
 }
-
-/* AIOStreams: manifest test and stream request */
-function getAioBase() {
-  const manifest=(localStorage.getItem("vyro_aio_url")||"").trim();
-  const base=manifest.replace(/\/manifest\.json(?:\?.*)?$/i,"");
-  if(!manifest||base===manifest) throw new Error("Your AIOStreams URL must end with /manifest.json.");
-  return base;
+function getAioBase(){
+const manifest=(localStorage.getItem("vyro_aio_url")||"").trim(),base=manifest.replace(/\/manifest\.json(?:\?.*)?$/i,"");
+if(!manifest||base===manifest)throw new Error("Your AIOStreams URL must end with /manifest.json.");
+return base;
 }
-async function watchPlaceholder() {
-  const panel=$("streamPanel");
-  if(!panel||!activeDetail||!activeDetail.item)return;
-  panel.innerHTML="<p>Finding available streams…</p>";
-  try {
-    const ids=await api(`/${activeDetail.type}/${activeDetail.id}/external_ids`);
-    if(!ids.imdb_id) throw new Error("No IMDb ID was returned for this title.");
-    if(activeDetail.type==="tv") {
-      window.vyroCurrentImdb=ids.imdb_id;
-      panel.innerHTML=`
-        <h2>Choose episode</h2>
-        <div class="field"><label for="streamSeason">Season</label><input id="streamSeason" type="number" min="1" value="1"></div>
-        <div class="field"><label for="streamEpisode">Episode</label><input id="streamEpisode" type="number" min="1" value="1"></div>
-        <button class="primary" onclick="loadAioEpisode()">Find episode streams</button>
-        <div id="streamChoices"></div><div id="vyroPlayer"></div>`;
-    } else {
-      await requestAioStreams("movie",ids.imdb_id);
-    }
-  } catch(e) {
-    panel.innerHTML=`<p>Could not request streams: ${esc(e.message)}</p><p class="note">If this is a network or CORS error, the add-on may require a compatible proxy.</p>`;
-  }
+async function watchTitle(){
+const panel=$("streamPanel");if(!panel||!activeDetail||!activeDetail.item)return;
+panel.innerHTML=loadingHTML("Finding available streams…");
+try{
+const ids=await api("/"+activeDetail.type+"/"+activeDetail.id+"/external_ids");
+if(!ids.imdb_id)throw new Error("TMDB did not return an IMDb ID for this title.");
+if(activeDetail.type==="tv"){
+currentEpisodeImdb=ids.imdb_id;
+panel.innerHTML='<h2>Choose episode</h2><div class="field"><label for="streamSeason">Season</label><input id="streamSeason" type="number" min="1" max="99" value="1"></div><div class="field"><label for="streamEpisode">Episode</label><input id="streamEpisode" type="number" min="1" max="999" value="1"></div><button class="primary" onclick="loadAioEpisode()">Find episode streams</button><div id="streamChoices"></div><div id="vyroPlayer" class="playerWrap"></div>';
+}else await requestAioStreams("movie",ids.imdb_id);
+}catch(e){panel.innerHTML='<p><strong>Could not find streams</strong></p><p class="note">'+escapeHTML(e.message)+'</p><p class="player-note">If this is a network or CORS error, the add-on server may not allow requests from this app.</p>';}
 }
-async function loadAioEpisode() {
-  try {
-    const season=Math.max(1,Number($("streamSeason").value)||1);
-    const episode=Math.max(1,Number($("streamEpisode").value)||1);
-    await requestAioStreams("series",`${window.vyroCurrentImdb}:${season}:${episode}`);
-  } catch(e) {
-    const choices=$("streamChoices");
-    if(choices) choices.innerHTML=`<p>${esc(e.message)}</p>`;
-  }
+async function loadAioEpisode(){
+try{const s=Math.max(1,Math.min(99,Number($("streamSeason").value)||1)),e=Math.max(1,Math.min(999,Number($("streamEpisode").value)||1));await requestAioStreams("series",currentEpisodeImdb+":"+s+":"+e);}
+catch(err){const c=$("streamChoices");if(c)c.innerHTML='<p class="player-note">'+escapeHTML(err.message)+'</p>';}
 }
-async function requestAioStreams(type,id) {
-  const base=getAioBase();
-  const panel=$("streamPanel");
-  panel.innerHTML='<p>Loading streams…</p>';
-  const endpoint=`${base}/stream/${type}/${encodeURIComponent(id)}.json`;
-  const response=await fetch(endpoint);
-  if(!response.ok) throw new Error(`AIOStreams returned HTTP ${response.status}.`);
-  const data=await response.json();
-  const streams=Array.isArray(data.streams)?data.streams:[];
-  if(!streams.length) {
-    panel.innerHTML='<p>No streams were returned for this title.</p><p class="note">Check your add-on configuration or try another title.</p>';
-    return;
-  }
-  window.vyroStreams=streams;
-  panel.innerHTML=`<h2>Available streams (${streams.length})</h2><div id="streamChoices"></div><div id="vyroPlayer" class="playerWrap"></div>`;
-  $("streamChoices").innerHTML=streams.map((s,i)=>{
-    const label=esc(s.name||s.title||`Stream ${i+1}`);
-    const description=esc(s.title||s.description||s.behaviorHints?.filename||"");
-    if(typeof s.url==="string"&&/^https?:\/\//i.test(s.url)) {
-      return `<button class="streamChoice" onclick="playAioStream(${i})">${label}<small>${description}</small></button>`;
-    }
-    if(typeof s.externalUrl==="string"&&/^https?:\/\//i.test(s.externalUrl)) {
-      return `<button class="streamChoice" onclick="openAioExternal(${i})">${label}<small>Open external source</small></button>`;
-    }
-    return `<div class="streamChoice">${label}<small>This source is not a direct video URL.</small></div>`;
-  }).join("");
+async function requestAioStreams(type,id){
+const base=getAioBase(),panel=$("streamPanel");panel.innerHTML=loadingHTML("Loading available sources…");
+const response=await fetch(base+"/stream/"+type+"/"+encodeURIComponent(id)+".json",{headers:{Accept:"application/json"}});
+if(!response.ok)throw new Error("AIOStreams returned HTTP "+response.status+".");
+const data=await response.json(),streams=Array.isArray(data.streams)?data.streams:[];
+if(!streams.length){panel.innerHTML='<p><strong>No streams found</strong></p><p class="player-note">Try another title or check which sources are enabled in your add-on configuration.</p>';return;}
+currentStreams=streams;
+panel.innerHTML='<h2>Available sources ('+streams.length+')</h2><div id="streamChoices"></div><div id="vyroPlayer" class="playerWrap"></div>';
+$("streamChoices").innerHTML=streams.map((s,i)=>{
+const label=escapeHTML(s.name||s.title||("Source "+(i+1))),desc=escapeHTML(s.title||s.description||(s.behaviorHints&&s.behaviorHints.filename)||"");
+if(typeof s.url==="string"&&/^https?:\/\//i.test(s.url))return '<button class="streamChoice" onclick="playAioStream('+i+')">'+label+'<small>'+(desc||"Tap to try playback")+'</small></button>';
+if(typeof s.externalUrl==="string"&&/^https?:\/\//i.test(s.externalUrl))return '<button class="streamChoice" onclick="openAioExternal('+i+')">'+label+'<small>Open external source</small></button>';
+return '<div class="streamChoice">'+label+'<small>This source does not expose a direct video URL supported by this player.</small></div>';
+}).join("");
 }
-function playAioStream(index) {
-  const stream=window.vyroStreams[index];
-  const player=$("vyroPlayer");
-  if(!stream||!stream.url||!player)return;
-  const video=document.createElement("video");
-  video.controls=true;
-  video.playsInline=true;
-  video.setAttribute("playsinline","");
-  video.preload="metadata";
-  video.src=stream.url;
-  player.replaceChildren(video);
-  video.play().catch(()=>{});
+function playAioStream(index){
+const s=currentStreams[index],player=$("vyroPlayer");if(!s||!s.url||!player)return;
+const video=document.createElement("video");video.controls=true;video.playsInline=true;video.setAttribute("playsinline","");video.preload="metadata";video.src=s.url;
+video.addEventListener("error",()=>{const p=document.createElement("p");p.className="player-note";p.textContent="This source could not play in the built-in iPhone player. Try another source.";player.append(p);},{once:true});
+player.replaceChildren(video);
+video.play().catch(()=>{const p=document.createElement("p");p.className="player-note";p.textContent="Tap the play button on the video to start playback.";player.append(p);});
 }
-function openAioExternal(index) {
-  const stream=window.vyroStreams[index];
-  if(stream?.externalUrl) window.open(stream.externalUrl,"_blank","noopener");
-}
-function saveSettings() {
-  localStorage.setItem("vyro_tmdb_key",$("tmdbKey").value.trim());
-  localStorage.setItem("vyro_aio_url",$("aioUrl").value.trim());
-  localStorage.setItem("vyro_aiometa_url",$("aioMetaUrl").value.trim());
-  $("connectionStatus").textContent="Settings saved on this device.";
-  loadHome();
-  alert("Settings saved.");
-}
-async function testAio() {
-  const url=$("aioUrl").value.trim();
-  if(!url){$("connectionStatus").textContent="Enter your AIOStreams manifest URL first.";return;}
-  $("connectionStatus").textContent="Testing manifest…";
-  try {
-    const response=await fetch(url);
-    if(!response.ok) throw new Error("HTTP "+response.status);
-    const data=await response.json();
-    $("connectionStatus").textContent="Manifest reachable.\nName: "+(data.name||data.title||"Not specified")+"\nID: "+(data.id||"Not specified")+"\nStream requests and playback are separate from this test.";
-  } catch(e) {
-    $("connectionStatus").textContent="Could not read manifest: "+e.message+"\nThe server may block requests from the app (CORS).";
-  }
-}
-function loadSavedSettings() {
-  $("tmdbKey").value=localStorage.getItem("vyro_tmdb_key")||"";
-  $("aioUrl").value=localStorage.getItem("vyro_aio_url")||"";
-  $("aioMetaUrl").value=localStorage.getItem("vyro_aiometa_url")||"";
-}
-loadSavedSettings();
-renderSaved();
+function openAioExternal(index){const s=currentStreams[index];if(s&&s.externalUrl&&/^https?:\/\//i.test(s.externalUrl))window.open(s.externalUrl,"_blank","noopener,noreferrer");}
+function saveSettings(){
+try{
+localStorage.setItem("vyro_tmdb_key",$("tmdbKey").value.trim());
+localStorage.setItem("vyro_aio_url",$("aioUrl").value.trim());
+localStorage.setItem("vyro_aiometa_url",$("aioMetaUrl").value.trim());
+$("connectionStatus").textContent="Settings saved on this device.";
+$("discoverResults").dataset.loaded="";$("seriesResults").dataset.loaded="";
 loadHome();
+}catch(e){$("connectionStatus").textContent="Could not save settings: "+e.message;}
+}
+async function testAio(){
+const url=$("aioUrl").value.trim();if(!url){$("connectionStatus").textContent="Enter your AIOStreams manifest URL first.";return;}
+$("connectionStatus").textContent="Testing manifest…";
+try{
+const response=await fetch(url,{headers:{Accept:"application/json"}});
+if(!response.ok)throw new Error("HTTP "+response.status);
+const d=await response.json();
+$("connectionStatus").textContent="Manifest reachable.\nName: "+(d.name||d.title||"Not specified")+"\nID: "+(d.id||"Not specified")+"\nThis confirms the manifest can be read; it does not guarantee every stream can play.";
+}catch(e){$("connectionStatus").textContent="Could not read manifest: "+e.message+"\nThe server may block requests from this app (CORS).";}
+}
+function loadSavedSettings(){
+$("tmdbKey").value=localStorage.getItem("vyro_tmdb_key")||"";
+$("aioUrl").value=localStorage.getItem("vyro_aio_url")||"";
+$("aioMetaUrl").value=localStorage.getItem("vyro_aiometa_url")||"";
+}
+loadSavedSettings();renderSaved();loadHome();
 </script>
 </body>
 </html>
