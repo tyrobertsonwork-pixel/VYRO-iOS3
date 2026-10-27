@@ -1,0 +1,389 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#08090d">
+<title>VYRO</title>
+<style>
+:root{color-scheme:dark;--bg:#08090d;--panel:#11131b;--muted:#9296a7;--text:#f6f6fb;--accent:#a78bfa;--line:#252735}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding-bottom:100px}
+button,input{font:inherit}
+button{cursor:pointer}
+header{position:sticky;top:0;z-index:10;background:#08090deF;backdrop-filter:blur(18px);padding:calc(env(safe-area-inset-top) + 14px) 18px 14px;border-bottom:1px solid #ffffff0c}
+.top{display:flex;align-items:center;justify-content:space-between}
+.logo{font-size:26px;font-weight:900;letter-spacing:5px}
+.logo span{color:var(--accent)}
+.pill{border:1px solid #343443;border-radius:22px;padding:8px 12px;background:#151620;color:white}
+main{padding:18px}
+h1{font-size:27px;margin:10px 0 7px;letter-spacing:-.8px}
+h2{font-size:20px;margin:26px 0 13px}
+p{color:var(--muted);line-height:1.5}
+.hero{min-height:340px;border-radius:25px;padding:24px;display:flex;flex-direction:column;justify-content:flex-end;position:relative;overflow:hidden;background:linear-gradient(0deg,#090a10 2%,#090a1070 58%,#17152a),radial-gradient(ellipse at 70% 25%,#7c3aed 0,#302054 25%,#10121f 66%);border:1px solid #ffffff14}
+.hero:before{content:"V";position:absolute;right:5px;top:-70px;font-size:330px;font-weight:900;color:#ffffff08;line-height:1}
+.hero>*{position:relative}
+.eyebrow{font-size:11px;letter-spacing:3px;color:#c4b5fd;font-weight:800}
+.hero h1{font-size:36px;max-width:270px;margin:12px 0}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.primary,.secondary{border:0;border-radius:12px;padding:12px 17px;font-weight:750}
+.primary{background:#a78bfa;color:#100d1b}
+.secondary{background:#ffffff18;color:white;border:1px solid #ffffff20}
+.search{width:100%;border:1px solid var(--line);background:#12141c;color:white;padding:14px 15px;border-radius:13px;outline:none}
+.search:focus{border-color:var(--accent)}
+.chips{display:flex;gap:8px;overflow:auto;margin:15px 0}
+.chip{white-space:nowrap;background:#14151e;border:1px solid #292a39;color:#c9c9d6;padding:9px 14px;border-radius:30px}
+.chip.active{background:#a78bfa;color:#100d1b;border-color:#a78bfa}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
+.card{min-width:0;cursor:pointer}
+.poster{aspect-ratio:2/3;border-radius:14px;background:linear-gradient(145deg,#29243e,#12131b 75%);overflow:hidden;position:relative;border:1px solid #ffffff10}
+.poster img{width:100%;height:100%;object-fit:cover;display:block}
+.poster .fallback{height:100%;display:flex;align-items:center;justify-content:center;font-size:35px;color:#a78bfa;font-weight:900}
+.rating{position:absolute;top:8px;left:8px;background:#09090dd9;border-radius:7px;padding:5px 7px;font-size:11px}
+.card h3{font-size:14px;margin:9px 0 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card small{color:var(--muted)}
+.empty{padding:28px 15px;text-align:center;background:var(--panel);border-radius:16px;color:var(--muted);grid-column:1/-1}
+.page{display:none}.page.active{display:block}
+nav{position:fixed;z-index:20;bottom:0;left:0;right:0;padding:10px 8px calc(env(safe-area-inset-bottom) + 8px);display:flex;justify-content:space-around;background:#101118f5;border-top:1px solid #ffffff12;backdrop-filter:blur(20px)}
+nav button{background:none;border:0;color:#888b9d;display:flex;flex-direction:column;gap:5px;align-items:center;font-size:10px;min-width:55px}
+nav button b{font-size:19px;font-weight:500}
+nav button.active{color:#c4b5fd}
+.field{margin:18px 0}
+.field label{display:block;font-size:13px;margin-bottom:8px;color:#d6d5e1}
+.field input{width:100%;padding:13px;background:#12141c;border:1px solid var(--line);border-radius:11px;color:white}
+.note{font-size:12px;color:var(--muted)}
+.detail{position:fixed;inset:0;z-index:30;background:#08090d;overflow:auto;display:none;padding:20px;padding-top:calc(env(safe-area-inset-top) + 20px);padding-bottom:45px}
+.detail.open{display:block}
+.detail img{width:100%;max-height:45vh;object-fit:cover;border-radius:18px}
+.close{float:right;margin-bottom:14px}
+.status{padding:12px;background:#151620;border-radius:10px;font-size:13px;white-space:pre-wrap;overflow-wrap:anywhere}
+footer{text-align:center;padding:25px 0;color:#555869;font-size:11px}
+</style>
+</head>
+<body>
+<header>
+  <div class="top">
+    <div class="logo">VYR<span>O</span></div>
+    <button class="pill" onclick="showPage('settings')">⚙ Settings</button>
+  </div>
+</header>
+
+<main>
+<section id="home" class="page active">
+  <div class="hero">
+    <div class="eyebrow">YOUR NEXT OBSESSION</div>
+    <h1>A universe of stories.</h1>
+    <p>Discover films and series worth staying up for.</p>
+    <div class="actions">
+      <button class="primary" onclick="showPage('discover')">Explore titles ↗</button>
+      <button class="secondary" onclick="showPage('mylist')">＋ My List</button>
+    </div>
+  </div>
+  <h2>Trending now</h2>
+  <div id="trending" class="grid"><div class="empty">Add your TMDB API key in Settings to load titles.</div></div>
+  <h2>Popular series</h2>
+  <div id="popular" class="grid"><div class="empty">Your next series awaits.</div></div>
+</section>
+
+<section id="discover" class="page">
+  <h1>Discover</h1>
+  <p>Find your next film or series.</p>
+  <input id="searchInput" class="search" placeholder="Search movies and series…" autocomplete="off">
+  <div class="chips">
+    <button class="chip active" data-kind="movie" onclick="setKind('movie',this)">Movies</button>
+    <button class="chip" data-kind="tv" onclick="setKind('tv',this)">Series</button>
+    <button class="chip" data-kind="trending" onclick="setKind('trending',this)">Trending</button>
+  </div>
+  <div id="discoverResults" class="grid"><div class="empty">Enter a search or browse trending titles.</div></div>
+</section>
+
+<section id="mylist" class="page">
+  <h1>My List</h1>
+  <p>Your saved movies and series, stored on this device.</p>
+  <div id="savedResults" class="grid"></div>
+</section>
+
+<section id="series" class="page">
+  <h1>Series</h1>
+  <p>Find your next binge-worthy show.</p>
+  <div id="seriesResults" class="grid"></div>
+</section>
+
+<section id="settings" class="page">
+  <h1>Settings</h1>
+  <p>Configure VYRO's catalogue and streaming integration.</p>
+  <div class="field">
+    <label for="tmdbKey">TMDB API key</label>
+    <input id="tmdbKey" type="password" placeholder="Enter your TMDB API key">
+    <p class="note">Get an API key from themoviedb.org. Your key is saved locally on this device.</p>
+  </div>
+  <div class="field">
+    <label for="aioUrl">AIOStreams manifest URL</label>
+    <input id="aioUrl" type="url" placeholder="https://your-config.example/manifest.json">
+  </div>
+  <div class="field">
+    <label for="rdToken">Real-Debrid token (optional)</label>
+    <input id="rdToken" type="password" placeholder="Enter token only if needed">
+    <p class="note">Stored locally on this device, not in the GitHub repository. This prototype does not yet use the token for playback.</p>
+  </div>
+  <div class="actions">
+    <button class="primary" onclick="saveSettings()">Save settings</button>
+    <button class="secondary" onclick="testAio()">Test manifest</button>
+  </div>
+  <h2>Connection status</h2>
+  <div id="connectionStatus" class="status">Not tested.</div>
+  <h2>About VYRO</h2>
+  <p>VYRO is a cinematic catalogue prototype. Movie discovery and saved lists work after configuring TMDB. Actual add-on playback still needs to be implemented.</p>
+</section>
+<footer>VYRO · YOUR CINEMA, REIMAGINED</footer>
+</main>
+
+<nav>
+  <button class="active" data-page="home" onclick="showPage('home')"><b>⌂</b>Home</button>
+  <button data-page="discover" onclick="showPage('discover')"><b>⌕</b>Discover</button>
+  <button data-page="mylist" onclick="showPage('mylist')"><b>♡</b>My List</button>
+  <button data-page="series" onclick="showPage('series')"><b>▤</b>Series</button>
+  <button data-page="settings" onclick="showPage('settings')"><b>⚙</b>Settings</button>
+</nav>
+
+<div id="detail" class="detail">
+  <button class="secondary close" onclick="closeDetail()">✕ Close</button>
+  <div id="detailContent"></div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const read = (key, fallback) => {
+  try { return JSON.parse(localStorage.getItem(key)) ?? fallback; }
+  catch { return fallback; }
+};
+let currentKind = "movie";
+let currentResults = [];
+let activeDetail = null;
+
+function showPage(name) {
+  document.querySelectorAll(".page").forEach(p => p.classList.toggle("active", p.id === name));
+  document.querySelectorAll("nav button").forEach(b => b.classList.toggle("active", b.dataset.page === name));
+  if (name === "mylist") renderSaved();
+  if (name === "series") loadSeries();
+  if (name === "discover" && !$("discoverResults").dataset.loaded) loadTrending("discoverResults");
+  window.scrollTo(0,0);
+}
+
+function getKey() {
+  return localStorage.getItem("vyro_tmdb_key") || "";
+}
+
+async function api(path) {
+  const key = getKey();
+  if (!key) throw new Error("Add your TMDB API key in Settings first.");
+  const response = await fetch("https://api.themoviedb.org/3" + path +
+    (path.includes("?") ? "&" : "?") + "api_key=" + encodeURIComponent(key));
+  if (!response.ok) throw new Error("TMDB request failed (" + response.status + "). Check your API key.");
+  return response.json();
+}
+
+function posterUrl(path) {
+  return path ? "https://image.tmdb.org/t/p/w500" + path : "";
+}
+function titleOf(item) {
+  return item.title || item.name || "Untitled";
+}
+function yearOf(item) {
+  return (item.release_date || item.first_air_date || "").slice(0,4) || "Year unknown";
+}
+function esc(value) {
+  return String(value ?? "").replace(/[&<>"']/g, c => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[c]));
+}
+
+function cardHtml(item) {
+  const type = item.media_type || item._kind || currentKind;
+  const poster = posterUrl(item.poster_path);
+  return `<article class="card" onclick="openDetail('${type}',${Number(item.id)})">
+    <div class="poster">
+      ${poster ? `<img loading="lazy" src="${poster}" alt="${esc(titleOf(item))}" onerror="this.remove()">` : `<div class="fallback">V</div>`}
+      <span class="rating">★ ${Number(item.vote_average || 0).toFixed(1)}</span>
+    </div>
+    <h3>${esc(titleOf(item))}</h3><small>${esc(yearOf(item))}</small>
+  </article>`;
+}
+
+function renderCards(target, items) {
+  $(target).innerHTML = items.length
+    ? items.map(cardHtml).join("")
+    : `<div class="empty">Nothing to show yet.</div>`;
+}
+
+async function loadTrending(target) {
+  $(target).innerHTML = `<div class="empty">Loading titles…</div>`;
+  try {
+    const data = await api("/trending/all/week");
+    const items = data.results.filter(x => x.media_type !== "person").slice(0,12);
+    renderCards(target,items);
+    if (target === "discoverResults") $("discoverResults").dataset.loaded = "1";
+  } catch(e) {
+    $(target).innerHTML = `<div class="empty">${esc(e.message)}</div>`;
+  }
+}
+
+async function loadHome() {
+  if (!getKey()) return;
+  try {
+    const data = await api("/trending/movie/week");
+    renderCards("trending",data.results.slice(0,6).map(x=>({...x,_kind:"movie"})));
+  } catch(e) {
+    $("trending").innerHTML = `<div class="empty">${esc(e.message)}</div>`;
+  }
+  try {
+    const data = await api("/tv/popular");
+    renderCards("popular",data.results.slice(0,6).map(x=>({...x,_kind:"tv"})));
+  } catch(e) {}
+}
+
+async function loadSeries() {
+  $("seriesResults").innerHTML = `<div class="empty">Loading series…</div>`;
+  try {
+    const data = await api("/tv/popular");
+    renderCards("seriesResults",data.results.slice(0,20).map(x=>({...x,_kind:"tv"})));
+  } catch(e) {
+    $("seriesResults").innerHTML = `<div class="empty">${esc(e.message)}</div>`;
+  }
+}
+
+function setKind(kind, button) {
+  currentKind = kind;
+  document.querySelectorAll(".chip").forEach(c=>c.classList.toggle("active",c===button));
+  if (kind === "trending") loadTrending("discoverResults");
+  else if ($("searchInput").value.trim()) searchTitles();
+  else {
+    $("discoverResults").innerHTML = `<div class="empty">Search for a ${kind === "tv" ? "series" : "movie"} above.</div>`;
+  }
+}
+
+let searchTimer;
+$("searchInput").addEventListener("input", () => {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(searchTitles,350);
+});
+
+async function searchTitles() {
+  const query = $("searchInput").value.trim();
+  if (currentKind === "trending" && !query) return loadTrending("discoverResults");
+  if (!query) {
+    $("discoverResults").innerHTML = `<div class="empty">Enter a title to search.</div>`;
+    return;
+  }
+  $("discoverResults").innerHTML = `<div class="empty">Searching…</div>`;
+  try {
+    const endpoint = currentKind === "tv" ? "/search/tv" :
+      currentKind === "movie" ? "/search/movie" : "/search/multi";
+    const data = await api(endpoint + "?query=" + encodeURIComponent(query));
+    const items = data.results.filter(x=>x.media_type !== "person").slice(0,30)
+      .map(x=>({...x,_kind:x.media_type || currentKind}));
+    renderCards("discoverResults",items);
+  } catch(e) {
+    $("discoverResults").innerHTML = `<div class="empty">${esc(e.message)}</div>`;
+  }
+}
+
+function savedItems() {
+  return read("vyro_saved",[]);
+}
+function isSaved(type,id) {
+  return savedItems().some(x=>x.id===id && x.type===type);
+}
+function toggleSaved(item,type) {
+  let list = savedItems();
+  if (list.some(x=>x.id===item.id && x.type===type)) {
+    list = list.filter(x=>!(x.id===item.id && x.type===type));
+  } else {
+    list.unshift({...item,type});
+  }
+  localStorage.setItem("vyro_saved",JSON.stringify(list));
+  renderSaved();
+}
+function renderSaved() {
+  const items = savedItems();
+  $("savedResults").innerHTML = items.length
+    ? items.map(item=>cardHtml({...item,media_type:item.type})).join("")
+    : `<div class="empty">Your list is empty.<br><br>Open a title and tap “Add to My List”.</div>`;
+}
+
+async function openDetail(type,id) {
+  activeDetail = {type,id};
+  $("detail").classList.add("open");
+  $("detailContent").innerHTML = `<div class="empty">Loading title…</div>`;
+  try {
+    const data = await api(`/${type}/${id}`);
+    activeDetail.item = data;
+    const poster = posterUrl(data.poster_path || data.backdrop_path);
+    $("detailContent").innerHTML = `
+      ${poster ? `<img src="${poster}" alt="">` : ""}
+      <div class="eyebrow">${type === "tv" ? "SERIES" : "MOVIE"} · ${esc(yearOf(data))}</div>
+      <h1>${esc(titleOf(data))}</h1>
+      <p>★ ${Number(data.vote_average || 0).toFixed(1)} · ${esc((data.genres||[]).map(g=>g.name).join(" · "))}</p>
+      <p>${esc(data.overview || "No description available.")}</p>
+      <div class="actions">
+        <button class="primary" onclick="watchPlaceholder()">▶ Watch now</button>
+        <button class="secondary" onclick="saveCurrent()">＋ Add to My List</button>
+      </div>
+      <p class="note">Streaming playback is not connected in this prototype yet.</p>`;
+  } catch(e) {
+    $("detailContent").innerHTML = `<div class="empty">${esc(e.message)}</div>`;
+  }
+}
+function closeDetail() {
+  $("detail").classList.remove("open");
+}
+function saveCurrent() {
+  if (!activeDetail || !activeDetail.item) return;
+  toggleSaved(activeDetail.item,activeDetail.type);
+  alert(isSaved(activeDetail.type,activeDetail.id) ? "Saved to My List." : "Removed from My List.");
+}
+function watchPlaceholder() {
+  alert("VYRO catalogue is working, but a compatible streaming playback engine still needs to be integrated.");
+}
+
+function saveSettings() {
+  localStorage.setItem("vyro_tmdb_key",$("tmdbKey").value.trim());
+  localStorage.setItem("vyro_aio_url",$("aioUrl").value.trim());
+  localStorage.setItem("vyro_rd_token",$("rdToken").value.trim());
+  $("connectionStatus").textContent = "Settings saved on this device.";
+  loadHome();
+  alert("Settings saved.");
+}
+
+async function testAio() {
+  const url = $("aioUrl").value.trim();
+  if (!url) {
+    $("connectionStatus").textContent = "Enter your AIOStreams manifest URL first.";
+    return;
+  }
+  try {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error("HTTP " + response.status);
+    const data = await response.json();
+    $("connectionStatus").textContent = "Manifest reachable.\nName: " +
+      (data.name || data.title || "Not specified") +
+      "\nID: " + (data.id || "Not specified") +
+      "\nNote: this tests the manifest only; playback is not yet integrated.";
+  } catch(e) {
+    $("connectionStatus").textContent = "Could not read manifest: " + e.message +
+      "\nThe server may block browser requests (CORS), even if the URL is valid.";
+  }
+}
+
+function loadSavedSettings() {
+  $("tmdbKey").value = localStorage.getItem("vyro_tmdb_key") || "";
+  $("aioUrl").value = localStorage.getItem("vyro_aio_url") || "";
+  $("rdToken").value = localStorage.getItem("vyro_rd_token") || "";
+}
+loadSavedSettings();
+renderSaved();
+loadHome();
+</script>
+</body>
+</html>
