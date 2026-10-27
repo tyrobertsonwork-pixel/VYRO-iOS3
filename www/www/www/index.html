@@ -1,0 +1,292 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#08090d">
+<title>VYRO — Cinema, Reimagined</title>
+<style>
+:root{color-scheme:dark;--bg:#08090d;--panel:#13151d;--muted:#9699a8;--accent:#a78bfa;--line:#292b36}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:#f7f7fb;font:15px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button,input{font:inherit}
+button{cursor:pointer}
+header{position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;padding:17px 5%;background:#08090deF;backdrop-filter:blur(16px);border-bottom:1px solid #ffffff0b}
+.logo{font-size:24px;font-weight:900;letter-spacing:5px}.logo span{color:var(--accent)}
+.iconbtn,.navbtn{background:none;border:0;color:#c6c7d2;padding:10px}
+main{max-width:1400px;margin:auto;padding:0 5% 100px}
+.hero{min-height:440px;margin:20px 0 35px;border-radius:22px;overflow:hidden;position:relative;background:linear-gradient(90deg,#08090df5,#08090d50),linear-gradient(0deg,#08090d,#08090d00),#20212a;display:flex;align-items:end}
+.heroContent{padding:35px;max-width:620px;position:relative;z-index:1}
+.eyebrow{color:var(--accent);font-size:11px;font-weight:800;letter-spacing:3px;text-transform:uppercase}
+h1{font-size:clamp(36px,6vw,64px);line-height:1.02;margin:14px 0}
+p{color:#c0c1cc;line-height:1.6}
+.primary,.secondary{border:0;border-radius:9px;padding:12px 17px;font-weight:700;margin:6px 6px 0 0}
+.primary{background:#f7f5ff;color:#11111a}.secondary{background:#ffffff18;color:#fff;border:1px solid #ffffff20}
+.section{margin:36px 0}.sectionhead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px}
+h2{font-size:21px;margin:0}.muted{color:var(--muted);font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:17px}
+.movie{min-width:0;cursor:pointer}.poster{aspect-ratio:2/3;border-radius:12px;overflow:hidden;background:#191b24;position:relative}
+.poster img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .2s}
+.movie:hover img{transform:scale(1.035)}
+.movieTitle{font-weight:650;margin-top:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.movieMeta{font-size:12px;color:var(--muted);margin-top:4px}
+.searchbar{width:100%;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:15px;color:white;outline:none}
+.searchbar:focus,input:focus{border-color:var(--accent)}
+.bottomnav{position:fixed;z-index:10;bottom:0;left:0;right:0;background:#0d0e14f5;backdrop-filter:blur(18px);border-top:1px solid var(--line);display:flex;justify-content:space-around;padding:8px 4px calc(8px + env(safe-area-inset-bottom))}
+.navbtn{font-size:11px;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:52px}.navbtn.active{color:var(--accent)}
+.navbtn b{font-size:20px;font-weight:500}
+.overlay{position:fixed;inset:0;z-index:20;background:#08090df7;overflow:auto;padding:24px 5% 60px;display:none}
+.overlay.open{display:block}.close{float:right}
+.detail{max-width:950px;margin:40px auto;display:grid;grid-template-columns:minmax(150px,280px) 1fr;gap:28px}
+.detail img{width:100%;border-radius:14px}.detail h1{font-size:42px}
+.field{display:block;margin:17px 0}.field span{display:block;font-size:13px;color:#c3c4d0;margin-bottom:8px}
+.field input{width:100%;padding:13px;background:#0a0b10;border:1px solid var(--line);border-radius:9px;color:white}
+.notice{padding:14px;border:1px solid var(--line);border-radius:10px;color:#c5c6d0;line-height:1.5;margin:15px 0}
+.empty{padding:35px 10px;color:var(--muted);text-align:center}
+@media(max-width:1000px){.grid{grid-template-columns:repeat(4,minmax(0,1fr))}.hero{min-height:380px}}
+@media(max-width:600px){main{padding-left:16px;padding-right:16px}.grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}.hero{min-height:390px;margin-top:12px}.heroContent{padding:22px}.detail{grid-template-columns:115px 1fr;gap:17px;margin-top:45px}.detail h1{font-size:28px}header{padding:15px 18px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">VYRO<span>.</span></div>
+  <button class="iconbtn" onclick="openSearch()" aria-label="Search">⌕</button>
+</header>
+
+<main id="main">
+  <section class="hero" id="hero">
+    <div class="heroContent">
+      <div class="eyebrow">Your next obsession</div>
+      <h1>Stories that<br>stay with you.</h1>
+      <p>Discover your next favourite film or series.</p>
+      <button class="primary" onclick="showPage('discover')">Explore cinema ↗</button>
+      <button class="secondary" onclick="showPage('mylist')">＋ My List</button>
+    </div>
+  </section>
+  <section id="searchSection" style="display:none">
+    <input id="searchInput" class="searchbar" placeholder="Search movies and series…" autocomplete="off">
+  </section>
+  <div id="content"><div class="empty">Loading your cinema…</div></div>
+</main>
+
+<div class="overlay" id="detailOverlay">
+  <button class="secondary close" onclick="closeDetail()">✕ Close</button>
+  <div id="detailContent"></div>
+</div>
+
+<div class="overlay" id="settingsOverlay">
+  <button class="secondary close" onclick="closeSettings()">✕ Close</button>
+  <div style="max-width:650px;margin:45px auto">
+    <div class="eyebrow">Personalise VYRO</div>
+    <h1 style="font-size:38px">Settings</h1>
+    <p>Configure your catalogue and streaming integrations.</p>
+    <form id="settingsForm">
+      <label class="field"><span>TMDB API key</span><input id="tmdbKey" type="password" placeholder="Enter your TMDB API key" autocomplete="off"></label>
+      <label class="field"><span>AIOStreams manifest URL</span><input id="manifestUrl" type="url" placeholder="https://your-configured-addon/manifest.json" autocomplete="off"></label>
+      <label class="field"><span>Real-Debrid token (optional)</span><input id="rdToken" type="password" placeholder="Only if needed by your integration" autocomplete="off"></label>
+      <div class="notice">Security: these settings are stored in this app's local browser storage. This is not a secure credential vault. Avoid saving your Real-Debrid token on shared devices, and never commit keys or tokens to GitHub. For production, use a secure authentication flow or a backend that protects credentials.</div>
+      <button class="primary" type="submit">Save settings</button>
+      <button class="secondary" type="button" onclick="testManifest()">Test manifest URL</button>
+      <button class="secondary" type="button" onclick="clearSettings()">Clear saved settings</button>
+      <div id="settingsStatus" class="notice" role="status">Settings have not been tested.</div>
+    </form>
+  </div>
+</div>
+
+<nav class="bottomnav">
+  <button class="navbtn active" data-page="home" onclick="showPage('home')"><b>⌂</b>Home</button>
+  <button class="navbtn" data-page="discover" onclick="showPage('discover')"><b>◈</b>Discover</button>
+  <button class="navbtn" data-page="mylist" onclick="showPage('mylist')"><b>♡</b>My List</button>
+  <button class="navbtn" data-page="series" onclick="showPage('series')"><b>▤</b>Series</button>
+  <button class="navbtn" onclick="openSettings()"><b>⚙</b>Settings</button>
+</nav>
+
+<script>
+const API='https://api.themoviedb.org/3';
+const IMG='https://image.tmdb.org/t/p/w500';
+const BACKDROP='https://image.tmdb.org/t/p/w1280';
+const STORE='vyro_saved_v1';
+let page='home',requestId=0,searchTimer;
+let saved=JSON.parse(localStorage.getItem(STORE)||'[]');
+let cache={};
+
+const key=()=>localStorage.getItem('vyro_tmdb_key')||'';
+function esc(s=''){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function settings(){return {key:key(),manifest:localStorage.getItem('vyro_manifest_url')||'',rd:localStorage.getItem('vyro_rd_token')||''};}
+function imgPath(path){return path?IMG+path:'';}
+async function tmdb(path){
+  const k=key();
+  if(!k)throw new Error('Add your TMDB API key in Settings to load live catalogues.');
+  const sep=path.includes('?')?'&':'?';
+  const res=await fetch(API+path+sep+'api_key='+encodeURIComponent(k));
+  if(!res.ok)throw new Error('TMDB returned '+res.status+'. Check your API key and connection.');
+  return res.json();
+}
+function titleOf(m){return m.title||m.name||m.original_title||m.original_name||'Untitled';}
+function yearOf(m){return (m.release_date||m.first_air_date||'').slice(0,4)||'—';}
+function mediaType(m){return m.media_type||(m.first_air_date?'tv':'movie');}
+function card(m){
+  const id=m.id+'-'+mediaType(m);cache[id]=m;
+  const poster=m.poster_path?imgPath(m.poster_path):'';
+  return `<article class="movie" tabindex="0" role="button" aria-label="Open ${esc(titleOf(m))}" onclick="openDetail('${id}')" onkeydown="if(event.key==='Enter')openDetail('${id}')">
+    <div class="poster">${poster?`<img loading="lazy" src="${poster}" alt="${esc(titleOf(m))} poster">`:'<div class="empty">No poster</div>'}</div>
+    <div class="movieTitle">${esc(titleOf(m))}</div>
+    <div class="movieMeta">${yearOf(m)}${m.vote_average?' · ★ '+Number(m.vote_average).toFixed(1):''}</div>
+  </article>`;
+}
+function section(title,items){
+  return `<section class="section"><div class="sectionhead"><h2>${esc(title)}</h2><span class="muted">${items.length} titles</span></div><div class="grid">${items.length?items.map(card).join(''):'<div class="empty">Nothing here yet.</div>'}</div></section>`;
+}
+async function loadHome(){
+  const thisReq=++requestId;
+  document.getElementById('content').innerHTML='<div class="empty">Loading films and series…</div>';
+  try{
+    const [movies,tv]=await Promise.all([
+      tmdb('/trending/movie/week'),tmdb('/trending/tv/week')
+    ]);
+    if(thisReq!==requestId)return;
+    document.getElementById('content').innerHTML=section('Trending movies',movies.results||[])+section('Trending series',tv.results||[]);
+    const heroMovie=(movies.results||[]).find(m=>m.backdrop_path);
+    if(heroMovie){
+      document.getElementById('hero').style.backgroundImage=`linear-gradient(90deg,#08090df5,#08090d30),linear-gradient(0deg,#08090d,#08090d00),url("${BACKDROP+heroMovie.backdrop_path}")`;
+      document.querySelector('.heroContent .eyebrow').textContent='Trending now';
+      document.querySelector('.heroContent h1').textContent=titleOf(heroMovie);
+      document.querySelector('.heroContent p').textContent=(heroMovie.overview||'Discover your next favourite story.').slice(0,170);
+      document.querySelector('.heroContent .primary').onclick=()=>openDetail(heroMovie.id+'-'+mediaType(heroMovie));
+    }
+  }catch(e){if(thisReq===requestId)document.getElementById('content').innerHTML=`<div class="notice">${esc(e.message)}<br><button class="secondary" onclick="openSettings()">Open settings</button></div>`;}
+}
+async function loadDiscover(){
+  const thisReq=++requestId;
+  document.getElementById('content').innerHTML='<div class="empty">Discovering films…</div>';
+  try{
+    const d=await tmdb('/discover/movie?sort_by=popularity.desc&include_adult=false');
+    if(thisReq===requestId)document.getElementById('content').innerHTML=section('Discover movies',d.results||[]);
+  }catch(e){document.getElementById('content').innerHTML=`<div class="notice">${esc(e.message)} <button class="secondary" onclick="openSettings()">Settings</button></div>`;}
+}
+async function loadSeries(){
+  const thisReq=++requestId;
+  document.getElementById('content').innerHTML='<div class="empty">Loading series…</div>';
+  try{
+    const d=await tmdb('/trending/tv/week');
+    if(thisReq===requestId)document.getElementById('content').innerHTML=section('Trending series',d.results||[]);
+  }catch(e){document.getElementById('content').innerHTML=`<div class="notice">${esc(e.message)} <button class="secondary" onclick="openSettings()">Settings</button></div>`;}
+}
+function showPage(p){
+  page=p;requestId++;
+  document.querySelectorAll('.navbtn[data-page]').forEach(b=>b.classList.toggle('active',b.dataset.page===p));
+  document.getElementById('searchSection').style.display=p==='search'?'block':'none';
+  document.getElementById('hero').style.display=['home','discover'].includes(p)?'flex':'none';
+  if(p==='home')loadHome();
+  else if(p==='discover')loadDiscover();
+  else if(p==='series')loadSeries();
+  else if(p==='mylist'){
+    document.getElementById('content').innerHTML='<section class="section"><h2>My List</h2><p class="muted">Your saved titles stay on this device.</p><div id="savedGrid" class="grid"></div></section>';
+    const grid=document.getElementById('savedGrid');
+    grid.innerHTML=saved.length?saved.map(id=>cache[id]).filter(Boolean).map(card).join(''):'<div class="empty">Your list is empty. Open a title and tap “Add to My List”.</div>';
+    // Restore saved titles from TMDB when app reloads.
+    if(saved.some(id=>!cache[id]))loadSavedDetails();
+  }else if(p==='search')searchNow();
+}
+async function loadSavedDetails(){
+  const missing=saved.filter(id=>!cache[id]);
+  for(const id of missing){
+    const [rawId,type]=id.split('-');
+    try{const m=await tmdb('/'+(type==='tv'?'tv':'movie')+'/'+rawId);m.media_type=type;cache[id]=m;}catch(_){}
+  }
+  if(page==='mylist'){
+    const grid=document.getElementById('savedGrid');
+    if(grid)grid.innerHTML=saved.map(id=>cache[id]).filter(Boolean).map(card).join('')||'<div class="empty">Could not load saved titles. Check your TMDB settings.</div>';
+  }
+}
+function toggleSaved(id){
+  saved=saved.includes(id)?saved.filter(x=>x!==id):[...saved,id];
+  localStorage.setItem(STORE,JSON.stringify(saved));
+  const b=document.getElementById('saveTitle');
+  if(b)b.textContent=saved.includes(id)?'✓ In My List':'＋ Add to My List';
+}
+async function openDetail(id){
+  let m=cache[id];if(!m)return;
+  const overlay=document.getElementById('detailOverlay');
+  overlay.classList.add('open');document.body.style.overflow='hidden';
+  document.getElementById('detailContent').innerHTML='<div class="empty">Loading title…</div>';
+  try{
+    const type=mediaType(m);
+    const d=await tmdb('/'+(type==='tv'?'tv':'movie')+'/'+m.id);
+    d.media_type=type;cache[id]=d;m=d;
+    document.getElementById('detailContent').innerHTML=`<div class="detail">
+      <div>${m.poster_path?`<img src="${IMG+m.poster_path}" alt="${esc(titleOf(m))} poster">`:''}</div>
+      <div><div class="eyebrow">${type==='tv'?'Series':'Feature film'}</div>
+      <h1>${esc(titleOf(m))}</h1>
+      <p>${yearOf(m)} · ★ ${Number(m.vote_average||0).toFixed(1)} ${m.runtime?'· '+m.runtime+' min':''}</p>
+      <p>${esc(m.overview||'No synopsis available.')}</p>
+      <p class="muted">${(m.genres||[]).map(g=>esc(g.name)).join(' · ')}</p>
+      <button id="saveTitle" class="primary" onclick="toggleSaved('${id}')">${saved.includes(id)?'✓ In My List':'＋ Add to My List'}</button>
+      <button class="secondary" onclick="playTitle()">Watch now</button>
+      <div class="notice" id="playNotice" style="display:none">Playback is not connected yet. Configure and validate your AIOStreams integration in Settings first.</div>
+      </div></div>`;
+  }catch(e){document.getElementById('detailContent').innerHTML=`<div class="notice">${esc(e.message)}</div>`;}
+}
+function playTitle(){
+  const n=document.getElementById('playNotice');if(n)n.style.display='block';
+}
+function closeDetail(){document.getElementById('detailOverlay').classList.remove('open');document.body.style.overflow='';}
+function openSearch(){
+  showPage('search');document.getElementById('searchInput').focus();
+}
+async function searchNow(){
+  const q=document.getElementById('searchInput').value.trim();
+  if(!q){document.getElementById('content').innerHTML='<div class="empty">Search for a film or series.</div>';return;}
+  const thisReq=++requestId;
+  document.getElementById('content').innerHTML='<div class="empty">Searching…</div>';
+  try{
+    const d=await tmdb('/search/multi?include_adult=false&query='+encodeURIComponent(q));
+    if(thisReq===requestId)document.getElementById('content').innerHTML=section('Search results',(d.results||[]).filter(m=>['movie','tv'].includes(m.media_type)));
+  }catch(e){document.getElementById('content').innerHTML=`<div class="notice">${esc(e.message)} <button class="secondary" onclick="openSettings()">Settings</button></div>`;}
+}
+document.getElementById('searchInput').addEventListener('input',()=>{
+  clearTimeout(searchTimer);searchTimer=setTimeout(searchNow,350);
+});
+function openSettings(){
+  const s=settings();
+  document.getElementById('tmdbKey').value=s.key;
+  document.getElementById('manifestUrl').value=s.manifest;
+  document.getElementById('rdToken').value=s.rd;
+  document.getElementById('settingsOverlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeSettings(){document.getElementById('settingsOverlay').classList.remove('open');document.body.style.overflow='';}
+document.getElementById('settingsForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  localStorage.setItem('vyro_tmdb_key',document.getElementById('tmdbKey').value.trim());
+  localStorage.setItem('vyro_manifest_url',document.getElementById('manifestUrl').value.trim());
+  localStorage.setItem('vyro_rd_token',document.getElementById('rdToken').value.trim());
+  document.getElementById('settingsStatus').textContent='Settings saved on this device. TMDB connection has not been tested yet.';
+  showPage('home');
+});
+async function testManifest(){
+  const url=document.getElementById('manifestUrl').value.trim();
+  const status=document.getElementById('settingsStatus');
+  if(!url){status.textContent='Enter your configured AIOStreams manifest URL first.';return;}
+  try{
+    const u=new URL(url);
+    if(u.protocol!=='https:')throw new Error('Use an HTTPS manifest URL.');
+    status.textContent='Checking manifest…';
+    const r=await fetch(url,{method:'GET'});
+    if(!r.ok)throw new Error('Server returned HTTP '+r.status+'.');
+    const data=await r.json();
+    if(!data||!data.id||!data.version)throw new Error('The response does not look like a valid Stremio addon manifest.');
+    status.textContent='Manifest reachable: '+(data.name||data.id)+'. This does not yet confirm stream playback or Real-Debrid authorisation.';
+  }catch(e){status.textContent='Could not verify manifest from this app: '+e.message+' CORS restrictions or addon authentication may prevent browser testing.';}
+}
+function clearSettings(){
+  if(!confirm('Clear saved TMDB, AIOStreams and Real-Debrid settings from this device?'))return;
+  ['vyro_tmdb_key','vyro_manifest_url','vyro_rd_token'].forEach(k=>localStorage.removeItem(k));
+  document.getElementById('settingsForm').reset();
+  document.getElementById('settingsStatus').textContent='Saved settings cleared.';
+}
+loadHome();
+</script>
+</body>
+</html>
