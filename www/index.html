@@ -11,12 +11,9 @@
     :root {
       color-scheme: dark;
       --bg: #090b0f;
-      --bg-2: #0d1016;
       --panel: rgba(18, 22, 29, 0.9);
       --panel-2: rgba(24, 29, 38, 0.94);
-      --panel-3: rgba(255,255,255,0.03);
       --line: rgba(255,255,255,0.08);
-      --line-strong: rgba(255,255,255,0.14);
       --text: #f7f1ea;
       --muted: #a1a7b3;
       --soft: #dfe6f5;
@@ -34,15 +31,15 @@
     html { background: var(--bg); scroll-behavior: smooth; }
     body {
       margin: 0;
+      min-height: 100vh;
+      color: var(--text);
       background:
         radial-gradient(circle at top left, rgba(255,92,104,0.15), transparent 24%),
         radial-gradient(circle at bottom right, rgba(126,216,255,0.12), transparent 30%),
         linear-gradient(180deg, #07090d 0%, #0b0d12 100%);
-      color: var(--text);
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
       -webkit-font-smoothing: antialiased;
       text-rendering: optimizeLegibility;
-      min-height: 100vh;
       padding-bottom: 78px;
     }
     body::before {
@@ -51,20 +48,21 @@
       inset: 0;
       background: repeating-linear-gradient(
         0deg,
-        rgba(255,255,255,0.018),
-        rgba(255,255,255,0.018) 1px,
+        rgba(255,255,255,0.015),
+        rgba(255,255,255,0.015) 1px,
         transparent 1px,
         transparent 4px
       );
       pointer-events: none;
-      opacity: 0.25;
+      opacity: 0.3;
     }
+
     a { color: inherit; text-decoration: none; }
     button, input { font: inherit; }
     button { cursor: pointer; }
     img { display: block; max-width: 100%; }
-    video { display: block; max-width: 100%; }
-    input, button { -webkit-appearance: none; appearance: none; }
+    input { outline: none; }
+    button, input { -webkit-appearance: none; appearance: none; }
 
     .topbar {
       position: sticky;
@@ -74,7 +72,7 @@
       align-items: center;
       gap: 12px;
       min-height: 68px;
-      padding: calc(var(--safe-top) + 10px) 18px 12px;
+      padding: calc(var(--safe-top) + 8px) 18px 12px;
       background: rgba(9, 11, 15, 0.72);
       backdrop-filter: blur(18px) saturate(1.2);
       -webkit-backdrop-filter: blur(18px) saturate(1.2);
@@ -91,17 +89,16 @@
       text-transform: uppercase;
       white-space: nowrap;
     }
-
     .brand-mark {
       width: 28px;
       height: 28px;
-      border-radius: 10px;
       display: grid;
       place-items: center;
+      border-radius: 10px;
       background: linear-gradient(135deg, var(--accent), var(--accent-2));
       color: #0a0d11;
-      font-weight: 900;
       font-size: 14px;
+      font-weight: 900;
       box-shadow: 0 10px 20px rgba(255, 92, 104, 0.4);
     }
 
@@ -115,9 +112,7 @@
       background: rgba(255,255,255,0.04);
       border: 1px solid rgba(255,255,255,0.05);
     }
-
     .navlink {
-      appearance: none;
       border: none;
       background: transparent;
       color: var(--muted);
@@ -145,12 +140,12 @@
     .icon-btn {
       width: 36px;
       height: 36px;
+      display: grid;
+      place-items: center;
       border-radius: 12px;
       border: 1px solid rgba(255,255,255,0.08);
       background: rgba(255,255,255,0.03);
       color: var(--soft);
-      display: grid;
-      place-items: center;
       font-size: 16px;
     }
 
@@ -284,9 +279,7 @@
       color: var(--soft);
     }
 
-    .section {
-      margin: 22px 0 12px;
-    }
+    .section { margin: 22px 0 12px; }
     .section-header {
       display: flex;
       align-items: end;
@@ -323,6 +316,7 @@
       gap: 10px;
     }
     .mood-card {
+      position: relative;
       display: flex;
       flex-direction: column;
       justify-content: end;
@@ -333,7 +327,6 @@
       background-size: cover;
       background-position: center;
       overflow: hidden;
-      position: relative;
       box-shadow: var(--shadow);
     }
     .mood-card::before {
@@ -381,19 +374,18 @@
     .poster-card {
       scroll-snap-align: start;
       position: relative;
-      min-width: 0;
       border-radius: 18px;
       overflow: hidden;
       background: rgba(255,255,255,0.02);
       border: 1px solid rgba(255,255,255,0.06);
       transition: transform .15s ease, border-color .15s ease;
+      min-width: 0;
     }
     .poster-card:active { transform: translateY(1px); }
     .poster-card:hover { border-color: rgba(255,255,255,0.12); }
-
     .poster-art {
       position: relative;
-      aspect-ratio: 2 / 3;
+      aspect-ratio: 3 / 4.6;
       overflow: hidden;
       background: linear-gradient(135deg, rgba(255,92,104,0.3), rgba(126,216,255,0.15), rgba(8,10,15,0.7));
     }
@@ -419,9 +411,7 @@
       font-weight: 900;
       padding: 0 8px;
     }
-    .poster-body {
-      padding: 10px 10px 12px;
-    }
+    .poster-body { padding: 10px 10px 12px; }
     .poster-title {
       margin: 0;
       font-size: 14px;
@@ -607,14 +597,12 @@
       .catalog-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
       .mood-row { grid-template-columns: repeat(4, minmax(0, 1fr)); }
     }
-
     @media (min-width: 900px) {
       .page-shell { padding-left: 34px; padding-right: 34px; }
       .hero { min-height: 620px; }
       .rail { grid-auto-columns: 19%; }
       .catalog-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
     }
-
     @media (max-width: 720px) {
       .navpill { display: none; }
       .mood-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -630,14 +618,14 @@
     </div>
 
     <div class="navpill">
-      <button class="navlink active" data-page="home">Home</button>
-      <button class="navlink" data-page="discover">Discover</button>
-      <button class="navlink" data-page="mylist">My List</button>
+      <button type="button" class="navlink active" data-page="home">Home</button>
+      <button type="button" class="navlink" data-page="discover">Discover</button>
+      <button type="button" class="navlink" data-page="mylist">My List</button>
     </div>
 
     <div class="top-actions">
-      <button class="icon-btn" aria-label="Search" data-page="discover">⌕</button>
-      <button class="icon-btn" aria-label="Settings" data-page="settings">⚙</button>
+      <button type="button" class="icon-btn" data-page="discover" aria-label="Search">⌕</button>
+      <button type="button" class="icon-btn" data-page="settings" aria-label="Settings">⚙</button>
     </div>
   </header>
 
@@ -657,8 +645,8 @@
             </div>
             <p id="heroCopy" class="hero-copy">Loading titles...</p>
             <div class="cta-row">
-              <button class="button primary">▶ Play now</button>
-              <button class="button secondary">More info</button>
+              <button type="button" class="button primary">▶ Play now</button>
+              <button type="button" class="button secondary">More info</button>
             </div>
           </div>
         </div>
@@ -669,7 +657,7 @@
               <small>Curated for tonight</small>
               <h2>Late night picks</h2>
             </div>
-            <button class="link-chip">See all</button>
+            <button type="button" class="link-chip">See all</button>
           </div>
           <div id="trendingRail" class="rail"></div>
         </section>
@@ -690,7 +678,7 @@
               <small>Big screens</small>
               <h2>Popular movies</h2>
             </div>
-            <button class="link-chip">More</button>
+            <button type="button" class="link-chip">More</button>
           </div>
           <div id="popularRail" class="rail"></div>
         </section>
@@ -708,9 +696,9 @@
         </div>
 
         <div class="filter-row">
-          <button class="filter active" data-filter="trending">For you</button>
-          <button class="filter" data-filter="movie">Movies</button>
-          <button class="filter" data-filter="tv">Series</button>
+          <button type="button" class="filter active" data-filter="trending">For you</button>
+          <button type="button" class="filter" data-filter="movie">Movies</button>
+          <button type="button" class="filter" data-filter="tv">Series</button>
         </div>
 
         <div id="discoverGrid" class="catalog-grid"></div>
@@ -743,8 +731,8 @@
               <input id="metaManifestUrl" type="url" placeholder="Optional metadata manifest" style="width:100%; min-height:46px; border-radius:12px; border:1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.02); color: var(--text); padding: 0 14px;" />
             </div>
             <div class="cta-row" style="margin-top:16px;">
-              <button id="saveSettingsBtn" class="button primary">Save</button>
-              <button id="testManifestBtn" class="button secondary">Test manifest</button>
+              <button type="button" id="saveSettingsBtn" class="button primary">Save</button>
+              <button type="button" id="testManifestBtn" class="button secondary">Test manifest</button>
             </div>
           </div>
 
@@ -759,10 +747,10 @@
   </main>
 
   <nav class="bottom-nav" aria-label="Main navigation">
-    <button class="bottom-tab active" data-page="home"><b>⌂</b>Home</button>
-    <button class="bottom-tab" data-page="discover"><b>⌕</b>Discover</button>
-    <button class="bottom-tab" data-page="mylist"><b>＋</b>My List</button>
-    <button class="bottom-tab" data-page="settings"><b>⚙</b>Settings</button>
+    <button type="button" class="bottom-tab active" data-page="home"><b>⌂</b>Home</button>
+    <button type="button" class="bottom-tab" data-page="discover"><b>⌕</b>Discover</button>
+    <button type="button" class="bottom-tab" data-page="mylist"><b>＋</b>My List</button>
+    <button type="button" class="bottom-tab" data-page="settings"><b>⚙</b>Settings</button>
   </nav>
 
   <script>
@@ -772,8 +760,6 @@
     const API = 'https://api.themoviedb.org/3';
     const IMG = 'https://image.tmdb.org/t/p/w500';
     const BACKDROP = 'https://image.tmdb.org/t/p/w1280';
-
-    let saved = JSON.parse(localStorage.getItem(APP_STORE) || '[]');
     let activeFilter = 'trending';
 
     const key = () => localStorage.getItem(TMDB_KEY_STORAGE) || DEFAULT_TMDB_KEY;
@@ -868,28 +854,28 @@
         tmdb('/trending/tv/week'),
         tmdb('/movie/popular?language=en-US&page=1')
       ])
-      .then(([movies, shows, popularMovies]) => {
-        const trends = [...(movies.results || []), ...(shows.results || [])].slice(0, 10);
-        const top = (movies.results || [])[0] || (shows.results || [])[0];
+        .then(([movies, shows, popularMovies]) => {
+          const trends = [...(movies.results || []), ...(shows.results || [])].slice(0, 10);
+          const top = (movies.results || [])[0] || (shows.results || [])[0];
 
-        document.getElementById('trendingRail').innerHTML = trends.map(item => renderPosterCard(item, item.media_type === 'tv' ? 'TV' : 'Movie')).join('');
-        document.getElementById('popularRail').innerHTML = (popularMovies.results || []).slice(0, 8).map(item => renderPosterCard(item, 'Pop')).join('');
+          document.getElementById('trendingRail').innerHTML = trends.map(item => renderPosterCard(item, item.media_type === 'tv' ? 'TV' : 'Movie')).join('');
+          document.getElementById('popularRail').innerHTML = (popularMovies.results || []).slice(0, 8).map(item => renderPosterCard(item, 'Pop')).join('');
 
-        if (top) {
-          const bg = top.backdrop_path ? `url('${BACKDROP}${top.backdrop_path}')` : 'linear-gradient(90deg, rgba(8,10,15,0.9), rgba(8,10,15,0.5))';
-          document.getElementById('heroBg').style.backgroundImage = `linear-gradient(90deg, rgba(8,10,15,0.9) 0%, rgba(8,10,15,0.52) 30%, rgba(8,10,15,0.18) 70%, rgba(8,10,15,0.4) 100%), ${bg}`;
-          document.getElementById('heroEyebrow').textContent = 'VYRO original';
-          document.getElementById('heroTitle').textContent = titleOf(top);
-          document.getElementById('heroMeta').textContent = mediaType(top) === 'tv' ? 'Trending series' : 'Trending movie';
-          document.getElementById('heroScore').textContent = `${ratingOf(top)} ★`;
-          document.getElementById('heroYear').textContent = yearOf(top);
-          document.getElementById('heroCopy').textContent = (top.overview || 'A cinematic experience built for tonight.').slice(0, 170);
-        }
-      })
-      .catch(err => {
-        document.getElementById('trendingRail').innerHTML = `<div class="empty">${escapeHtml(err.message)}</div>`;
-        document.getElementById('popularRail').innerHTML = `<div class="empty">${escapeHtml(err.message)}</div>`;
-      });
+          if (top) {
+            const bg = top.backdrop_path ? `url('${BACKDROP}${top.backdrop_path}')` : 'linear-gradient(90deg, rgba(8,10,15,0.9), rgba(8,10,15,0.5))';
+            document.getElementById('heroBg').style.backgroundImage = `linear-gradient(90deg, rgba(8,10,15,0.9) 0%, rgba(8,10,15,0.52) 30%, rgba(8,10,15,0.18) 70%, rgba(8,10,15,0.4) 100%), ${bg}`;
+            document.getElementById('heroEyebrow').textContent = 'VYRO original';
+            document.getElementById('heroTitle').textContent = titleOf(top);
+            document.getElementById('heroMeta').textContent = mediaType(top) === 'tv' ? 'Trending series' : 'Trending movie';
+            document.getElementById('heroScore').textContent = `${ratingOf(top)} ★`;
+            document.getElementById('heroYear').textContent = yearOf(top);
+            document.getElementById('heroCopy').textContent = (top.overview || 'A cinematic experience built for tonight.').slice(0, 170);
+          }
+        })
+        .catch(err => {
+          document.getElementById('trendingRail').innerHTML = `<div class="empty">${escapeHtml(err.message)}</div>`;
+          document.getElementById('popularRail').innerHTML = `<div class="empty">${escapeHtml(err.message)}</div>`;
+        });
     }
 
     function renderDiscover(filter = activeFilter) {
@@ -897,17 +883,18 @@
       const query = filter === 'trending' ? '/trending/all/week' : `/trending/${filter}/week`;
 
       tmdb(query)
-      .then(data => {
-        const results = (data.results || []).filter(item => item.media_type === filter || filter === 'trending' || mediaType(item) === filter).slice(0, 12);
-        target.innerHTML = results.length ? results.map(renderBrowseItem).join('') : '<div class="empty">No titles found for this view.</div>';
-      })
-      .catch(err => {
-        target.innerHTML = `<div class="empty">${escapeHtml(err.message)}</div>`;
-      });
+        .then(data => {
+          const results = (data.results || []).filter(item => item.media_type === filter || filter === 'trending' || mediaType(item) === filter).slice(0, 12);
+          target.innerHTML = results.length ? results.map(renderBrowseItem).join('') : '<div class="empty">No titles found for this view.</div>';
+        })
+        .catch(err => {
+          target.innerHTML = `<div class="empty">${escapeHtml(err.message)}</div>`;
+        });
     }
 
     function renderSaved() {
       const grid = document.getElementById('savedGrid');
+      const saved = JSON.parse(localStorage.getItem(APP_STORE) || '[]');
       if (!saved.length) {
         grid.innerHTML = '<div class="empty">Your list is empty. Save a title from the catalogue to keep it here.</div>';
         return;
@@ -918,12 +905,12 @@
         return tmdb(`/${type === 'tv' ? 'tv' : 'movie'}/${rawId}`)
           .then(item => ({ ...item, media_type: type }));
       }))
-      .then(items => {
-        grid.innerHTML = items.map(renderBrowseItem).join('');
-      })
-      .catch(err => {
-        grid.innerHTML = `<div class="empty">${escapeHtml(err.message)}</div>`;
-      });
+        .then(items => {
+          grid.innerHTML = items.map(renderBrowseItem).join('');
+        })
+        .catch(err => {
+          grid.innerHTML = `<div class="empty">${escapeHtml(err.message)}</div>`;
+        });
     }
 
     function searchNow() {
@@ -935,41 +922,42 @@
       }
 
       tmdb(`/search/multi?query=${encodeURIComponent(q)}&include_adult=false`)
-      .then(data => {
-        const results = (data.results || []).filter(item => ['movie', 'tv'].includes(mediaType(item))).slice(0, 12);
-        grid.innerHTML = results.length ? results.map(renderBrowseItem).join('') : '<div class="empty">No matches found.</div>';
-      })
-      .catch(err => {
-        grid.innerHTML = `<div class="empty">${escapeHtml(err.message)}</div>`;
-      });
+        .then(data => {
+          const results = (data.results || []).filter(item => ['movie', 'tv'].includes(mediaType(item))).slice(0, 12);
+          grid.innerHTML = results.length ? results.map(renderBrowseItem).join('') : '<div class="empty">No matches found.</div>';
+        })
+        .catch(err => {
+          grid.innerHTML = `<div class="empty">${escapeHtml(err.message)}</div>`;
+        });
     }
 
     function showPage(name) {
       document.querySelectorAll('.page').forEach(page => page.classList.toggle('active', page.id === name));
       document.querySelectorAll('.navlink, .bottom-tab, .icon-btn').forEach(btn => {
-        const active = btn.dataset.page === name;
-        btn.classList.toggle('active', active);
+        btn.classList.toggle('active', btn.dataset.page === name);
       });
     }
 
     function fillSettingsForm() {
-      const tmdbInput = document.getElementById('tmdbKey');
-      const manifestInput = document.getElementById('manifestUrl');
-      const metaInput = document.getElementById('metaManifestUrl');
-      tmdbInput.value = localStorage.getItem(TMDB_KEY_STORAGE) || DEFAULT_TMDB_KEY;
-      manifestInput.value = localStorage.getItem('vyro_manifest_url') || '';
-      metaInput.value = localStorage.getItem('vyro_meta_manifest_url') || '';
+      document.getElementById('tmdbKey').value = localStorage.getItem(TMDB_KEY_STORAGE) || DEFAULT_TMDB_KEY;
+      document.getElementById('manifestUrl').value = localStorage.getItem('vyro_manifest_url') || '';
+      document.getElementById('metaManifestUrl').value = localStorage.getItem('vyro_meta_manifest_url') || '';
     }
 
+    document.addEventListener('click', (event) => {
+      const target = event.target.closest('[data-page]');
+      if (!target) return;
+      showPage(target.dataset.page);
+    });
+
     document.getElementById('saveSettingsBtn').addEventListener('click', () => {
+      const status = document.getElementById('settingsStatus');
       const tmdbInput = document.getElementById('tmdbKey');
       const manifestInput = document.getElementById('manifestUrl');
       const metaInput = document.getElementById('metaManifestUrl');
-      const status = document.getElementById('settingsStatus');
 
-      const value = tmdbInput.value.trim();
-      if (value) {
-        localStorage.setItem(TMDB_KEY_STORAGE, value);
+      if (tmdbInput.value.trim()) {
+        localStorage.setItem(TMDB_KEY_STORAGE, tmdbInput.value.trim());
       }
       localStorage.setItem('vyro_manifest_url', manifestInput.value.trim());
       localStorage.setItem('vyro_meta_manifest_url', metaInput.value.trim());
@@ -1003,16 +991,9 @@
 
     document.querySelectorAll('.filter').forEach(btn => {
       btn.addEventListener('click', () => {
-        document.querySelectorAll('.filter').forEach(el => el.classList.toggle('active', el === btn));
         activeFilter = btn.dataset.filter;
+        document.querySelectorAll('.filter').forEach(el => el.classList.toggle('active', el === btn));
         renderDiscover(activeFilter);
-      });
-    });
-
-    document.querySelectorAll('.navlink, .bottom-tab, .icon-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const page = btn.dataset.page;
-        if (page) showPage(page);
       });
     });
 
