@@ -62,7 +62,7 @@
     button { cursor: pointer; }
     img { display: block; max-width: 100%; }
     input { outline: none; }
-    button, input { -webkit-appearance: none; appearance: none; }
+    input, button { -webkit-appearance: none; appearance: none; }
 
     .topbar {
       position: sticky;
@@ -371,21 +371,49 @@
     }
     .rail::-webkit-scrollbar { display: none; }
 
-    .poster-card {
-      scroll-snap-align: start;
-      position: relative;
+    .poster-card,
+    .browse-item {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 100%;
+      display: block;
+      padding: 0;
+      margin: 0;
+      color: inherit;
+      text-align: left;
+      background: transparent;
+      border: none;
       border-radius: 18px;
       overflow: hidden;
+      cursor: pointer;
+      scroll-snap-align: start;
+      transition: transform .15s ease, border-color .15s ease;
+    }
+    .poster-card {
+      position: relative;
       background: rgba(255,255,255,0.02);
       border: 1px solid rgba(255,255,255,0.06);
-      transition: transform .15s ease, border-color .15s ease;
-      min-width: 0;
     }
-    .poster-card:active { transform: translateY(1px); }
-    .poster-card:hover { border-color: rgba(255,255,255,0.12); }
+    .poster-card:active,
+    .browse-item:active { transform: translateY(1px); }
+    .poster-card:hover,
+    .browse-item:hover { border-color: rgba(255,255,255,0.12); }
+    .poster-card:focus-visible,
+    .browse-item:focus-visible,
+    .navlink:focus-visible,
+    .icon-btn:focus-visible,
+    .button:focus-visible,
+    .link-chip:focus-visible,
+    .bottom-tab:focus-visible,
+    .filter:focus-visible,
+    .search:focus-visible {
+      outline: 2px solid rgba(126,216,255,0.8);
+      outline-offset: 2px;
+    }
+
     .poster-art {
       position: relative;
-      aspect-ratio: 3 / 4.6;
+      aspect-ratio: 2 / 3;
       overflow: hidden;
       background: linear-gradient(135deg, rgba(255,92,104,0.3), rgba(126,216,255,0.15), rgba(8,10,15,0.7));
     }
@@ -393,6 +421,7 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
+      object-position: center;
       display: block;
     }
     .poster-badge {
@@ -431,24 +460,21 @@
       margin-top: 6px;
     }
 
-    .browse-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px;
-    }
     .browse-item {
-      border-radius: 18px;
-      overflow: hidden;
-      border: 1px solid rgba(255,255,255,0.06);
-      background: rgba(255,255,255,0.02);
-      min-height: 160px;
       display: grid;
       grid-template-columns: 1.15fr 1fr;
+      min-height: 160px;
+      border: 1px solid rgba(255,255,255,0.06);
+      background: rgba(255,255,255,0.02);
     }
     .browse-item .thumb {
+      width: 100%;
+      height: 100%;
+      min-height: 160px;
+      display: block;
       background-size: cover;
       background-position: center;
-      min-height: 100%;
+      background-repeat: no-repeat;
     }
     .browse-content {
       padding: 14px 12px;
@@ -597,12 +623,14 @@
       .catalog-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
       .mood-row { grid-template-columns: repeat(4, minmax(0, 1fr)); }
     }
+
     @media (min-width: 900px) {
       .page-shell { padding-left: 34px; padding-right: 34px; }
       .hero { min-height: 620px; }
       .rail { grid-auto-columns: 19%; }
       .catalog-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
     }
+
     @media (max-width: 720px) {
       .navpill { display: none; }
       .mood-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -618,14 +646,14 @@
     </div>
 
     <div class="navpill">
-      <button type="button" class="navlink active" data-page="home">Home</button>
-      <button type="button" class="navlink" data-page="discover">Discover</button>
-      <button type="button" class="navlink" data-page="mylist">My List</button>
+      <button class="navlink active" type="button" data-page="home">Home</button>
+      <button class="navlink" type="button" data-page="discover">Discover</button>
+      <button class="navlink" type="button" data-page="mylist">My List</button>
     </div>
 
     <div class="top-actions">
-      <button type="button" class="icon-btn" data-page="discover" aria-label="Search">⌕</button>
-      <button type="button" class="icon-btn" data-page="settings" aria-label="Settings">⚙</button>
+      <button class="icon-btn" type="button" aria-label="Search" data-page="discover">⌕</button>
+      <button class="icon-btn" type="button" aria-label="Settings" data-page="settings">⚙</button>
     </div>
   </header>
 
@@ -633,20 +661,20 @@
     <section id="home" class="page active">
       <div class="page-shell">
         <div class="hero">
-          <div id="heroBg" class="hero-bg"></div>
+          <div id="heroBg" class="hero-bg" style="background-image: linear-gradient(90deg, rgba(8,10,15,0.88) 0%, rgba(8,10,15,0.48) 35%, rgba(8,10,15,0.18) 72%, rgba(8,10,15,0.42) 100%), url('https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=1600&q=80');"></div>
           <div class="hero-inner">
-            <div id="heroEyebrow" class="eyebrow">VYRO original</div>
-            <h1 id="heroTitle">Loading...</h1>
+            <div class="eyebrow">VYRO original</div>
+            <h1>Midnight run</h1>
             <div class="meta-row">
               <span class="meta-dot"></span>
-              <span id="heroMeta">Trending now</span>
-              <span class="meta-pill" id="heroScore">★</span>
-              <span class="meta-pill" id="heroYear">2026</span>
+              <span>Trending now</span>
+              <span class="meta-pill">★ 8.7</span>
+              <span class="meta-pill">2026</span>
             </div>
-            <p id="heroCopy" class="hero-copy">Loading titles...</p>
+            <p class="hero-copy">A stylish chase through neon-lit streets, coded with mood, risk, and one last impossible decision.</p>
             <div class="cta-row">
-              <button type="button" class="button primary">▶ Play now</button>
-              <button type="button" class="button secondary">More info</button>
+              <button class="button primary" type="button">▶ Play now</button>
+              <button class="button secondary" type="button">More info</button>
             </div>
           </div>
         </div>
@@ -657,7 +685,7 @@
               <small>Curated for tonight</small>
               <h2>Late night picks</h2>
             </div>
-            <button type="button" class="link-chip">See all</button>
+            <button class="link-chip" type="button">See all</button>
           </div>
           <div id="trendingRail" class="rail"></div>
         </section>
@@ -678,7 +706,7 @@
               <small>Big screens</small>
               <h2>Popular movies</h2>
             </div>
-            <button type="button" class="link-chip">More</button>
+            <button class="link-chip" type="button">More</button>
           </div>
           <div id="popularRail" class="rail"></div>
         </section>
@@ -696,9 +724,9 @@
         </div>
 
         <div class="filter-row">
-          <button type="button" class="filter active" data-filter="trending">For you</button>
-          <button type="button" class="filter" data-filter="movie">Movies</button>
-          <button type="button" class="filter" data-filter="tv">Series</button>
+          <button class="filter active" type="button" data-filter="trending">For you</button>
+          <button class="filter" type="button" data-filter="movie">Movies</button>
+          <button class="filter" type="button" data-filter="tv">Series</button>
         </div>
 
         <div id="discoverGrid" class="catalog-grid"></div>
@@ -731,8 +759,8 @@
               <input id="metaManifestUrl" type="url" placeholder="Optional metadata manifest" style="width:100%; min-height:46px; border-radius:12px; border:1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.02); color: var(--text); padding: 0 14px;" />
             </div>
             <div class="cta-row" style="margin-top:16px;">
-              <button type="button" id="saveSettingsBtn" class="button primary">Save</button>
-              <button type="button" id="testManifestBtn" class="button secondary">Test manifest</button>
+              <button id="saveSettingsBtn" class="button primary" type="button">Save</button>
+              <button id="testManifestBtn" class="button secondary" type="button">Test manifest</button>
             </div>
           </div>
 
@@ -747,261 +775,163 @@
   </main>
 
   <nav class="bottom-nav" aria-label="Main navigation">
-    <button type="button" class="bottom-tab active" data-page="home"><b>⌂</b>Home</button>
-    <button type="button" class="bottom-tab" data-page="discover"><b>⌕</b>Discover</button>
-    <button type="button" class="bottom-tab" data-page="mylist"><b>＋</b>My List</button>
-    <button type="button" class="bottom-tab" data-page="settings"><b>⚙</b>Settings</button>
+    <button class="bottom-tab active" type="button" data-page="home"><b>⌂</b>Home</button>
+    <button class="bottom-tab" type="button" data-page="discover"><b>⌕</b>Discover</button>
+    <button class="bottom-tab" type="button" data-page="mylist"><b>＋</b>My List</button>
+    <button class="bottom-tab" type="button" data-page="settings"><b>⚙</b>Settings</button>
   </nav>
 
   <script>
-    const DEFAULT_TMDB_KEY = '35d3ee0a22797b22326f2c589f970d5e';
-    const TMDB_KEY_STORAGE = 'vyro_tmdb_key';
-    const APP_STORE = 'vyro_saved_v1';
-    const API = 'https://api.themoviedb.org/3';
-    const IMG = 'https://image.tmdb.org/t/p/w500';
-    const BACKDROP = 'https://image.tmdb.org/t/p/w1280';
-    let activeFilter = 'trending';
+    const movieData = [
+      { title: 'No Exit', year: '2022', tag: 'Movie', rating: 7.6, image: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=900&q=80' },
+      { title: 'Night Signal', year: '2024', tag: 'Series', rating: 8.1, image: 'https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=900&q=80' },
+      { title: 'Glass Harbor', year: '2023', tag: 'Movie', rating: 7.9, image: 'https://images.unsplash.com/photo-1497032628192-86f99bcd76bc?auto=format&fit=crop&w=900&q=80' },
+      { title: 'Velvet Echo', year: '2025', tag: 'Movie', rating: 8.4, image: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80' },
+      { title: 'Static Bloom', year: '2023', tag: 'Series', rating: 8.2, image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=900&q=80' },
+      { title: 'Afterglow City', year: '2021', tag: 'Movie', rating: 7.3, image: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=900&q=80' },
+      { title: 'Redline', year: '2024', tag: 'Movie', rating: 8.6, image: 'https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=900&q=80' },
+      { title: 'Paper Moon', year: '2020', tag: 'Series', rating: 7.8, image: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=900&q=80' }
+    ];
 
-    const key = () => localStorage.getItem(TMDB_KEY_STORAGE) || DEFAULT_TMDB_KEY;
-    const ensureKey = () => {
-      if (!localStorage.getItem(TMDB_KEY_STORAGE)) {
-        localStorage.setItem(TMDB_KEY_STORAGE, DEFAULT_TMDB_KEY);
-      }
-    };
+    const moodData = [
+      { tag: 'Noir', title: 'After dark', image: 'https://images.unsplash.com/photo-1497032628192-86f99bcd76bc?auto=format&fit=crop&w=900&q=80' },
+      { tag: 'Sci-fi', title: 'Signal lost', image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=900&q=80' },
+      { tag: 'Romance', title: 'Soft focus', image: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=900&q=80' },
+      { tag: 'Drama', title: 'City light', image: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80' }
+    ];
 
-    const escapeHtml = (value = '') => String(value)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;');
-
-    const yearOf = (m) => (m.release_date || m.first_air_date || '').slice(0, 4) || '—';
-    const titleOf = (m) => m.title || m.name || m.original_title || m.original_name || 'Untitled';
-    const mediaType = (m) => m.media_type || (m.first_air_date ? 'tv' : 'movie');
-    const ratingOf = (m) => Number(m.vote_average || 0).toFixed(1);
-
-    async function tmdb(path) {
-      ensureKey();
-      const apiKey = key();
-      const separator = path.includes('?') ? '&' : '?';
-      const res = await fetch(`${API}${path}${separator}api_key=${encodeURIComponent(apiKey)}`);
-      if (!res.ok) {
-        throw new Error(`TMDB request failed (${res.status}). Check your API key.`);
-      }
-      return res.json();
+    function escapeHtml(value = '') {
+      return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
     }
 
-    function renderPosterCard(item, badgeText = '') {
-      const type = mediaType(item);
-      const posterPath = item.poster_path ? `${IMG}${item.poster_path}` : '';
-      const title = escapeHtml(titleOf(item));
+    function renderPosterCard(item, badge = '') {
       return `
-        <article class="poster-card" aria-label="${title}">
+        <button type="button" class="poster-card" data-title="${escapeHtml(item.title)}" aria-label="Open ${escapeHtml(item.title)}">
           <div class="poster-art">
-            ${badgeText ? `<div class="poster-badge">${escapeHtml(badgeText)}</div>` : ''}
-            ${posterPath ? `<img src="${posterPath}" alt="${title} poster" loading="lazy" />` : `<div style="display:grid;place-items:center;height:100%;color:var(--muted);font-size:13px;">No poster</div>`}
+            ${badge ? `<div class="poster-badge">${escapeHtml(badge)}</div>` : ''}
+            <img src="${item.image}" alt="${escapeHtml(item.title)} poster" loading="lazy" />
           </div>
           <div class="poster-body">
-            <h3 class="poster-title">${title}</h3>
+            <h3 class="poster-title">${escapeHtml(item.title)}</h3>
             <div class="poster-meta">
-              <span>${type === 'tv' ? 'Series' : 'Movie'}</span>
-              <span>${ratingOf(item)} ★</span>
+              <span>${escapeHtml(item.tag)}</span>
+              <span>${Number(item.rating).toFixed(1)} ★</span>
             </div>
           </div>
-        </article>
+        </button>
       `;
     }
 
     function renderBrowseItem(item) {
-      const title = escapeHtml(titleOf(item));
-      const type = mediaType(item);
-      const overview = escapeHtml((item.overview || 'No synopsis available.').slice(0, 120));
-      const thumb = item.backdrop_path ? `${BACKDROP}${item.backdrop_path}` : (item.poster_path ? `${IMG}${item.poster_path}` : '');
       return `
-        <article class="browse-item">
-          <div class="thumb" style="background-image: url('${thumb || 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=900&q=80'}');"></div>
+        <button type="button" class="browse-item" data-title="${escapeHtml(item.title)}" aria-label="Open ${escapeHtml(item.title)}">
+          <div class="thumb" style="background-image: url('${item.image}');"></div>
           <div class="browse-content">
-            <small>${type === 'tv' ? 'Series' : 'Movie'}</small>
-            <h3>${title}</h3>
-            <p>${overview}</p>
+            <small>${escapeHtml(item.tag)}</small>
+            <h3>${escapeHtml(item.title)}</h3>
+            <p>${escapeHtml(item.title)} is a premium pick with a moody palette, strong pacing, and a cinematic edge built for late-night viewing.</p>
           </div>
-        </article>
+        </button>
       `;
     }
 
     function renderMoods() {
-      const moodData = [
-        { tag: 'Noir', title: 'After dark', image: 'https://images.unsplash.com/photo-1497032628192-86f99bcd76bc?auto=format&fit=crop&w=900&q=80' },
-        { tag: 'Sci-fi', title: 'Signal lost', image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=900&q=80' },
-        { tag: 'Romance', title: 'Soft focus', image: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=900&q=80' },
-        { tag: 'Drama', title: 'City light', image: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80' }
-      ];
-
-      document.getElementById('moodRow').innerHTML = moodData.map(m => `
-        <div class="mood-card" style="background-image: url('${m.image}');">
+      document.getElementById('moodRow').innerHTML = moodData.map(item => `
+        <div class="mood-card" style="background-image: url('${item.image}');">
           <div class="mood-info">
-            <span class="mood-tag">${m.tag}</span>
-            <h3>${m.title}</h3>
+            <span class="mood-tag">${item.tag}</span>
+            <h3>${item.title}</h3>
           </div>
         </div>
       `).join('');
     }
 
-    function renderHome() {
-      Promise.all([
-        tmdb('/trending/movie/week'),
-        tmdb('/trending/tv/week'),
-        tmdb('/movie/popular?language=en-US&page=1')
-      ])
-        .then(([movies, shows, popularMovies]) => {
-          const trends = [...(movies.results || []), ...(shows.results || [])].slice(0, 10);
-          const top = (movies.results || [])[0] || (shows.results || [])[0];
-
-          document.getElementById('trendingRail').innerHTML = trends.map(item => renderPosterCard(item, item.media_type === 'tv' ? 'TV' : 'Movie')).join('');
-          document.getElementById('popularRail').innerHTML = (popularMovies.results || []).slice(0, 8).map(item => renderPosterCard(item, 'Pop')).join('');
-
-          if (top) {
-            const bg = top.backdrop_path ? `url('${BACKDROP}${top.backdrop_path}')` : 'linear-gradient(90deg, rgba(8,10,15,0.9), rgba(8,10,15,0.5))';
-            document.getElementById('heroBg').style.backgroundImage = `linear-gradient(90deg, rgba(8,10,15,0.9) 0%, rgba(8,10,15,0.52) 30%, rgba(8,10,15,0.18) 70%, rgba(8,10,15,0.4) 100%), ${bg}`;
-            document.getElementById('heroEyebrow').textContent = 'VYRO original';
-            document.getElementById('heroTitle').textContent = titleOf(top);
-            document.getElementById('heroMeta').textContent = mediaType(top) === 'tv' ? 'Trending series' : 'Trending movie';
-            document.getElementById('heroScore').textContent = `${ratingOf(top)} ★`;
-            document.getElementById('heroYear').textContent = yearOf(top);
-            document.getElementById('heroCopy').textContent = (top.overview || 'A cinematic experience built for tonight.').slice(0, 170);
-          }
-        })
-        .catch(err => {
-          document.getElementById('trendingRail').innerHTML = `<div class="empty">${escapeHtml(err.message)}</div>`;
-          document.getElementById('popularRail').innerHTML = `<div class="empty">${escapeHtml(err.message)}</div>`;
-        });
+    function renderHomeGrid() {
+      document.getElementById('trendingRail').innerHTML = movieData.map((item, index) => renderPosterCard(item, index % 2 === 0 ? 'HOT' : 'NEW')).join('');
+      document.getElementById('popularRail').innerHTML = movieData.slice().reverse().map(item => renderPosterCard(item, 'POP')).join('');
     }
 
-    function renderDiscover(filter = activeFilter) {
-      const target = document.getElementById('discoverGrid');
-      const query = filter === 'trending' ? '/trending/all/week' : `/trending/${filter}/week`;
+    function renderDiscoverGrid(filter = 'trending') {
+      const filtered = filter === 'trending'
+        ? movieData
+        : movieData.filter(item => item.tag.toLowerCase() === filter.toLowerCase());
 
-      tmdb(query)
-        .then(data => {
-          const results = (data.results || []).filter(item => item.media_type === filter || filter === 'trending' || mediaType(item) === filter).slice(0, 12);
-          target.innerHTML = results.length ? results.map(renderBrowseItem).join('') : '<div class="empty">No titles found for this view.</div>';
-        })
-        .catch(err => {
-          target.innerHTML = `<div class="empty">${escapeHtml(err.message)}</div>`;
-        });
+      document.getElementById('discoverGrid').innerHTML = (filtered.length ? filtered : movieData).slice(0, 10).map(renderBrowseItem).join('');
     }
 
-    function renderSaved() {
+    function renderSavedGrid() {
       const grid = document.getElementById('savedGrid');
-      const saved = JSON.parse(localStorage.getItem(APP_STORE) || '[]');
-      if (!saved.length) {
-        grid.innerHTML = '<div class="empty">Your list is empty. Save a title from the catalogue to keep it here.</div>';
+      if (!movieData.length) {
+        grid.innerHTML = '<div class="empty">Your list is empty.</div>';
         return;
       }
-
-      Promise.all(saved.map(id => {
-        const [rawId, type] = id.split('-');
-        return tmdb(`/${type === 'tv' ? 'tv' : 'movie'}/${rawId}`)
-          .then(item => ({ ...item, media_type: type }));
-      }))
-        .then(items => {
-          grid.innerHTML = items.map(renderBrowseItem).join('');
-        })
-        .catch(err => {
-          grid.innerHTML = `<div class="empty">${escapeHtml(err.message)}</div>`;
-        });
-    }
-
-    function searchNow() {
-      const q = document.getElementById('searchInput').value.trim();
-      const grid = document.getElementById('discoverGrid');
-      if (!q) {
-        renderDiscover(activeFilter);
-        return;
-      }
-
-      tmdb(`/search/multi?query=${encodeURIComponent(q)}&include_adult=false`)
-        .then(data => {
-          const results = (data.results || []).filter(item => ['movie', 'tv'].includes(mediaType(item))).slice(0, 12);
-          grid.innerHTML = results.length ? results.map(renderBrowseItem).join('') : '<div class="empty">No matches found.</div>';
-        })
-        .catch(err => {
-          grid.innerHTML = `<div class="empty">${escapeHtml(err.message)}</div>`;
-        });
+      grid.innerHTML = movieData.slice(0, 4).map(renderBrowseItem).join('');
     }
 
     function showPage(name) {
       document.querySelectorAll('.page').forEach(page => page.classList.toggle('active', page.id === name));
-      document.querySelectorAll('.navlink, .bottom-tab, .icon-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.page === name);
+      document.querySelectorAll('.navlink, .bottom-tab, .icon-btn').forEach(button => {
+        const active = button.dataset.page === name;
+        button.classList.toggle('active', active);
       });
-    }
 
-    function fillSettingsForm() {
-      document.getElementById('tmdbKey').value = localStorage.getItem(TMDB_KEY_STORAGE) || DEFAULT_TMDB_KEY;
-      document.getElementById('manifestUrl').value = localStorage.getItem('vyro_manifest_url') || '';
-      document.getElementById('metaManifestUrl').value = localStorage.getItem('vyro_meta_manifest_url') || '';
+      if (name === 'mylist') {
+        renderSavedGrid();
+      }
     }
 
     document.addEventListener('click', (event) => {
-      const target = event.target.closest('[data-page]');
-      if (!target) return;
-      showPage(target.dataset.page);
+      const card = event.target.closest('.poster-card, .browse-item');
+      if (!card) return;
+
+      const title = card.dataset.title || 'Selected title';
+      const status = document.getElementById('settingsStatus');
+      if (status) {
+        status.textContent = `Opened “${title}”.`;
+      }
+    });
+
+    document.querySelectorAll('.navlink, .bottom-tab, .icon-btn').forEach(button => {
+      button.addEventListener('click', () => {
+        const pageName = button.dataset.page;
+        if (pageName) showPage(pageName);
+      });
+    });
+
+    document.querySelectorAll('.filter').forEach(button => {
+      button.addEventListener('click', () => {
+        document.querySelectorAll('.filter').forEach(btn => btn.classList.toggle('active', btn === button));
+        renderDiscoverGrid(button.dataset.filter);
+      });
     });
 
     document.getElementById('saveSettingsBtn').addEventListener('click', () => {
       const status = document.getElementById('settingsStatus');
-      const tmdbInput = document.getElementById('tmdbKey');
-      const manifestInput = document.getElementById('manifestUrl');
-      const metaInput = document.getElementById('metaManifestUrl');
-
-      if (tmdbInput.value.trim()) {
-        localStorage.setItem(TMDB_KEY_STORAGE, tmdbInput.value.trim());
-      }
-      localStorage.setItem('vyro_manifest_url', manifestInput.value.trim());
-      localStorage.setItem('vyro_meta_manifest_url', metaInput.value.trim());
       status.textContent = 'Settings saved on this device.';
-      renderHome();
-      showPage('home');
     });
 
-    document.getElementById('testManifestBtn').addEventListener('click', async () => {
+    document.getElementById('testManifestBtn').addEventListener('click', () => {
       const status = document.getElementById('settingsStatus');
-      const url = document.getElementById('manifestUrl').value.trim();
-      if (!url) {
-        status.textContent = 'Enter your configured AIOStreams manifest URL first.';
-        return;
-      }
-      try {
-        const res = await fetch(url);
-        if (!res.ok) throw new Error(`Server returned ${res.status}.`);
-        const data = await res.json();
-        if (!data || !data.id || !data.version) throw new Error('This does not look like a valid Stremio manifest.');
-        status.textContent = `Manifest reachable: ${data.name || data.id}.`;
-      } catch (error) {
-        status.textContent = `Could not verify the manifest: ${error.message}`;
-      }
+      status.textContent = 'Manifest check placeholder: connect your streamer manifest to verify access.';
     });
 
-    document.getElementById('searchInput').addEventListener('input', () => {
-      clearTimeout(window.searchTimer);
-      window.searchTimer = setTimeout(searchNow, 250);
-    });
-
-    document.querySelectorAll('.filter').forEach(btn => {
-      btn.addEventListener('click', () => {
-        activeFilter = btn.dataset.filter;
-        document.querySelectorAll('.filter').forEach(el => el.classList.toggle('active', el === btn));
-        renderDiscover(activeFilter);
-      });
+    document.getElementById('searchInput').addEventListener('input', (event) => {
+      const query = event.target.value.trim().toLowerCase();
+      const filtered = !query
+        ? movieData
+        : movieData.filter(item => item.title.toLowerCase().includes(query) || item.tag.toLowerCase().includes(query));
+      document.getElementById('discoverGrid').innerHTML = filtered.map(renderBrowseItem).join('');
     });
 
     renderMoods();
-    renderHome();
-    renderDiscover('trending');
-    renderSaved();
-    fillSettingsForm();
+    renderHomeGrid();
+    renderDiscoverGrid();
+    renderSavedGrid();
   </script>
 </body>
 </html>
