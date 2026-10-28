@@ -9,6 +9,353 @@
 <title>VYRO — Cinema, reimagined</title>
 <link rel="preconnect" href="https://image.tmdb.org">
 <link rel="preconnect" href="https://api.themoviedb.org">
+
+/* VYRO — PREMIUM CINEMA REDESIGN */
+:root {
+  --bg: #07080c;
+  --panel: #11131b;
+  --line: #ffffff16;
+  --accent: #ff5368;
+}
+
+body {
+  background: radial-gradient(ellipse at 50% -10%, #42202d55, transparent 48%), #07080c;
+  letter-spacing: -.01em;
+}
+
+.top {
+  gap: 10px;
+  padding-left: 16px;
+  padding-right: 16px;
+  background: #08090df2;
+  border-bottom-color: #ffffff0b;
+}
+
+.logo {
+  font-size: 15px;
+  letter-spacing: .24em;
+}
+
+.mark {
+  width: 34px;
+  height: 34px;
+  border-radius: 11px;
+  box-shadow: 0 5px 22px #ff536825;
+}
+
+/* Remove the duplicated top navigation on iPhone */
+@media (max-width: 699px) {
+  .navtop { display: none; }
+
+  .top {
+    padding-top: calc(var(--top) + 8px);
+    padding-bottom: 9px;
+  }
+
+  .topbtn {
+    min-width: 39px;
+    min-height: 39px;
+    border-radius: 12px;
+  }
+
+  .shell {
+    padding: 14px;
+  }
+
+  .hero {
+    min-height: clamp(370px, 62vh, 490px);
+    border: 0;
+    border-radius: 18px;
+  }
+
+  .herotext {
+    padding: 20px;
+  }
+
+  .rail {
+    grid-auto-columns: clamp(118px, 36vw, 155px);
+    gap: 11px;
+    scroll-snap-type: x mandatory;
+  }
+
+  .section {
+    margin: 25px 0;
+  }
+
+  .bottom {
+    display: flex;
+    padding: 8px 9px calc(8px + var(--safe));
+    gap: 5px;
+    background: #090a10ed;
+    box-shadow: 0 -10px 32px #0003;
+  }
+
+  .bottom button {
+    min-height: 49px;
+    border-radius: 12px;
+  }
+
+  .detailbody {
+    grid-template-columns: 92px minmax(0, 1fr);
+    gap: 14px;
+    padding: 15px;
+  }
+
+  .detailbody img {
+    width: 92px;
+    border-radius: 12px;
+  }
+}
+
+/* Cinematic hero */
+.hero {
+  background: #12131a;
+  box-shadow: 0 22px 65px #0005;
+}
+
+.hero:after {
+  background:
+    linear-gradient(0deg, #07080c 0%, #07080ce8 14%, #07080c9c 43%, #07080c12 78%),
+    linear-gradient(90deg, #07080c85, transparent 85%);
+}
+
+.herotext {
+  max-width: 760px;
+}
+
+.eyebrow {
+  color: #ff9ca8;
+  letter-spacing: .22em;
+}
+
+h1 {
+  line-height: .96;
+  letter-spacing: -.06em;
+  text-wrap: balance;
+}
+
+.desc {
+  font-size: 13px;
+  line-height: 1.55;
+  color: #e0e1e8;
+  max-width: 500px;
+}
+
+/* Premium buttons */
+.btn {
+  min-height: 44px;
+  padding: 0 17px;
+  border-radius: 12px;
+  background: #ffffff0a;
+  border-color: #ffffff1c;
+  transition: transform .18s, background .18s;
+}
+
+.btn.primary {
+  background: linear-gradient(135deg, #ff6578, #e83e5a);
+  box-shadow: 0 8px 26px #ff53682c;
+}
+
+.btn:active,
+.topbtn:active,
+.bottom button:active {
+  transform: scale(.97);
+}
+
+/* Richer poster cards */
+.section {
+  margin: 30px 0;
+}
+
+.sectionhead {
+  margin-bottom: 14px;
+}
+
+.sectionhead h2 {
+  font-size: clamp(18px, 4vw, 23px);
+  letter-spacing: -.045em;
+}
+
+.rail {
+  gap: 13px;
+  padding: 3px 2px 13px;
+}
+
+.poster {
+  border-radius: 13px;
+  border-color: #ffffff12;
+  box-shadow: 0 9px 22px #0003;
+  isolation: isolate;
+}
+
+.poster img {
+  display: block;
+  transition: transform .3s ease;
+}
+
+.card:active .poster img {
+  transform: scale(1.035);
+}
+
+.poster .badge {
+  z-index: 1;
+  border: 1px solid #ffffff1c;
+  border-radius: 6px;
+  background: #08090dd9;
+  padding: 5px 7px;
+}
+
+.cardtitle {
+  font-size: 12px;
+  line-height: 1.4;
+  margin: 9px 1px 4px;
+}
+
+.catalog {
+  gap: 21px 12px;
+}
+
+.catalog .poster {
+  border-radius: 13px;
+}
+
+/* Cleaner catalogue filters and settings */
+.chip {
+  background: #ffffff06;
+  border-color: #ffffff17;
+  transition: background .2s, border-color .2s;
+}
+
+.chip.active {
+  background: #ff536822;
+  border-color: #ff53687a;
+  color: white;
+}
+
+.panel {
+  padding: 18px;
+  border-radius: 17px;
+  border-color: #ffffff12;
+  background: linear-gradient(145deg, #ffffff08, #ffffff03);
+}
+
+.field {
+  border-radius: 12px;
+  border-color: #ffffff18;
+  background: #0d0f15;
+}
+
+/* More polished movie details */
+.overlay {
+  background: #05060af5;
+  backdrop-filter: blur(14px);
+}
+
+.dialog {
+  border-radius: 20px;
+  border-color: #ffffff18;
+  background: #101219;
+  box-shadow: 0 24px 90px #0009;
+}
+
+.dialogtop {
+  padding: 11px;
+}
+
+.detailhero {
+  min-height: clamp(190px, 44vw, 330px);
+  padding: 22px;
+  background-position: center 28%;
+}
+
+.detailhero:before {
+  background: linear-gradient(
+    0deg,
+    #101219 0%,
+    #101219a6 32%,
+    #10121910 100%
+  );
+}
+
+.detailhero h2 {
+  font-size: clamp(28px, 7vw, 48px);
+  line-height: 1.02;
+  max-width: 90%;
+  text-wrap: balance;
+}
+
+.detailbody p {
+  font-size: 13px;
+  line-height: 1.65;
+  color: #d5d7e0;
+}
+
+.tag {
+  border-radius: 7px;
+  background: #ffffff08;
+  border-color: #ffffff18;
+  padding: 6px 8px;
+}
+
+.stream {
+  border-radius: 13px;
+  border-color: #ffffff16;
+  background: #ffffff07;
+  padding: 14px;
+}
+
+.resume {
+  border-radius: 14px;
+  border-color: #ffffff13;
+  background: linear-gradient(145deg, #ffffff0b, #ffffff04);
+}
+
+.resume img {
+  border-radius: 9px;
+}
+
+.empty {
+  border-style: solid;
+  border-color: #ffffff12;
+  border-radius: 16px;
+  background: linear-gradient(145deg, #ffffff06, #ffffff02);
+}
+
+/* Desktop layout */
+@media (min-width: 700px) {
+  .hero {
+    min-height: clamp(500px, 58vw, 680px);
+  }
+
+  .rail {
+    grid-auto-columns: 175px;
+    gap: 15px;
+  }
+
+  .bottom {
+    display: none;
+  }
+}
+
+@media (max-width: 350px) {
+  .logo {
+    font-size: 13px;
+    letter-spacing: .16em;
+  }
+
+  .mark {
+    width: 30px;
+    height: 30px;
+  }
+
+  .hero {
+    min-height: 360px;
+  }
+
+  .herotext {
+    padding: 16px;
+  }
+}
 <style>
 :root{color-scheme:dark;--bg:#08090d;--panel:#11131a;--line:#ffffff15;--text:#f7f7fb;--muted:#9da3b2;--accent:#ff5368;--safe:env(safe-area-inset-bottom,0px);--top:env(safe-area-inset-top,0px)}
 *{box-sizing:border-box}
