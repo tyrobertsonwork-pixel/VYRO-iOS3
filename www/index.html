@@ -11,9 +11,12 @@
     :root {
       color-scheme: dark;
       --bg: #090b0f;
+      --bg-2: #0d1016;
       --panel: rgba(18, 22, 29, 0.9);
       --panel-2: rgba(24, 29, 38, 0.94);
+      --panel-3: rgba(255,255,255,0.03);
       --line: rgba(255,255,255,0.08);
+      --line-strong: rgba(255,255,255,0.14);
       --text: #f7f1ea;
       --muted: #a1a7b3;
       --soft: #dfe6f5;
@@ -32,11 +35,11 @@
     body {
       margin: 0;
       min-height: 100vh;
-      color: var(--text);
       background:
-        radial-gradient(circle at top left, rgba(255,92,104,0.15), transparent 24%),
+        radial-gradient(circle at top left, rgba(255,92,104,0.14), transparent 26%),
         radial-gradient(circle at bottom right, rgba(126,216,255,0.12), transparent 30%),
         linear-gradient(180deg, #07090d 0%, #0b0d12 100%);
+      color: var(--text);
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
       -webkit-font-smoothing: antialiased;
       text-rendering: optimizeLegibility;
@@ -61,7 +64,7 @@
     button, input { font: inherit; }
     button { cursor: pointer; }
     img { display: block; max-width: 100%; }
-    input { outline: none; }
+    video { display: block; max-width: 100%; }
     input, button { -webkit-appearance: none; appearance: none; }
 
     .topbar {
@@ -72,7 +75,7 @@
       align-items: center;
       gap: 12px;
       min-height: 68px;
-      padding: calc(var(--safe-top) + 8px) 18px 12px;
+      padding: calc(var(--safe-top) + 10px) 18px 12px;
       background: rgba(9, 11, 15, 0.72);
       backdrop-filter: blur(18px) saturate(1.2);
       -webkit-backdrop-filter: blur(18px) saturate(1.2);
@@ -113,6 +116,7 @@
       border: 1px solid rgba(255,255,255,0.05);
     }
     .navlink {
+      appearance: none;
       border: none;
       background: transparent;
       color: var(--muted);
@@ -140,12 +144,12 @@
     .icon-btn {
       width: 36px;
       height: 36px;
-      display: grid;
-      place-items: center;
       border-radius: 12px;
       border: 1px solid rgba(255,255,255,0.08);
       background: rgba(255,255,255,0.03);
       color: var(--soft);
+      display: grid;
+      place-items: center;
       font-size: 16px;
     }
 
@@ -199,10 +203,10 @@
       background: rgba(255,255,255,0.05);
       border: 1px solid rgba(255,255,255,0.08);
       font-size: 10px;
+      font-weight: 700;
       letter-spacing: 0.18em;
       text-transform: uppercase;
       color: #f7d4cf;
-      font-weight: 700;
     }
     .eyebrow::before {
       content: "";
@@ -220,6 +224,7 @@
       letter-spacing: -0.06em;
       word-break: break-word;
     }
+
     .meta-row {
       display: flex;
       flex-wrap: wrap;
@@ -249,6 +254,7 @@
       font-size: 15px;
       line-height: 1.7;
     }
+
     .cta-row {
       display: flex;
       flex-wrap: wrap;
@@ -279,7 +285,7 @@
       color: var(--soft);
     }
 
-    .section { margin: 22px 0 12px; }
+    .section { margin: 24px 0 12px; }
     .section-header {
       display: flex;
       align-items: end;
@@ -310,54 +316,6 @@
       color: var(--soft);
     }
 
-    .mood-row {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 10px;
-    }
-    .mood-card {
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      justify-content: end;
-      min-height: 200px;
-      padding: 16px;
-      border-radius: 20px;
-      border: 1px solid rgba(255,255,255,0.06);
-      background-size: cover;
-      background-position: center;
-      overflow: hidden;
-      box-shadow: var(--shadow);
-    }
-    .mood-card::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(180deg, rgba(0,0,0,0.08), rgba(0,0,0,0.72));
-    }
-    .mood-info {
-      position: relative;
-      z-index: 1;
-    }
-    .mood-tag {
-      display: inline-flex;
-      width: fit-content;
-      padding: 5px 8px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.09);
-      font-size: 10px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-    .mood-card h3 {
-      margin: 0;
-      font-size: clamp(18px, 3vw, 26px);
-      letter-spacing: -0.05em;
-    }
-
     .rail {
       display: grid;
       grid-auto-flow: column;
@@ -372,7 +330,8 @@
     .rail::-webkit-scrollbar { display: none; }
 
     .poster-card,
-    .browse-item {
+    .browse-item,
+    .detail-button {
       appearance: none;
       -webkit-appearance: none;
       width: 100%;
@@ -389,24 +348,31 @@
       scroll-snap-align: start;
       transition: transform .15s ease, border-color .15s ease;
     }
-    .poster-card {
-      position: relative;
+    .poster-card,
+    .browse-item {
       background: rgba(255,255,255,0.02);
       border: 1px solid rgba(255,255,255,0.06);
     }
     .poster-card:active,
-    .browse-item:active { transform: translateY(1px); }
+    .browse-item:active,
+    .detail-button:active { transform: translateY(1px); }
     .poster-card:hover,
-    .browse-item:hover { border-color: rgba(255,255,255,0.12); }
+    .browse-item:hover,
+    .detail-button:hover { border-color: rgba(255,255,255,0.12); }
+
     .poster-card:focus-visible,
     .browse-item:focus-visible,
+    .detail-button:focus-visible,
+    .navlink:focus-visible,
     .navlink:focus-visible,
     .icon-btn:focus-visible,
     .button:focus-visible,
     .link-chip:focus-visible,
     .bottom-tab:focus-visible,
     .filter:focus-visible,
-    .search:focus-visible {
+    .search:focus-visible,
+    .close-button:focus-visible,
+    .toggle-save:focus-visible {
       outline: 2px solid rgba(126,216,255,0.8);
       outline-offset: 2px;
     }
@@ -464,8 +430,6 @@
       display: grid;
       grid-template-columns: 1.15fr 1fr;
       min-height: 160px;
-      border: 1px solid rgba(255,255,255,0.06);
-      background: rgba(255,255,255,0.02);
     }
     .browse-item .thumb {
       width: 100%;
@@ -552,6 +516,7 @@
       border-color: rgba(255,92,104,0.32);
       color: white;
     }
+
     .catalog-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -566,6 +531,95 @@
       color: var(--muted);
       text-align: center;
       line-height: 1.7;
+    }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      display: none;
+      background: rgba(7, 9, 13, 0.88);
+      backdrop-filter: blur(16px);
+      overflow-y: auto;
+      padding: 48px 16px 120px;
+    }
+    .overlay.open { display: block; }
+
+    .detail-panel {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 22px;
+      border-radius: 24px;
+      background: rgba(12, 15, 20, 0.96);
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: var(--shadow);
+    }
+    .close-row {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 18px;
+    }
+    .close-button {
+      min-height: 40px;
+      padding: 0 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03);
+      color: var(--soft);
+      font-weight: 700;
+    }
+    .detail-layout {
+      display: grid;
+      grid-template-columns: minmax(180px, 280px) 1fr;
+      gap: 22px;
+    }
+    .detail-poster {
+      width: 100%;
+      border-radius: 18px;
+      aspect-ratio: 2 / 3;
+      object-fit: cover;
+      background: rgba(255,255,255,0.04);
+    }
+    .detail-copy h2 {
+      margin: 0 0 10px;
+      font-size: clamp(30px, 5vw, 52px);
+      letter-spacing: -0.06em;
+      line-height: 0.96;
+    }
+    .detail-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 14px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .detail-meta span {
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .detail-copy p {
+      margin: 0 0 18px;
+      color: rgba(245,246,250,0.8);
+      line-height: 1.7;
+      font-size: 15px;
+    }
+    .toggle-save {
+      min-height: 46px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+      font-weight: 800;
+      padding: 0 16px;
+    }
+    .toggle-save.saved {
+      background: rgba(149,227,179,0.12);
+      border-color: rgba(149,227,179,0.28);
+      color: #dfffe8;
     }
 
     .bottom-nav {
@@ -609,8 +663,8 @@
     .bottom-tab b { font-size: 18px; }
 
     footer {
-      color: var(--muted);
       text-align: center;
+      color: var(--muted);
       font-size: 10px;
       letter-spacing: 0.18em;
       text-transform: uppercase;
@@ -621,7 +675,6 @@
       .page-shell { padding-left: 22px; padding-right: 22px; }
       .rail { grid-auto-columns: 28%; }
       .catalog-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-      .mood-row { grid-template-columns: repeat(4, minmax(0, 1fr)); }
     }
 
     @media (min-width: 900px) {
@@ -633,8 +686,8 @@
 
     @media (max-width: 720px) {
       .navpill { display: none; }
-      .mood-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .catalog-grid { grid-template-columns: 1fr; }
+      .detail-layout { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -664,17 +717,17 @@
           <div id="heroBg" class="hero-bg" style="background-image: linear-gradient(90deg, rgba(8,10,15,0.88) 0%, rgba(8,10,15,0.48) 35%, rgba(8,10,15,0.18) 72%, rgba(8,10,15,0.42) 100%), url('https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=1600&q=80');"></div>
           <div class="hero-inner">
             <div class="eyebrow">VYRO original</div>
-            <h1>Midnight run</h1>
+            <h1 id="heroTitle">Midnight run</h1>
             <div class="meta-row">
               <span class="meta-dot"></span>
-              <span>Trending now</span>
-              <span class="meta-pill">★ 8.7</span>
-              <span class="meta-pill">2026</span>
+              <span id="heroMeta">Trending now</span>
+              <span class="meta-pill" id="heroScore">★ 8.7</span>
+              <span class="meta-pill" id="heroYear">2026</span>
             </div>
-            <p class="hero-copy">A stylish chase through neon-lit streets, coded with mood, risk, and one last impossible decision.</p>
+            <p id="heroCopy" class="hero-copy">A stylish chase through neon-lit streets, coded with mood, risk, and one last impossible decision.</p>
             <div class="cta-row">
-              <button class="button primary" type="button">▶ Play now</button>
-              <button class="button secondary" type="button">More info</button>
+              <button class="button primary" type="button" id="heroPrimary">▶ Play now</button>
+              <button class="button secondary" type="button" id="heroSecondary">More info</button>
             </div>
           </div>
         </div>
@@ -726,7 +779,7 @@
         <div class="filter-row">
           <button class="filter active" type="button" data-filter="trending">For you</button>
           <button class="filter" type="button" data-filter="movie">Movies</button>
-          <button class="filter" type="button" data-filter="tv">Series</button>
+          <button class="filter" type="button" data-filter="series">Series</button>
         </div>
 
         <div id="discoverGrid" class="catalog-grid"></div>
@@ -781,16 +834,113 @@
     <button class="bottom-tab" type="button" data-page="settings"><b>⚙</b>Settings</button>
   </nav>
 
+  <div id="detailOverlay" class="overlay" aria-live="polite">
+    <div class="detail-panel">
+      <div class="close-row">
+        <button id="closeDetailBtn" class="close-button" type="button">Close</button>
+      </div>
+      <div id="detailContent"></div>
+    </div>
+  </div>
+
   <script>
     const movieData = [
-      { title: 'No Exit', year: '2022', tag: 'Movie', rating: 7.6, image: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=900&q=80' },
-      { title: 'Night Signal', year: '2024', tag: 'Series', rating: 8.1, image: 'https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=900&q=80' },
-      { title: 'Glass Harbor', year: '2023', tag: 'Movie', rating: 7.9, image: 'https://images.unsplash.com/photo-1497032628192-86f99bcd76bc?auto=format&fit=crop&w=900&q=80' },
-      { title: 'Velvet Echo', year: '2025', tag: 'Movie', rating: 8.4, image: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80' },
-      { title: 'Static Bloom', year: '2023', tag: 'Series', rating: 8.2, image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=900&q=80' },
-      { title: 'Afterglow City', year: '2021', tag: 'Movie', rating: 7.3, image: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=900&q=80' },
-      { title: 'Redline', year: '2024', tag: 'Movie', rating: 8.6, image: 'https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=900&q=80' },
-      { title: 'Paper Moon', year: '2020', tag: 'Series', rating: 7.8, image: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=900&q=80' }
+      {
+        id: 'midnight-run',
+        title: 'Midnight Run',
+        type: 'movie',
+        year: '2026',
+        runtime: '112 min',
+        rating: 8.7,
+        badge: 'HOT',
+        image: 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=900&q=80',
+        blurb: 'A stylish chase through neon-lit streets, coded with mood, risk, and one last impossible decision.',
+        description: 'When a citywide blackout hits at the worst possible time, a courier with a dangerous secret has one night to outrun a network of corrupt enforcers. Stylish, tense, and built for midnight viewing.'
+      },
+      {
+        id: 'glass-harbor',
+        title: 'Glass Harbor',
+        type: 'movie',
+        year: '2024',
+        runtime: '104 min',
+        rating: 7.9,
+        badge: 'NEW',
+        image: 'https://images.unsplash.com/photo-1497032628192-86f99bcd76bc?auto=format&fit=crop&w=900&q=80',
+        blurb: 'A moody, reflective drama about memory, identity, and survival on a storm-battered coast.',
+        description: 'On a windswept coast, a rising architect revisits the last place she left behind—only to find ghosts of her past built into every wall.'
+      },
+      {
+        id: 'velvet-echo',
+        title: 'Velvet Echo',
+        type: 'movie',
+        year: '2025',
+        runtime: '118 min',
+        rating: 8.4,
+        badge: 'POP',
+        image: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80',
+        blurb: 'A tense, sensual mystery where every clue feels like a memory someone wants to keep buried.',
+        description: 'A radio host receives a voice message that seems to predict murders before they happen—forcing her to decide whether she is chasing a killer or a confession.'
+      },
+      {
+        id: 'night-signal',
+        title: 'Night Signal',
+        type: 'series',
+        year: '2024',
+        runtime: '8 eps',
+        rating: 8.1,
+        badge: 'TV',
+        image: 'https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=900&q=80',
+        blurb: 'A surveillance-driven sci-fi thriller where the signal can see the future before it happens.',
+        description: 'A small team of engineers discover an anomaly in a dormant communications array; as the signal intensifies, so do the lies around it.'
+      },
+      {
+        id: 'static-bloom',
+        title: 'Static Bloom',
+        type: 'series',
+        year: '2023',
+        runtime: '10 eps',
+        rating: 8.2,
+        badge: 'TV',
+        image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=900&q=80',
+        blurb: 'Dark tech-noir with a pulse of romance and surveillance anxiety.',
+        description: 'In a city where every apartment monitors its residents, a data analyst and an artist drift into a dangerous conspiracy built on addiction to attention.'
+      },
+      {
+        id: 'afterglow-city',
+        title: 'Afterglow City',
+        type: 'movie',
+        year: '2021',
+        runtime: '99 min',
+        rating: 7.3,
+        badge: 'POP',
+        image: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=900&q=80',
+        blurb: 'Soft-focus romance lit by neon reflections and one final goodbye.',
+        description: 'Two strangers in a city of endless lights fall into each other in the exact wrong season—before one of them has to leave for good.'
+      },
+      {
+        id: 'redline',
+        title: 'Redline',
+        type: 'movie',
+        year: '2024',
+        runtime: '109 min',
+        rating: 8.6,
+        badge: 'HOT',
+        image: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=900&q=80',
+        blurb: 'A pulse-racing heist thriller with a runaway pace and zero room for error.',
+        description: 'A former racer turns to theft to pay off a debt, only to discover the impossible route is the one that leads straight to the city’s criminal elite.'
+      },
+      {
+        id: 'paper-moon',
+        title: 'Paper Moon',
+        type: 'series',
+        year: '2020',
+        runtime: '6 eps',
+        rating: 7.8,
+        badge: 'NEW',
+        image: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=900&q=80',
+        blurb: 'A quiet, intimate story of grief, gentleness, and the stories we tell ourselves.',
+        description: 'An archivist begins to recover her lost sense of wonder after discovering a collection of handwritten notes hidden in an old cinema archive.'
+      }
     ];
 
     const moodData = [
@@ -799,6 +949,11 @@
       { tag: 'Romance', title: 'Soft focus', image: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=900&q=80' },
       { tag: 'Drama', title: 'City light', image: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80' }
     ];
+
+    const savedKey = 'vyro_saved_v1';
+    const settingsKey = 'vyro_settings_v1';
+    let saved = JSON.parse(localStorage.getItem(savedKey) || '[]');
+    let activeFilter = 'trending';
 
     function escapeHtml(value = '') {
       return String(value)
@@ -809,9 +964,18 @@
         .replace(/'/g, '&#39;');
     }
 
+    function getSavedState(id) {
+      return saved.includes(id);
+    }
+
+    function persistSaved() {
+      localStorage.setItem(savedKey, JSON.stringify(saved));
+    }
+
     function renderPosterCard(item, badge = '') {
+      const savedState = getSavedState(item.id) ? 'saved' : '';
       return `
-        <button type="button" class="poster-card" data-title="${escapeHtml(item.title)}" aria-label="Open ${escapeHtml(item.title)}">
+        <button type="button" class="poster-card ${savedState}" data-id="${item.id}" aria-label="Open ${escapeHtml(item.title)}">
           <div class="poster-art">
             ${badge ? `<div class="poster-badge">${escapeHtml(badge)}</div>` : ''}
             <img src="${item.image}" alt="${escapeHtml(item.title)} poster" loading="lazy" />
@@ -819,7 +983,7 @@
           <div class="poster-body">
             <h3 class="poster-title">${escapeHtml(item.title)}</h3>
             <div class="poster-meta">
-              <span>${escapeHtml(item.tag)}</span>
+              <span>${escapeHtml(item.type === 'series' ? 'Series' : 'Movie')}</span>
               <span>${Number(item.rating).toFixed(1)} ★</span>
             </div>
           </div>
@@ -829,12 +993,12 @@
 
     function renderBrowseItem(item) {
       return `
-        <button type="button" class="browse-item" data-title="${escapeHtml(item.title)}" aria-label="Open ${escapeHtml(item.title)}">
+        <button type="button" class="browse-item" data-id="${item.id}" aria-label="Open ${escapeHtml(item.title)}">
           <div class="thumb" style="background-image: url('${item.image}');"></div>
           <div class="browse-content">
-            <small>${escapeHtml(item.tag)}</small>
+            <small>${escapeHtml(item.type === 'series' ? 'Series' : 'Movie')}</small>
             <h3>${escapeHtml(item.title)}</h3>
-            <p>${escapeHtml(item.title)} is a premium pick with a moody palette, strong pacing, and a cinematic edge built for late-night viewing.</p>
+            <p>${escapeHtml(item.blurb)}</p>
           </div>
         </button>
       `;
@@ -851,26 +1015,45 @@
       `).join('');
     }
 
-    function renderHomeGrid() {
-      document.getElementById('trendingRail').innerHTML = movieData.map((item, index) => renderPosterCard(item, index % 2 === 0 ? 'HOT' : 'NEW')).join('');
-      document.getElementById('popularRail').innerHTML = movieData.slice().reverse().map(item => renderPosterCard(item, 'POP')).join('');
+    function renderHome() {
+      const trending = movieData.slice(0, 8);
+      const popular = movieData.slice().reverse().slice(0, 8);
+      document.getElementById('trendingRail').innerHTML = trending.map(item => renderPosterCard(item, item.badge)).join('');
+      document.getElementById('popularRail').innerHTML = popular.map(item => renderPosterCard(item, item.badge)).join('');
+
+      const heroItem = movieData[0];
+      document.getElementById('heroBg').style.backgroundImage = `linear-gradient(90deg, rgba(8,10,15,0.88) 0%, rgba(8,10,15,0.48) 35%, rgba(8,10,15,0.18) 72%, rgba(8,10,15,0.42) 100%), url('${heroItem.image}')`;
+      document.getElementById('heroTitle').textContent = heroItem.title;
+      document.getElementById('heroMeta').textContent = heroItem.type === 'series' ? 'Trending series' : 'Trending movie';
+      document.getElementById('heroScore').textContent = `★ ${Number(heroItem.rating).toFixed(1)}`;
+      document.getElementById('heroYear').textContent = heroItem.year;
+      document.getElementById('heroCopy').textContent = heroItem.blurb;
+
+      document.getElementById('heroPrimary').onclick = () => openDetail(heroItem.id);
+      document.getElementById('heroSecondary').onclick = () => openDetail(heroItem.id);
     }
 
-    function renderDiscoverGrid(filter = 'trending') {
-      const filtered = filter === 'trending'
-        ? movieData
-        : movieData.filter(item => item.tag.toLowerCase() === filter.toLowerCase());
+    function renderDiscover(filter = activeFilter) {
+      const target = document.getElementById('discoverGrid');
+      let items = movieData;
 
-      document.getElementById('discoverGrid').innerHTML = (filtered.length ? filtered : movieData).slice(0, 10).map(renderBrowseItem).join('');
+      if (filter !== 'trending') {
+        items = movieData.filter(item => item.type === filter);
+      }
+
+      target.innerHTML = items.length ? items.map(renderBrowseItem).join('') : '<div class="empty">No titles match this filter.</div>';
     }
 
-    function renderSavedGrid() {
+    function renderSaved() {
       const grid = document.getElementById('savedGrid');
-      if (!movieData.length) {
-        grid.innerHTML = '<div class="empty">Your list is empty.</div>';
+      const items = movieData.filter(item => saved.includes(item.id));
+
+      if (!items.length) {
+        grid.innerHTML = '<div class="empty">Your list is empty. Tap a poster to save something for later.</div>';
         return;
       }
-      grid.innerHTML = movieData.slice(0, 4).map(renderBrowseItem).join('');
+
+      grid.innerHTML = items.map(renderBrowseItem).join('');
     }
 
     function showPage(name) {
@@ -881,57 +1064,144 @@
       });
 
       if (name === 'mylist') {
-        renderSavedGrid();
+        renderSaved();
       }
     }
 
-    document.addEventListener('click', (event) => {
-      const card = event.target.closest('.poster-card, .browse-item');
-      if (!card) return;
-
-      const title = card.dataset.title || 'Selected title';
-      const status = document.getElementById('settingsStatus');
-      if (status) {
-        status.textContent = `Opened “${title}”.`;
+    function toggleSave(id) {
+      if (saved.includes(id)) {
+        saved = saved.filter(item => item !== id);
+      } else {
+        saved = [id, ...saved];
       }
+      persistSaved();
+      renderHome();
+      renderSaved();
+      updateDetailButtonState();
+    }
+
+    function openDetail(id) {
+      const item = movieData.find(entry => entry.id === id);
+      if (!item) return;
+
+      const detailContent = document.getElementById('detailContent');
+      const isSaved = getSavedState(item.id);
+
+      detailContent.innerHTML = `
+        <div class="detail-layout">
+          <img class="detail-poster" src="${item.image}" alt="${escapeHtml(item.title)} poster" />
+          <div class="detail-copy">
+            <h2>${escapeHtml(item.title)}</h2>
+            <div class="detail-meta">
+              <span>${escapeHtml(item.type === 'series' ? 'Series' : 'Movie')}</span>
+              <span>${escapeHtml(item.year)}</span>
+              <span>${escapeHtml(item.runtime)}</span>
+              <span>★ ${Number(item.rating).toFixed(1)}</span>
+            </div>
+            <p>${escapeHtml(item.description)}</p>
+            <div class="cta-row">
+              <button class="toggle-save ${isSaved ? 'saved' : ''}" type="button" data-action="save" data-id="${item.id}">${isSaved ? 'Saved to My List' : 'Add to My List'}</button>
+            </div>
+          </div>
+        </div>
+      `;
+
+      const overlay = document.getElementById('detailOverlay');
+      overlay.classList.add('open');
+      updateDetailButtonState();
+    }
+
+    function closeDetail() {
+      document.getElementById('detailOverlay').classList.remove('open');
+    }
+
+    function updateDetailButtonState() {
+      const button = document.querySelector('.toggle-save[data-action="save"]');
+      if (!button) return;
+      const id = button.dataset.id;
+      const isSaved = getSavedState(id);
+      button.classList.toggle('saved', isSaved);
+      button.textContent = isSaved ? 'Saved to My List' : 'Add to My List';
+    }
+
+    function loadSettings() {
+      const settings = JSON.parse(localStorage.getItem(settingsKey) || '{}');
+      document.getElementById('tmdbKey').value = settings.tmdbKey || '';
+      document.getElementById('manifestUrl').value = settings.manifestUrl || '';
+      document.getElementById('metaManifestUrl').value = settings.metaManifestUrl || '';
+    }
+
+    function saveSettings() {
+      const settings = {
+        tmdbKey: document.getElementById('tmdbKey').value.trim(),
+        manifestUrl: document.getElementById('manifestUrl').value.trim(),
+        metaManifestUrl: document.getElementById('metaManifestUrl').value.trim()
+      };
+      localStorage.setItem(settingsKey, JSON.stringify(settings));
+      document.getElementById('settingsStatus').textContent = 'Settings saved on this device.';
+    }
+
+    document.addEventListener('click', (event) => {
+      const poster = event.target.closest('.poster-card');
+      const browse = event.target.closest('.browse-item');
+      const actionSave = event.target.closest('[data-action="save"]');
+
+      if (actionSave) {
+        toggleSave(actionSave.dataset.id);
+        return;
+      }
+
+      if (poster || browse) {
+        const id = (poster || browse).dataset.id;
+        openDetail(id);
+      }
+    });
+
+    document.getElementById('closeDetailBtn').addEventListener('click', closeDetail);
+    document.getElementById('detailOverlay').addEventListener('click', (event) => {
+      if (event.target === event.currentTarget) closeDetail();
+    });
+
+    document.getElementById('saveSettingsBtn').addEventListener('click', saveSettings);
+    document.getElementById('testManifestBtn').addEventListener('click', () => {
+      const url = document.getElementById('manifestUrl').value.trim();
+      const status = document.getElementById('settingsStatus');
+      if (!url) {
+        status.textContent = 'Enter a manifest URL before testing.';
+        return;
+      }
+      status.textContent = 'Manifest check queued. Connect the app to your configured streamer manifest to validate access.';
+    });
+
+    document.getElementById('searchInput').addEventListener('input', (event) => {
+      const query = event.target.value.trim().toLowerCase();
+      const filter = activeFilter === 'trending' ? movieData : movieData.filter(item => item.type === activeFilter);
+      const visible = !query ? filter : filter.filter(item => item.title.toLowerCase().includes(query) || item.blurb.toLowerCase().includes(query));
+      document.getElementById('discoverGrid').innerHTML = visible.length ? visible.map(renderBrowseItem).join('') : '<div class="empty">No matches found.</div>';
     });
 
     document.querySelectorAll('.navlink, .bottom-tab, .icon-btn').forEach(button => {
       button.addEventListener('click', () => {
         const pageName = button.dataset.page;
-        if (pageName) showPage(pageName);
+        if (pageName) {
+          showPage(pageName);
+        }
       });
     });
 
     document.querySelectorAll('.filter').forEach(button => {
       button.addEventListener('click', () => {
+        activeFilter = button.dataset.filter;
         document.querySelectorAll('.filter').forEach(btn => btn.classList.toggle('active', btn === button));
-        renderDiscoverGrid(button.dataset.filter);
+        renderDiscover(activeFilter);
       });
     });
 
-    document.getElementById('saveSettingsBtn').addEventListener('click', () => {
-      const status = document.getElementById('settingsStatus');
-      status.textContent = 'Settings saved on this device.';
-    });
-
-    document.getElementById('testManifestBtn').addEventListener('click', () => {
-      const status = document.getElementById('settingsStatus');
-      status.textContent = 'Manifest check placeholder: connect your streamer manifest to verify access.';
-    });
-
-    document.getElementById('searchInput').addEventListener('input', (event) => {
-      const query = event.target.value.trim().toLowerCase();
-      const filtered = !query
-        ? movieData
-        : movieData.filter(item => item.title.toLowerCase().includes(query) || item.tag.toLowerCase().includes(query));
-      document.getElementById('discoverGrid').innerHTML = filtered.map(renderBrowseItem).join('');
-    });
-
     renderMoods();
-    renderHomeGrid();
-    renderDiscoverGrid();
-    renderSavedGrid();
+    renderHome();
+    renderDiscover(activeFilter);
+    renderSaved();
+    loadSettings();
   </script>
 </body>
 </html>
