@@ -651,6 +651,35 @@ video { display: block; width: 100%; max-height: 56vh; aspect-ratio: 16 / 9; bor
 @media (min-width: 700px) { #detail.overlay { padding-bottom: 32px; } .cinema-hero { min-height: min(68vh, 680px); padding: 0 48px 38px; } .cinema-info { padding: 0 48px; } .cinema-recommendations { padding-left: max(48px, calc((100vw - 780px)/2)); } .cinema-recommendations .sectionhead { padding-right: 48px; } .cinema-recommendations .rail { grid-auto-columns: 170px; } }
 @media (max-width: 380px) { .cinema-hero { min-height: 62svh; padding: 0 18px 20px; } .cinema-info { padding: 0 18px; } .cinema-actions { grid-template-columns: minmax(0,1fr) 48px; } .cinema-secondary { grid-column: 1 / -1; } .cinema-recommendations { padding-left: 18px; } }
 
+
+/* Final polish: cast portraits, tactile states, and safe-area details. */
+.cinema-cast-rail { display: flex; gap: 16px; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x proximity; padding: 0 22px 12px 0; scrollbar-width: none; }
+.cinema-cast-rail::-webkit-scrollbar, .cinema-ratings::-webkit-scrollbar, .cinema-recommendations .rail::-webkit-scrollbar { display: none; }
+.cinema-cast-card { flex: 0 0 118px; min-width: 0; scroll-snap-align: start; }
+.cinema-cast-photo { position: relative; width: 100%; aspect-ratio: 4 / 5; overflow: hidden; border-radius: 15px; background: linear-gradient(145deg,#272522,#111); }
+.cinema-cast-photo img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.cinema-cast-photo span { position: absolute; inset: 0; display: grid; place-items: center; color: #d8b18b; font-size: 25px; font-weight: 800; }
+.cinema-cast-photo img + span { display: none; }
+.cinema-cast-photo.no-photo span { display: grid; }
+.cinema-cast-card strong { display: block; margin-top: 10px; color: #f5f3ef; font-size: 13px; line-height: 1.3; }
+.cinema-cast-card small { display: block; margin-top: 4px; color: #969696; font-size: 11px; line-height: 1.35; }
+.cinema-muted { color: #999; font-size: 13px; }
+.cinema-play, .cinema-icon-action, .cinema-secondary, .cinema-close { transition: transform .18s ease, background-color .18s ease, border-color .18s ease; }
+.cinema-play:active, .cinema-icon-action:active, .cinema-secondary:active, .cinema-close:active { transform: scale(.97); }
+.cinema-play:focus-visible, .cinema-icon-action:focus-visible, .cinema-secondary:focus-visible, .cinema-close:focus-visible { outline: 2px solid #f0c18f; outline-offset: 3px; }
+.cinema-art { background-color: #171513; }
+.cinema-title h1 { text-wrap: balance; }
+.cinema-info, .cinema-recommendations { box-sizing: border-box; }
+@media (max-width: 380px) {
+  .cinema-cast-rail { gap: 12px; }
+  .cinema-cast-card { flex-basis: 104px; }
+  .cinema-meta { gap: 10px; font-size: 13px; }
+  .cinema-synopsis { font-size: 15px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cinema-play, .cinema-icon-action, .cinema-secondary, .cinema-close { transition: none; }
+}
+
 </style>
 </head>
 <body>
@@ -1340,7 +1369,7 @@ async function openDetails(item) {
       </div>
       <p id="synopsis" class="cinema-synopsis">${esc(item.overview || 'Loading synopsis…')}</p>
       <section class="cinema-section" id="ratingssection" hidden><h3>Ratings</h3><div id="externalratings" class="cinema-ratings"></div></section>
-      <section class="cinema-section" id="castsection"><h3>Cast</h3><p id="cast" class="cinema-cast">Loading cast…</p></section>
+      <section class="cinema-section" id="castsection"><h3>Cast</h3><div id="cast" class="cinema-cast-rail"><p class="cinema-muted">Loading cast…</p></div></section>
     </section>
     <section class="cinema-recommendations"><div class="sectionhead"><h2>More like this</h2></div><div id="similar" class="rail"></div></section>
   `;
@@ -1368,7 +1397,9 @@ async function openDetails(item) {
     }
     if ($('runtime')) {
       const minutes = Number(details.runtime || details.episode_run_time?.[0] || 0);
-      $('runtime').textContent = minutes ? minutes + ' min' : '';
+      $('runtime').textContent = minutes
+        ? (minutes >= 60 ? Math.floor(minutes / 60) + ' hr' + (Math.floor(minutes / 60) === 1 ? '' : 's') + (minutes % 60 ? ' ' + (minutes % 60) + ' min' : '') : minutes + ' min')
+        : '';
     }
 
     $('synopsis').textContent =
@@ -1378,10 +1409,17 @@ async function openDetails(item) {
       .map(genre => `<span class="tag">${esc(genre.name)}</span>`)
       .join('');
 
-    $('cast').textContent = (details.credits?.cast || [])
-      .slice(0, 5)
-      .map(person => person.name)
-      .join(' · ');
+    const cast = (details.credits?.cast || []).slice(0, 12);
+    $('cast').innerHTML = cast.length ? cast.map(person => {
+      const portrait = person.profile_path ? img(person.profile_path, 'w185') : '';
+      const initials = String(person.name || '?').split(/\s+/).slice(0, 2).map(part => part[0] || '').join('').toUpperCase();
+      return `<article class="cinema-cast-card">
+        <div class="cinema-cast-photo">${portrait ? `<img loading="lazy" decoding="async" src="${esc(portrait)}" alt="" onerror="this.remove();this.parentElement.classList.add('no-photo')">` : ''}
+          <span>${esc(initials)}</span></div>
+        <strong>${esc(person.name || 'Unknown cast member')}</strong>
+        <small>${esc(person.character || '')}</small>
+      </article>`;
+    }).join('') : '<p class="cinema-muted">Cast details are not available.</p>';
 
     renderRail(
       'similar',
