@@ -1590,14 +1590,14 @@ function playStream(stream, item) {
   $('playernote').textContent =
     'Now playing · watch progress is saved on this device.';
 
-  const key = typeOf(item) + ':' + item.id;
+  const key = identityType(item) + ':' + item.id;
 
   video.ontimeupdate = () => {
     if (!Number.isFinite(video.duration) || !video.duration) return;
 
     state.progress[key] = {
       item,
-      type: typeOf(item),
+      type: identityType(item),
       time: video.currentTime,
       duration: video.duration,
       updated: Date.now()
