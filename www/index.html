@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#08090d">
+<meta name="theme-color" content="#090817">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>VYRO — Cinema, reimagined</title>
@@ -697,6 +697,48 @@ video { display: block; width: 100%; max-height: 56vh; aspect-ratio: 16 / 9; bor
 .person-credit small { color: #9b9b9b; font-size: 12px; }
 html, body { touch-action: manipulation; }
 button, a, [role="button"] { touch-action: manipulation; }
+
+
+/* Signature palette: midnight ink, ultraviolet, and electric coral. */
+:root {
+  color-scheme: dark;
+  --bg: #090817;
+  --surface: #111020;
+  --surface-raised: #19172b;
+  --line: rgba(183, 153, 255, .19);
+  --text: #f7f5ff;
+  --muted: #a7a3bd;
+  --accent: #a78bfa;
+  --accent-strong: #c4b5fd;
+  --signature-coral: #ff6b8a;
+}
+html { background: var(--bg); scrollbar-color: #3a315d var(--bg); }
+body { background: radial-gradient(ellipse at 50% -18%, rgba(112,72,200,.19), transparent 48%), var(--bg); }
+.top { background: rgba(9,8,23,.88); border-bottom-color: rgba(183,153,255,.13); }
+.mark { background: linear-gradient(140deg, #c4b5fd 0%, #8b5cf6 60%, #6d5dfc 100%); color: #100b24; box-shadow: 0 5px 22px rgba(139,92,246,.24); }
+.navtop button.active, .bottom button.active { color: var(--accent-strong); background: rgba(167,139,250,.12); }
+.btn.primary, .cinema-play, .hero .primary { background: linear-gradient(115deg, #c4b5fd, #a78bfa 58%, #8b5cf6); border-color: #b7a0ff; color: #130d27; box-shadow: 0 7px 24px rgba(139,92,246,.18); }
+button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline-color: #c4b5fd; }
+.card { border-color: rgba(183,153,255,.13); }
+.card:active, .stream:active, .stream.stream-selected { border-color: var(--accent); }
+.panel, .dialog { border-color: rgba(183,153,255,.16); background-color: var(--surface); }
+.bottom { background: rgba(9,8,23,.91); border-top-color: rgba(183,153,255,.16); }
+.hero:after { background: linear-gradient(0deg, #090817 0%, rgba(9,8,23,.84) 17%, rgba(9,8,23,.2) 53%, transparent 78%); }
+.cinema-hero:after { background: linear-gradient(0deg,#090817 0%,rgba(9,8,23,.88) 13%,rgba(9,8,23,.16) 54%,rgba(9,8,23,.22) 100%); }
+.cinema-meta .score { background: rgba(167,139,250,.18); color: #e9ddff; }
+.cinema-icon-action, .cinema-secondary { border-color: rgba(183,153,255,.25); background: rgba(24,22,43,.88); }
+.cinema-close { border-color: rgba(255,255,255,.22); background: rgba(22,19,39,.7); }
+.cinema-cast-photo { background: linear-gradient(145deg,#29213f,#111020); }
+.tag { border-color: rgba(183,153,255,.24); background: rgba(167,139,250,.08); }
+.stream { border-color: rgba(183,153,255,.17); background: rgba(167,139,250,.045); }
+.stream:active, .stream.stream-selected { box-shadow: inset 3px 0 0 var(--accent), 0 0 18px rgba(139,92,246,.09); }
+.eyebrow { color: #d0bfff; }
+.sectionhead h2 { letter-spacing: -.045em; }
+.cinema-play:active, .btn.primary:active { filter: brightness(1.08); }
+@media (prefers-reduced-motion: no-preference) {
+  .mark { transition: box-shadow .2s ease, transform .2s ease; }
+  .logo:active .mark { transform: scale(.96); box-shadow: 0 2px 12px rgba(139,92,246,.3); }
+}
 
 </style>
 </head>
