@@ -976,6 +976,109 @@ video {
     scroll-behavior: auto !important;
   }
 }
+
+/* VYRO SIGNATURE VISUAL SYSTEM */
+:root {
+  --bg: #05070c;
+  --panel: #0c111b;
+  --line: rgba(164,195,255,.14);
+  --text: #f5f8ff;
+  --muted: #9aa9c0;
+  --accent: #68d8ff;
+}
+html { background:#05070c; scrollbar-color:#26334b #05070c; }
+body {
+  background:radial-gradient(ellipse at 50% -18%,rgba(63,113,210,.20),transparent 42%),radial-gradient(ellipse at 100% 42%,rgba(81,54,168,.09),transparent 32%),#05070c;
+  letter-spacing:-.018em;
+}
+.top {
+  background:rgba(5,7,12,.82);
+  border-bottom:1px solid rgba(130,183,255,.10);
+  backdrop-filter:blur(24px) saturate(160%);
+  -webkit-backdrop-filter:blur(24px) saturate(160%);
+}
+.logo { gap:11px; font-size:13px; letter-spacing:.30em; }
+.mark {
+  width:35px;height:35px;border-radius:12px;
+  background:linear-gradient(145deg,#a4efff,#55a8ff 48%,#7364ff);
+  color:#06101d;box-shadow:0 0 0 1px #c4f4ff55,0 0 28px #4bbcff35;
+}
+.navtop button { border-radius:999px; padding:10px 15px; }
+.navtop button.active,.navtop button:hover {
+  color:#eafaff;border:1px solid #8ddfff22;
+  background:linear-gradient(135deg,#78dfff18,#8d7cff10);
+}
+.topbtn { border-color:#9dcfff1c;background:#b5d8ff08; }
+.hero {
+  min-height:clamp(480px,54vw,690px);
+  border:1px solid rgba(153,200,255,.19);border-radius:28px;
+  background:linear-gradient(125deg,#101a2b,#090c15 65%);
+  box-shadow:0 35px 110px #0008,0 0 65px #2f6cb50c;
+  isolation:isolate;
+}
+.hero:before {
+  content:"";position:absolute;z-index:1;inset:0;pointer-events:none;
+  background:linear-gradient(110deg,rgba(4,7,13,.82),rgba(4,7,13,.42) 42%,transparent 78%);
+}
+.hero:after {
+  background:linear-gradient(0deg,#05070c 0%,rgba(5,7,12,.82) 10%,rgba(5,7,12,.18) 45%,transparent 72%),linear-gradient(90deg,rgba(5,7,12,.2),transparent 75%);
+}
+.heroimg { background-position:center 28%;filter:saturate(.9) contrast(1.06);animation:vyroReveal .9s ease-out both; }
+@keyframes vyroReveal { from { transform:scale(1.07);filter:brightness(.7); } to { transform:scale(1);filter:brightness(1); } }
+.herotext { padding:clamp(24px,4vw,54px);width:min(760px,100%); }
+.eyebrow {
+  display:inline-flex;align-items:center;gap:9px;padding:8px 11px;
+  border:1px solid #8fdfff35;border-radius:999px;background:#070f1d99;
+  color:#a8eaff;font-size:9px;letter-spacing:.22em;
+}
+.eyebrow:before { content:"";width:6px;height:6px;border-radius:50%;background:#6fe5ff;box-shadow:0 0 12px #6fe5ff; }
+h1 { font-size:clamp(43px,8vw,88px);font-weight:900;letter-spacing:-.075em;line-height:.91;text-shadow:0 8px 50px #0008; }
+.desc { color:#d4deee;line-height:1.75;text-shadow:0 2px 15px #0009; }
+.btn {
+  min-height:46px;padding:0 19px;border:1px solid rgba(165,208,255,.18);
+  border-radius:14px;background:rgba(181,213,255,.065);
+  transition:transform .2s,background .2s,border-color .2s,box-shadow .2s;
+}
+.btn:hover { background:rgba(126,204,255,.13);border-color:#82dcff6b;transform:translateY(-1px); }
+.btn.primary {
+  background:linear-gradient(115deg,#b0f4ff,#63c8ff 48%,#8e83ff);
+  color:#06101b;border-color:transparent;box-shadow:0 8px 28px #49c8ff27,inset 0 1px #ffffffa6;
+}
+.section { margin:42px 0; }
+.sectionhead { margin-bottom:17px; }
+.sectionhead small { color:#80dfff;font-size:9px;letter-spacing:.20em; }
+.sectionhead h2 { font-size:clamp(20px,3vw,27px);font-weight:850;letter-spacing:-.055em; }
+.rail { grid-auto-columns:clamp(138px,16vw,190px);gap:16px;padding:5px 2px 18px;scroll-snap-type:x mandatory; }
+.card { border-radius:17px;transition:transform .24s ease; }
+.card:hover { transform:translateY(-5px); }
+.poster { border-radius:16px;border:1px solid #a6cfff1c;background:#101725;box-shadow:0 10px 25px #0005;transition:border-color .25s,box-shadow .25s; }
+.card:hover .poster { border-color:#7adfff7a;box-shadow:0 16px 38px #0008,0 0 24px #58bfff18; }
+.poster img { transition:transform .45s cubic-bezier(.2,.8,.2,1),filter .3s; }
+.card:hover .poster img { transform:scale(1.055);filter:saturate(1.1); }
+.poster .badge { border:1px solid #b4eaff35;border-radius:7px;background:#080e19dd;color:#b4efff; }
+.field,input.field,select.field { background:#0f1623;border:1px solid #97c1ff30;border-radius:14px;min-height:48px;color:#f5f8ff; }
+.panel,.empty,.resume,.stream { border:1px solid #97c1ff24;border-radius:20px;background:linear-gradient(145deg,#111b2de8,#080c15f0);box-shadow:inset 0 1px #ffffff08,0 16px 40px #0002; }
+.panel { padding:22px;margin:18px 0; }
+.overlay { background:#01040aeb;backdrop-filter:blur(24px); }
+.dialog,.playershell { border:1px solid #a5d4ff20;border-radius:24px;background:#080d17;box-shadow:0 30px 100px #000a; }
+.bottom { border:1px solid #b6dfff18;border-bottom:0;background:#070b13e8;backdrop-filter:blur(24px) saturate(160%);box-shadow:0 -12px 40px #0004; }
+.bottom button.active { color:#b5f0ff;background:linear-gradient(135deg,#69d8ff18,#8c7cff12); }
+.bottom button.active b { color:#75deff; }
+@media (max-width:699px) {
+ .hero { min-height:clamp(470px,69vh,620px);border-radius:23px; }
+ .hero:before { background:linear-gradient(0deg,rgba(4,7,13,.96),rgba(4,7,13,.65) 36%,rgba(4,7,13,.05)); }
+ .heroimg { background-position:58% center; }
+ .herotext { padding:21px; }
+ h1 { font-size:clamp(42px,12vw,66px); }
+ .actions { display:grid;grid-template-columns:1.15fr 1fr; }
+ .actions .btn { padding:0 11px;font-size:12px; }
+ .section { margin:34px 0; }
+ .rail { grid-auto-columns:clamp(128px,39vw,164px);gap:12px; }
+ .sectionhead h2 { font-size:21px; }
+ .dialog { border-radius:22px 22px 0 0; }
+}
+@media (prefers-reduced-motion:reduce) { *,*:before,*:after { animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important; } }
+
 </style>
 </head>
 <body>
@@ -999,7 +1102,7 @@ video {
 <div class="hero">
 <div id="heroimg" class="heroimg"></div>
 <div class="herotext">
-<div class="eyebrow">Your next obsession</div>
+<div class="eyebrow">VYRO SELECTS · TONIGHT’S FEATURE</div>
 <h1 id="herotitle">Cinema, reimagined.</h1>
 <div id="herometa" class="meta"></div>
 <p id="herodesc" class="desc">Discover your next favourite story.</p>
