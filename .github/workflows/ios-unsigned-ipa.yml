@@ -39,7 +39,7 @@ jobs:
               "testaddon", "savextream", "testxtream", "closedetail", "closeplayer",
               "detail", "player", "video", "streams"
           ]
-          missing = [name for name in required_ids if not re.search(r'\bid=["\\']' + re.escape(name) + r'["\\']', html)]
+          missing = [name for name in required_ids if not (re.search(r'\bid="' + re.escape(name) + r'"', html) or re.search(r"\bid='" + re.escape(name) + r"'", html))]
           if missing:
               raise SystemExit("Required app controls missing: " + ", ".join(missing))
           print("Extracted inline app JavaScript; required navigation, settings and playback controls are present.")
