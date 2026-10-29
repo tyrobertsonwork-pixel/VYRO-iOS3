@@ -717,7 +717,8 @@ const state = {
   detail: null,
   hls: null,
   searchTimer: null,
-  saveTimer: null
+  saveTimer: null,
+  discoverRequestId: 0
 };
 
 const cache = new Map();
@@ -908,6 +909,10 @@ function showPage(name) {
 }
 
 async function initHome() {
+  // Keep hero controls responsive while the catalogue is loading.
+  $('heroplay').onclick = () => showPage('discover');
+  $('heroinfo').onclick = () => showPage(apiKey() ? 'discover' : 'settings');
+
   if (!apiKey()) {
     $('herotitle').innerHTML = 'Your next<br>great watch.';
     $('herodesc').textContent = 'Connect your catalogue to discover movies and series, build your watchlist and keep your viewing progress together.';
@@ -1012,9 +1017,13 @@ function paramsForDiscover() {
 }
 
 async function loadDiscover(reset = false) {
+  const requestId = ++state.discoverRequestId;
+  const previousPage = state.page;
   if (reset) {
     state.page = 1;
     state.results = [];
+  } else {
+    state.page += 1;
   }
 
   if (!apiKey()) {
@@ -1030,6 +1039,8 @@ async function loadDiscover(reset = false) {
 
   $('status').textContent = 'Loading titles…';
   $('more').hidden = true;
+  $('more').disabled = true;
+  $('more').textContent = 'Loading…';
 
   try {
     let data;
@@ -1094,6 +1105,7 @@ async function loadDiscover(reset = false) {
       }));
     }
 
+    if (requestId !== state.discoverRequestId) return;
     state.results = reset ? items : [...state.results, ...items];
 
     renderCatalog(
@@ -1107,8 +1119,15 @@ async function loadDiscover(reset = false) {
 
     $('more').hidden = state.page >= (data.total_pages || 1) || !items.length;
   } catch (error) {
-    $('results').innerHTML = `<div class="empty">${esc(error.message)}</div>`;
+    if (requestId !== state.discoverRequestId) return;
+    if (!reset) state.page = previousPage;
+    $('results').innerHTML = `<div class="empty">${esc(error.message)}<br><button class="btn" type="button" data-retry-discover>Try again</button></div>`;
     $('status').textContent = 'Could not load titles';
+  } finally {
+    if (requestId === state.discoverRequestId) {
+      $('more').disabled = false;
+      $('more').textContent = 'Load more';
+    }
   }
 }
 
@@ -1726,8 +1745,11 @@ function bind() {
   });
 
   $('more').addEventListener('click', () => {
-    state.page++;
-    loadDiscover(false);
+    if (!$('more').disabled) loadDiscover(false);
+  });
+
+  document.addEventListener('click', event => {
+    if (event.target.closest('[data-retry-discover]')) loadDiscover(true);
   });
 
   $('savetmdb').addEventListener('click', saveSettings);
