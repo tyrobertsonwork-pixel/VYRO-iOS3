@@ -740,6 +740,151 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
   .logo:active .mark { transform: scale(.96); box-shadow: 0 2px 12px rgba(139,92,246,.3); }
 }
 
+
+/* Liquid glass surface system: translucent, layered, luminous, and tactile. */
+:root {
+  --glass-fill: rgba(255,255,255,.075);
+  --glass-fill-strong: rgba(255,255,255,.115);
+  --glass-edge: rgba(255,255,255,.19);
+  --glass-highlight: rgba(255,255,255,.28);
+  --glass-shadow: 0 18px 48px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.12);
+}
+.top {
+  background: linear-gradient(180deg, rgba(20,16,42,.76), rgba(12,10,28,.58));
+  border-bottom: 1px solid rgba(255,255,255,.09);
+  box-shadow: 0 8px 32px rgba(0,0,0,.12);
+  -webkit-backdrop-filter: saturate(175%) blur(28px);
+  backdrop-filter: saturate(175%) blur(28px);
+}
+.mark {
+  border: 1px solid rgba(255,255,255,.35);
+  background: linear-gradient(145deg, rgba(255,255,255,.96), rgba(196,181,253,.86) 45%, rgba(139,92,246,.95));
+  box-shadow: 0 4px 22px rgba(167,139,250,.32), inset 0 1px 0 #ffffff;
+}
+.navtop button, .topbtn {
+  border: 1px solid transparent;
+  transition: background .2s ease, border-color .2s ease, transform .2s ease;
+}
+.navtop button.active {
+  border-color: rgba(196,181,253,.25);
+  background: linear-gradient(135deg, rgba(196,181,253,.17), rgba(139,92,246,.08));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.1), 0 5px 18px rgba(139,92,246,.08);
+}
+.topbtn {
+  border: 1px solid rgba(255,255,255,.18);
+  background: linear-gradient(145deg, rgba(255,255,255,.12), rgba(255,255,255,.035));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 8px 22px rgba(0,0,0,.12);
+  -webkit-backdrop-filter: blur(18px) saturate(165%);
+  backdrop-filter: blur(18px) saturate(165%);
+}
+.panel, .dialog {
+  border: 1px solid rgba(255,255,255,.13);
+  background: linear-gradient(145deg, rgba(35,30,61,.83), rgba(15,14,30,.92));
+  box-shadow: var(--glass-shadow);
+}
+.field, input, select, textarea {
+  border-color: rgba(255,255,255,.15);
+}
+.field:focus-within, input:focus, select:focus, textarea:focus {
+  border-color: rgba(196,181,253,.65);
+  box-shadow: 0 0 0 3px rgba(167,139,250,.12), inset 0 1px 0 rgba(255,255,255,.06);
+}
+.btn {
+  border: 1px solid rgba(255,255,255,.16);
+  background: linear-gradient(145deg, rgba(255,255,255,.12), rgba(255,255,255,.045));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.09);
+  -webkit-backdrop-filter: blur(14px) saturate(145%);
+  backdrop-filter: blur(14px) saturate(145%);
+}
+.btn.primary, .cinema-play, .hero .primary {
+  border: 1px solid rgba(255,255,255,.42);
+  background: linear-gradient(135deg, rgba(225,215,255,.96), rgba(167,139,250,.9) 52%, rgba(124,91,236,.94));
+  box-shadow: 0 8px 28px rgba(139,92,246,.25), inset 0 1px 0 rgba(255,255,255,.72), inset 0 -1px 0 rgba(50,24,110,.2);
+  color: #160d2d;
+}
+.card {
+  border: 1px solid rgba(255,255,255,.13);
+  box-shadow: 0 12px 30px rgba(0,0,0,.16);
+  transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+}
+.card:active {
+  transform: scale(.975);
+  border-color: rgba(196,181,253,.55);
+  box-shadow: 0 6px 22px rgba(139,92,246,.13);
+}
+.bottom {
+  border: 1px solid rgba(255,255,255,.16);
+  border-bottom: 0;
+  border-radius: 23px 23px 0 0;
+  padding: 9px 10px calc(8px + var(--safe));
+  background: linear-gradient(180deg, rgba(31,26,54,.83), rgba(13,11,27,.94));
+  box-shadow: 0 -12px 40px rgba(0,0,0,.24), inset 0 1px 0 rgba(255,255,255,.13);
+  -webkit-backdrop-filter: saturate(180%) blur(30px);
+  backdrop-filter: saturate(180%) blur(30px);
+}
+.bottom button { border-radius: 15px; }
+.bottom button.active {
+  border: 1px solid rgba(196,181,253,.22);
+  background: linear-gradient(145deg, rgba(196,181,253,.2), rgba(139,92,246,.08));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.13);
+}
+.overlay {
+  background: rgba(5,4,16,.76);
+  -webkit-backdrop-filter: blur(18px) saturate(135%);
+  backdrop-filter: blur(18px) saturate(135%);
+}
+#detail .dialog {
+  background: linear-gradient(180deg, rgba(19,16,35,.97), rgba(9,8,23,.98));
+  border-color: rgba(255,255,255,.16);
+}
+.cinema-close, #closeplayer {
+  border: 1px solid rgba(255,255,255,.25);
+  background: linear-gradient(145deg, rgba(255,255,255,.2), rgba(255,255,255,.075));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.18), 0 8px 24px rgba(0,0,0,.22);
+  -webkit-backdrop-filter: blur(24px) saturate(175%);
+  backdrop-filter: blur(24px) saturate(175%);
+}
+.cinema-icon-action, .cinema-secondary {
+  border: 1px solid rgba(255,255,255,.2);
+  background: linear-gradient(145deg, rgba(255,255,255,.12), rgba(255,255,255,.045));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.09), 0 8px 22px rgba(0,0,0,.14);
+  -webkit-backdrop-filter: blur(18px) saturate(165%);
+  backdrop-filter: blur(18px) saturate(165%);
+}
+.cinema-meta .score {
+  border: 1px solid rgba(196,181,253,.24);
+  background: linear-gradient(135deg, rgba(196,181,253,.22), rgba(139,92,246,.12));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.12);
+}
+.cinema-cast-photo, .person-credit, .stream {
+  border-color: rgba(255,255,255,.15);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+}
+.stream {
+  background: linear-gradient(135deg, rgba(255,255,255,.085), rgba(167,139,250,.035));
+  border-radius: 15px;
+  -webkit-backdrop-filter: blur(14px) saturate(145%);
+  backdrop-filter: blur(14px) saturate(145%);
+}
+.toast {
+  border: 1px solid rgba(255,255,255,.2);
+  background: linear-gradient(145deg, rgba(35,30,61,.92), rgba(15,14,30,.96));
+  box-shadow: 0 18px 45px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.12);
+  -webkit-backdrop-filter: blur(24px) saturate(175%);
+  backdrop-filter: blur(24px) saturate(175%);
+}
+@media (hover: hover) {
+  .card:hover { transform: translateY(-3px); border-color: rgba(196,181,253,.35); box-shadow: 0 18px 34px rgba(0,0,0,.22); }
+  .btn:hover, .topbtn:hover, .cinema-secondary:hover, .cinema-icon-action:hover { border-color: rgba(255,255,255,.3); background-color: rgba(255,255,255,.14); }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .top, .bottom, .panel, .dialog, .btn, .topbtn, .cinema-close, #closeplayer, .cinema-icon-action, .cinema-secondary, .stream, .toast {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background-color: #17142b;
+  }
+}
+
 </style>
 </head>
 <body>
