@@ -680,6 +680,24 @@ video { display: block; width: 100%; max-height: 56vh; aspect-ratio: 16 / 9; bor
   .cinema-play, .cinema-icon-action, .cinema-secondary, .cinema-close { transition: none; }
 }
 
+
+.cinema-cast-card { appearance: none; -webkit-appearance: none; display: block; padding: 0; border: 0; background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer; touch-action: manipulation; }
+.cinema-cast-card:active { transform: scale(.97); }
+.cinema-cast-card:focus-visible, .person-credit:focus-visible, .person-back:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.cinema-cast-photo { display: block; }
+.cinema-cast-photo > span { pointer-events: none; }
+.person-hero { min-height: min(68svh, 650px); }
+.person-hero:after { background: linear-gradient(0deg,#050505 0%,rgba(5,5,5,.78) 20%,rgba(5,5,5,.2) 60%,rgba(5,5,5,.24) 100%); }
+.person-art { background-position: center 20%; }
+.person-back { display: block; margin: 0 0 18px; padding: 8px 13px; border: 1px solid #ffffff30; border-radius: 999px; background: #111a; color: #f5f2ec; font-size: 13px; }
+.person-info { padding-top: 20px; }
+.person-known { grid-auto-columns: 132px; }
+.person-filmography { display: grid; gap: 8px; }
+.person-credit { display: flex; flex-direction: column; align-items: flex-start; gap: 5px; width: 100%; padding: 13px 14px; border: 1px solid #ffffff16; border-radius: 12px; background: #ffffff06; color: #f5f2ec; text-align: left; touch-action: manipulation; }
+.person-credit small { color: #9b9b9b; font-size: 12px; }
+html, body { touch-action: manipulation; }
+button, a, [role="button"] { touch-action: manipulation; }
+
 </style>
 </head>
 <body>
@@ -1413,12 +1431,12 @@ async function openDetails(item) {
     $('cast').innerHTML = cast.length ? cast.map(person => {
       const portrait = person.profile_path ? img(person.profile_path, 'w185') : '';
       const initials = String(person.name || '?').split(/\s+/).slice(0, 2).map(part => part[0] || '').join('').toUpperCase();
-      return `<article class="cinema-cast-card">
-        <div class="cinema-cast-photo">${portrait ? `<img loading="lazy" decoding="async" src="${esc(portrait)}" alt="" onerror="this.remove();this.parentElement.classList.add('no-photo')">` : ''}
-          <span>${esc(initials)}</span></div>
+      return `<button class="cinema-cast-card" type="button" data-person-id="${Number(person.id) || 0}" data-person-name="${esc(person.name || 'Cast member')}" aria-label="View ${esc(person.name || 'cast member')} details">
+        <span class="cinema-cast-photo">${portrait ? `<img loading="lazy" decoding="async" src="${esc(portrait)}" alt="" onerror="this.remove();this.parentElement.classList.add('no-photo')">` : ''}
+          <span>${esc(initials)}</span></span>
         <strong>${esc(person.name || 'Unknown cast member')}</strong>
         <small>${esc(person.character || '')}</small>
-      </article>`;
+      </button>`;
     }).join('') : '<p class="cinema-muted">Cast details are not available.</p>';
 
     renderRail(
@@ -1427,6 +1445,50 @@ async function openDetails(item) {
     );
   } catch {
     renderRail('similar', []);
+  }
+}
+
+async function openPersonDetails(personId, personName) {
+  const previous = state.detail;
+  state.personReturnItem = previous;
+  $('detailcontent').innerHTML = `
+    <section class="cinema-hero person-hero">
+      <div class="cinema-art person-art"></div>
+      <button id="closedetailhero" class="cinema-close" type="button" aria-label="Close details">×</button>
+      <div class="cinema-title">
+        <button id="backtotitle" class="person-back" type="button">‹ Back to title</button>
+        <div class="eyebrow">CAST &amp; CREW</div>
+        <h1>${esc(personName)}</h1>
+      </div>
+    </section>
+    <section class="cinema-info person-info">
+      <p class="cinema-muted" id="personbio">Loading biography…</p>
+      <div class="cinema-section"><h3>Known for</h3><div id="personknown" class="rail person-known"></div></div>
+      <div class="cinema-section"><h3>Filmography</h3><div id="personfilmography" class="person-filmography"></div></div>
+    </section>`;
+  try {
+    const person = await tmdb(`/person/${personId}`, { append_to_response: 'combined_credits,images' });
+    if (!$('detail').classList.contains('open') || !state.personReturnItem || Number(state.personReturnItem.id) !== Number(previous?.id)) return;
+    const profile = person.profile_path ? img(person.profile_path, 'w780') : '';
+    const art = $('detailcontent').querySelector('.person-art');
+    if (art && profile) art.style.backgroundImage = `url("${profile}")`;
+    const hero = $('detailcontent').querySelector('.person-hero');
+    if (hero) hero.style.setProperty('--detail-art', profile ? `url("${profile}")` : 'none');
+    const bio = person.biography || 'No biography is available for this person.';
+    $('personbio').textContent = bio;
+    const credits = (person.combined_credits?.cast || []).slice().sort((a,b) => {
+      const da = a.release_date || a.first_air_date || '';
+      const db = b.release_date || b.first_air_date || '';
+      return db.localeCompare(da);
+    });
+    const known = credits.slice().sort((a,b) => (b.popularity || 0) - (a.popularity || 0)).slice(0,10);
+    renderRail('personknown', known);
+    $('personfilmography').innerHTML = credits.slice(0,40).map(credit => `
+      <button type="button" class="person-credit" data-person-credit-id="${Number(credit.id) || 0}" data-person-credit-type="${esc(credit.media_type || 'movie')}">
+        <span>${esc(titleOf(credit))}</span><small>${esc(String(credit.release_date || credit.first_air_date || '').slice(0,4) || '—')} · ${esc(credit.character || credit.job || credit.department || '')}</small>
+      </button>`).join('') || '<p class="cinema-muted">No filmography is available.</p>';
+  } catch (error) {
+    $('personbio').textContent = 'Could not load actor details. Check your TMDB API key and connection.';
   }
 }
 
@@ -2223,7 +2285,16 @@ function bind() {
   $('closedetail').addEventListener('click', closeDetails);
   $('closeplayer').addEventListener('click', closePlayer);
   $('detailcontent').addEventListener('click', event => {
-    if (event.target.closest('#closedetailhero')) closeDetails();
+    if (event.target.closest('#closedetailhero')) { closeDetails(); return; }
+    const actor = event.target.closest('[data-person-id]');
+    if (actor && Number(actor.dataset.personId)) {
+      openPersonDetails(Number(actor.dataset.personId), actor.dataset.personName || 'Cast member');
+    }
+    if (event.target.closest('#backtotitle') && state.personReturnItem) {
+      const previous = state.personReturnItem;
+      state.personReturnItem = null;
+      openDetails(previous);
+    }
   });
 
   $('detail').addEventListener('click', event => {
