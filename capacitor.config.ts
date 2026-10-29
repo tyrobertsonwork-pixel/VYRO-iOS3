@@ -9,7 +9,7 @@ const config: CapacitorConfig = {
     // restrictions do not block Xtream requests in the installed app.
     CapacitorHttp: { enabled: true }
   },
-  ios: { contentInset: 'automatic', backgroundColor: '#080811' }
+  ios: { contentInset: 'never', backgroundColor: '#080811' }
 };
 
 export default config;
