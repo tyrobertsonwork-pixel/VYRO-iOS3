@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#08090d">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -29,6 +29,7 @@
 html {
   background: var(--bg);
   -webkit-text-size-adjust: 100%;
+  scroll-padding-top: 12px;
   scroll-behavior: auto;
   scrollbar-color: #37332e var(--bg);
 }
@@ -524,7 +525,11 @@ video { display: block; width: 100%; max-height: 65vh; aspect-ratio: 16 / 9; bor
 .chip { border-radius: 999px; }
 .stream { border-radius: 11px; }
 @media (max-width: 699px) {
-  body { padding-bottom: calc(104px + var(--safe)); }
+  body { padding-bottom: calc(112px + var(--safe)); }
+  main, .page, .shell { min-width: 0; }
+  .detailbody > div, .section, .sectionhead { min-width: 0; }
+  .field, .panel, .dialog, .playershell { max-width: 100%; }
+  .bottom { max-width: calc(100vw - 26px); }
   .top {
     gap: 10px;
     padding: calc(var(--top) + 9px) 16px 9px;
@@ -546,11 +551,11 @@ video { display: block; width: 100%; max-height: 65vh; aspect-ratio: 16 / 9; bor
       linear-gradient(0deg, #070707 0%, rgba(7,7,7,.92) 12%, rgba(7,7,7,.42) 42%, rgba(7,7,7,.08) 76%),
       linear-gradient(90deg, rgba(7,7,7,.28), transparent 78%);
   }
-  .herotext { padding: 24px 20px 27px; }
+  .herotext { padding: 24px 20px 27px; min-width: 0; overflow-wrap: anywhere; }
   h1 { font-size: clamp(42px, 11.5vw, 60px); }
   .desc { font-size: 14px; line-height: 1.58; max-width: 35ch; }
   .actions { gap: 10px; }
-  .actions .btn { min-height: 48px; border-radius: 13px; font-size: 12px; }
+  .actions .btn { min-width: 0; min-height: 48px; border-radius: 13px; padding-inline: 10px; font-size: 12px; white-space: normal; }
   .shell > .section { margin: 32px 18px; }
   .sectionhead h2 { font-size: 23px; }
   .sectionhead small { letter-spacing: .15em; }
@@ -594,7 +599,7 @@ video { display: block; width: 100%; max-height: 65vh; aspect-ratio: 16 / 9; bor
   .overlay { padding-left: 0; padding-right: 0; }
   .dialog { border-radius: 0 0 18px 18px; }
   .detailhero { min-height: 260px; padding: 22px 20px; }
-  .detailbody { padding: 18px 20px; }
+  .detailbody { padding: 18px 20px; min-width: 0; }\n  .detailbody > div { min-width: 0; overflow-wrap: anywhere; }\n  .playertop { min-width: 0; }\n  .playershell { overflow-wrap: anywhere; }
   .panel { padding: 18px; }
 }
 @media (prefers-reduced-motion: reduce) {
