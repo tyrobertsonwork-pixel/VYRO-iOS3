@@ -1345,8 +1345,9 @@ async function openDetails(item) {
     <section class="cinema-recommendations"><div class="sectionhead"><h2>More like this</h2></div><div id="similar" class="rail"></div></section>
   `;
 
-  $('playtitle').onclick = () => startStream(item);
-  $('savetitle').onclick = () => toggleSave(item);
+  $('playtitle').onclick = () => startStream(state.detail || item);
+  $('savetitle').onclick = () => toggleSave(state.detail || item);
+  $('othersources')?.addEventListener('click', () => startStream(state.detail || item));
 
   try {
     const details = await tmdb(`/${type}/${item.id}`, {
@@ -1356,6 +1357,19 @@ async function openDetails(item) {
     if (!$('detail').classList.contains('open') || state.detail?.id !== item.id) return;
 
     state.detail = { ...item, ...details, media_type: type };
+    const resolvedTitle = titleOf(state.detail);
+    const titleNode = $('detailcontent').querySelector('.cinema-title h1');
+    const artNode = $('detailcontent').querySelector('.cinema-art');
+    if (titleNode) titleNode.textContent = resolvedTitle;
+    if (artNode) artNode.setAttribute('aria-label', resolvedTitle + ' artwork');
+    const detailHero = $('detailcontent').querySelector('.cinema-hero');
+    if (detailHero && (details.backdrop_path || details.poster_path)) {
+      detailHero.style.setProperty('--detail-art', `url("${backdropOf(state.detail) || posterOf(state.detail)}")`);
+    }
+    if ($('runtime')) {
+      const minutes = Number(details.runtime || details.episode_run_time?.[0] || 0);
+      $('runtime').textContent = minutes ? minutes + ' min' : '';
+    }
 
     $('synopsis').textContent =
       details.overview || item.overview || 'No synopsis available.';
@@ -1398,7 +1412,9 @@ function toggleSave(item) {
   renderSaved();
 
   if ($('savetitle')) {
-    $('savetitle').textContent = index >= 0 ? '＋ My List' : '✓ Saved';
+    const isSaved = index < 0;
+    $('savetitle').textContent = isSaved ? '♥' : '♡';
+    $('savetitle').setAttribute('aria-label', isSaved ? 'Remove from My List' : 'Add to My List');
   }
 }
 
@@ -2168,6 +2184,9 @@ function bind() {
 
   $('closedetail').addEventListener('click', closeDetails);
   $('closeplayer').addEventListener('click', closePlayer);
+  $('detailcontent').addEventListener('click', event => {
+    if (event.target.closest('#closedetailhero')) closeDetails();
+  });
 
   $('detail').addEventListener('click', event => {
     if (event.target === $('detail')) closeDetails();
