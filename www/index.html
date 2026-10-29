@@ -1507,8 +1507,16 @@ async function fetchStreams(item) {
     let lastError = '';
     for (const id of idsToTry) {
       try {
+        // Stremio settings store the full manifest URL (often ending in
+        // /manifest.json). Stream resources live beside the manifest, not
+        // underneath /manifest.json. Preserve configured path prefixes and
+        // query parameters used by hosted/configured add-ons.
+        const endpoint = new URL(manifest);
+        endpoint.pathname = endpoint.pathname
+          .replace(/\/manifest\.json\/?$/i, '')
+          .replace(/\/+$/, '') + `/stream/${type}/${id}.json`;
         const response = await fetch(
-          `${manifest}/stream/${type}/${id}.json`,
+          endpoint.toString(),
           { headers: { Accept: 'application/json' } }
         );
         if (!response.ok) {
