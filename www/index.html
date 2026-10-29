@@ -748,6 +748,11 @@ function isXtreamItem(item) {
   return item?.media_type === 'xtream_movie' || item?.media_type === 'xtream_series';
 }
 
+// Preserve source identity: a provider's movie/series ID can overlap a TMDB ID.
+function identityType(item) {
+  return isXtreamItem(item) ? item.media_type : typeOf(item);
+}
+
 function yearOf(item) {
   return String(item?._xtreamYear || item?.release_date || item?.first_air_date || '').slice(0, 4) || '—';
 }
@@ -1154,7 +1159,7 @@ async function openDetails(item) {
           <button id="playtitle" class="btn primary">▶ Find a stream</button>
           <button id="savetitle" class="btn">${
             state.saved.some(saved =>
-              String(saved.id) === String(item.id) && typeOf(saved) === type
+              String(saved.id) === String(item.id) && identityType(saved) === identityType(item)
             ) ? '✓ Saved' : '＋ My List'
           }</button>
         </div>
@@ -1207,7 +1212,7 @@ function closeDetails() {
 
 function toggleSave(item) {
   const index = state.saved.findIndex(saved =>
-    String(saved.id) === String(item.id) && typeOf(saved) === typeOf(item)
+    String(saved.id) === String(item.id) && identityType(saved) === identityType(item)
   );
 
   if (index >= 0) {
@@ -1471,6 +1476,18 @@ function openPlayer(item) {
 }
 
 async function startStream(item) {
+  if (isXtreamItem(item)) {
+    if (item.media_type === 'xtream_movie') {
+      closeDetails();
+      playXtreamMovie(item);
+    } else {
+      closeDetails();
+      openXtreamDetails(item);
+      await loadXtreamEpisodes(item);
+    }
+    return;
+  }
+
   closeDetails();
   openPlayer(item);
 
