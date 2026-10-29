@@ -1011,6 +1011,36 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
   .bottom { width: calc(100% - 22px); }
 }
 
+
+/* Consolidated app interaction layer: vector iconography, responsive transitions, tactile controls. */
+.topbtn svg, .bottom button svg {
+  display: block;
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.topbtn { display: grid; place-items: center; }
+.bottom button { -webkit-user-select: none; user-select: none; }
+.bottom button svg { width: 21px; height: 21px; }
+.bottom button span { display: block; }
+.page.active { animation: app-page-enter .22s cubic-bezier(.2,.75,.25,1) both; }
+@keyframes app-page-enter {
+  from { opacity: .72; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.card, .btn, .topbtn, .bottom button, .chip {
+  -webkit-tap-highlight-color: transparent;
+}
+.bottom button.active svg { filter: drop-shadow(0 0 7px rgba(196,181,253,.28)); }
+@media (prefers-reduced-motion: reduce) {
+  .page.active { animation: none; }
+  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
+}
+
 </style>
 </head>
 <body>
@@ -1024,8 +1054,8 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 <button data-page="mylist">My List</button>
 </nav>
 <div class="topright">
-<button class="topbtn" aria-label="Search" data-page="discover">⌕</button>
-<button class="topbtn" aria-label="Settings" data-page="settings">⚙</button>
+<button class="topbtn" aria-label="Search" data-page="discover"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.6"></circle><path d="m16 16 4.2 4.2"></path></svg></button>
+<button class="topbtn" aria-label="Settings" data-page="settings"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Z"></path><path d="m19.4 13.5 1.1.9-1.7 3-1.4-.5a7.9 7.9 0 0 1-1.6.9l-.2 1.5h-3.5l-.2-1.5a7.9 7.9 0 0 1-1.6-.9l-1.4.5-1.7-3 1.1-.9a7.3 7.3 0 0 1 0-1.9l-1.1-.9 1.7-3 1.4.5a7.9 7.9 0 0 1 1.6-.9l.2-1.5h3.5l.2 1.5a7.9 7.9 0 0 1 1.6.9l1.4-.5 1.7 3-1.1.9a7.3 7.3 0 0 1 0 1.9Z" transform="translate(-1 -1) scale(1.08)"></path></svg></button>
 </div>
 </header>
 
@@ -1178,11 +1208,11 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 </section>
 </main>
 
-<nav class="bottom">
-<button class="active" data-page="home"><b>⌂</b>Home</button>
-<button data-page="discover"><b>⌕</b>Discover</button>
-<button data-page="mylist"><b>＋</b>My List</button>
-<button data-page="settings"><b>⚙</b>Settings</button>
+<nav class="bottom" aria-label="Main navigation">
+<button class="active" data-page="home" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3.5 10.5 8.5-7 8.5 7"></path><path d="M5.8 9.5v10h4.5v-6h3.4v6h4.5v-10"></path></svg><span>Home</span></button>
+<button data-page="discover"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.6"></circle><path d="m16 16 4.2 4.2"></path></svg><span>Discover</span></button>
+<button data-page="mylist"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v16M4 12h16"></path></svg><span>My List</span></button>
+<button data-page="settings"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Z"></path><path d="M19.4 13.5 20.5 14.4 18.8 17.4 17.4 16.9 15.8 17.8 15.6 19.3h-3.5l-.2-1.5-1.6-.9-1.4.5-1.7-3 1.1-.9v-1.9l-1.1-.9 1.7-3 1.4.5 1.6-.9.2-1.5h3.5l.2 1.5 1.6.9 1.4-.5 1.7 3-1.1.9v1.9Z"></path></svg><span>Settings</span></button>
 </nav>
 
 <div id="detail" class="overlay" role="dialog" aria-modal="true">
@@ -1432,18 +1462,25 @@ function renderContinue() {
 }
 
 function showPage(name) {
+  state.page = name;
   document.querySelectorAll('.page').forEach(page => {
     page.classList.toggle('active', page.id === name);
+    page.setAttribute('aria-hidden', page.id === name ? 'false' : 'true');
   });
 
   document.querySelectorAll('[data-page]').forEach(button => {
-    button.classList.toggle('active', button.dataset.page === name);
+    const active = button.dataset.page === name;
+    button.classList.toggle('active', active);
+    if (button.closest('.bottom')) {
+      if (active) button.setAttribute('aria-current', 'page');
+      else button.removeAttribute('aria-current');
+    }
   });
 
   if (name === 'mylist') renderSaved();
   if (name === 'discover' && !state.results.length) loadDiscover(true);
 
-  window.scrollTo(0, 0);
+  window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
 }
 
 async function initHome() {
