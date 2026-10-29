@@ -957,14 +957,13 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 
 /* App-shell pass: compact native-feeling navigation and immersive mobile browsing. */
 @media (max-width: 700px) {
-  /* Capacitor already places the web content below the iOS status area in this build;
-     don't add the safe-area inset a second time to the header. */
+  /* Web view extends edge-to-edge; CSS owns the safe-area inset exactly once. */
   .top {
     position: sticky;
     top: 0;
     gap: 10px;
     min-height: 70px;
-    padding: 9px 16px 10px;
+    padding: calc(var(--top) + 8px) 16px 10px;
     background: rgba(12,10,27,.82);
     border-bottom: 1px solid rgba(255,255,255,.08);
     -webkit-backdrop-filter: saturate(180%) blur(28px);
