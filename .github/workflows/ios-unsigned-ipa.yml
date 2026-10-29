@@ -20,6 +20,32 @@ jobs:
         with:
           node-version: 22
 
+      - name: Validate web app JavaScript and required controls
+        run: |
+          python3 - <<'PY'
+          import re
+          from pathlib import Path
+
+          html = Path("www/index.html").read_text(encoding="utf-8")
+          scripts = re.findall(r'<script\b([^>]*)>([\s\S]*?)</script\s*>', html, re.I)
+          inline = [body for attrs, body in scripts if not re.search(r'\bsrc\s*=', attrs, re.I) and body.strip()]
+          if not inline:
+              raise SystemExit("No inline application script found")
+          Path("/tmp/vyro-app.js").write_text("\n\n".join(inline), encoding="utf-8")
+
+          required_ids = [
+              "home", "discover", "mylist", "settings", "query", "kind", "sort",
+              "results", "saved", "tmdbkey", "manifests", "savetmdb", "saveaddon",
+              "testaddon", "savextream", "testxtream", "closedetail", "closeplayer",
+              "detail", "player", "video", "streams"
+          ]
+          missing = [name for name in required_ids if not re.search(r'\bid=["\\']' + re.escape(name) + r'["\\']', html)]
+          if missing:
+              raise SystemExit("Required app controls missing: " + ", ".join(missing))
+          print("Extracted inline app JavaScript; required navigation, settings and playback controls are present.")
+          PY
+          node --check /tmp/vyro-app.js
+
       - name: Install dependencies
         run: npm install
 
