@@ -1310,7 +1310,11 @@ function explainXtreamFetchError(error) {
   if (/failed to fetch|load failed|network request failed|networkerror/i.test(message)) {
     return 'The app could not read the provider response. Common causes are a wrong host/port, an unreachable server, HTTP blocked by iOS, or the provider blocking WebView CORS. The app cannot bypass provider CORS by itself.';
   }
-  if (/json|unexpected token|not valid json/i.test(message)) return 'The server returned something other than JSON. Check that this is the Xtream server URL, not a playlist URL or web portal login page.';
+  // Preserve the detailed, sanitized HTTP/content-type/body hint produced by
+  // xtreamRequest; only map low-level JSON parser errors to the generic message.
+  if (/^Unexpected token|^JSON\.parse|^Expected property name|^not valid json$/i.test(message)) {
+    return 'The server returned something other than JSON. Check that this is the Xtream server URL, not a playlist URL or web portal login page.';
+  }
   return message;
 }
 async function xtreamRequest(action, extra = {}) {
