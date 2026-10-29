@@ -1338,6 +1338,13 @@ async function xtreamRequest(action, extra = {}) {
   try { data = JSON.parse(text); } catch { /* Some providers return HTML/text for HTTP errors. */ }
   if (!response.ok) {
     const apiMessage = data?.user_info?.message || data?.user_info?.status || data?.message || data?.error;
+    if (response.status === 429) {
+      const retryAfter = response.headers.get('retry-after');
+      const waitHint = retryAfter && /^\d+$/.test(retryAfter)
+        ? ' Wait at least ' + retryAfter + ' seconds before trying again.'
+        : ' Wait a few minutes before trying again.';
+      throw new Error('Provider rate-limited VYRO (HTTP 429).' + waitHint + ' The connection test now checks login only; catalogue requests should be loaded separately. If other IPTV apps still work, ask the provider whether it rate-limits requests from this device/network.');
+    }
     if (response.status === 401) {
       if (apiMessage) throw new Error('Provider returned HTTP 401: ' + String(apiMessage).slice(0, 180) + '. Check the exact provider URL/port and ask the provider whether API/player access is enabled.');
       throw new Error('Provider returned HTTP 401 before VYRO received a valid Xtream response. This can be provider-side web/API authentication, a wrong host or port, or an access rule. Confirm the exact server URL/port with your provider; don’t assume the password alone is wrong.');
@@ -1381,18 +1388,17 @@ async function testXtream() {
       throw new Error('Enter your provider username and password.');
     }
     setStatus('Checking Xtream login…');
+    // Keep the connection test to one request. Some providers rate-limit
+    // clients that immediately request multiple catalogue endpoints.
     const account = await xtreamRequest('');
     if (!account?.user_info || account.user_info.auth !== 1) {
       throw new Error('The endpoint responded, but did not return a valid Xtream account response.');
     }
-    setStatus('Login accepted. Checking movie and series catalogues…');
-    const [movies, series] = await Promise.all([
-      xtreamRequest('get_vod_streams'),
-      xtreamRequest('get_series')
-    ]);
-    if (!Array.isArray(movies)) throw new Error('Login worked, but the movie endpoint did not return a list.');
-    if (!Array.isArray(series)) throw new Error('Login worked, but the series endpoint did not return a list.');
-    setStatus('Xtream backend OK · login accepted · ' + movies.length.toLocaleString() + ' movies · ' + series.length.toLocaleString() + ' series. Tap Load provider movies or Load provider series in Discover.');
+    const expiry = account.user_info.exp_date;
+    const expiryText = expiry && /^\d+$/.test(String(expiry))
+      ? ' · account expiry ' + new Date(Number(expiry) * 1000).toLocaleDateString()
+      : '';
+    setStatus('Xtream login accepted' + expiryText + '. Connection test complete. Load movies or series from Discover when ready.');
   } catch (error) {
     setStatus('Xtream diagnostic failed: ' + explainXtreamFetchError(error));
   }
