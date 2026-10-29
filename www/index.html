@@ -1328,11 +1328,20 @@ async function xtreamRequest(action, extra = {}) {
   } finally {
     clearTimeout(timeout);
   }
-  if (!response.ok) throw new Error('Provider returned HTTP ' + response.status + '. Check the URL, port and account status.');
   const contentType = response.headers.get('content-type') || '';
   const text = await response.text();
-  let data;
-  try { data = JSON.parse(text); } catch {
+  let data = null;
+  try { data = JSON.parse(text); } catch { /* Some providers return HTML/text for HTTP errors. */ }
+  if (!response.ok) {
+    const apiMessage = data?.user_info?.message || data?.user_info?.status || data?.message || data?.error;
+    if (response.status === 401) {
+      if (apiMessage) throw new Error('Provider returned HTTP 401: ' + String(apiMessage).slice(0, 180) + '. Check the exact provider URL/port and ask the provider whether API/player access is enabled.');
+      throw new Error('Provider returned HTTP 401 before VYRO received a valid Xtream response. This can be provider-side web/API authentication, a wrong host or port, or an access rule. Confirm the exact server URL/port with your provider; don’t assume the password alone is wrong.');
+    }
+    if (apiMessage) throw new Error('Provider returned HTTP ' + response.status + ': ' + String(apiMessage).slice(0, 180));
+    throw new Error('Provider returned HTTP ' + response.status + (contentType ? ' (' + contentType + ')' : '') + '. Check the exact server URL/port and ask the provider whether player API access is enabled.');
+  }
+  if (data === null) {
     throw new Error('The server replied with a non-JSON page' + (contentType ? ' (' + contentType + ')' : '') + '. Use the Xtream server host URL, not an M3U playlist or web login URL.');
   }
   if (data?.user_info?.auth === 0) {
