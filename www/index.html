@@ -1715,6 +1715,29 @@ function playStream(stream, item) {
   const isHls =
     /\.m3u8($|\?)/i.test(parsed.href) ||
     /mpegurl/i.test(stream.mimeType || '');
+  const extension = (parsed.pathname.split('.').pop() || '').toLowerCase();
+  const likelyUnsupported = ['mkv', 'avi', 'wmv', 'flv', 'ts'].includes(extension);
+
+  // Don't claim playback started before the browser confirms it. iOS WebKit
+  // often cannot decode MKV/AVI/TS even when the provider URL is valid.
+  $('playernote').textContent = isHls
+    ? 'Loading HLS stream…'
+    : likelyUnsupported
+      ? 'Opening source… this format may not be supported by the built-in iOS player.'
+      : 'Loading video…';
+
+  video.onerror = () => {
+    const code = video.error?.code;
+    const detail = ({
+      1: 'Playback was aborted.',
+      2: 'A network error occurred while loading this stream.',
+      3: 'iOS could not decode this video format or codec.',
+      4: 'This video format or source URL is not supported by the built-in iOS player.'
+    })[code] || 'The video could not be loaded.';
+    $('playernote').textContent = detail + (likelyUnsupported
+      ? ' The source is .' + extension + '; try a compatible MP4 or HLS source.'
+      : ' Try another source if this continues.');
+  };
 
   if (isHls && window.Hls && Hls.isSupported() && state.settings.player !== 'native') {
     state.hls = new Hls({
@@ -1726,26 +1749,37 @@ function playStream(stream, item) {
     state.hls.attachMedia(video);
 
     state.hls.on(Hls.Events.MANIFEST_PARSED, () => {
-      video.play().catch(() => {});
+      video.play().then(() => {
+        $('playernote').textContent = 'Playing · watch progress is saved on this device.';
+      }).catch(() => {
+        $('playernote').textContent = 'Stream loaded. Press Play in the video controls to start.';
+      });
     });
 
     state.hls.on(Hls.Events.ERROR, (_, data) => {
       if (data.fatal) {
-        $('playernote').textContent =
-          'Playback failed. The source may block browser playback.';
+        $('playernote').textContent = data.type === Hls.ErrorTypes.NETWORK_ERROR
+          ? 'HLS network error. The source may be offline or blocking requests.'
+          : data.type === Hls.ErrorTypes.MEDIA_ERROR
+            ? 'HLS media decode error. Try another source or format.'
+            : 'HLS playback failed. Try another source.';
       }
     });
   } else {
     video.src = parsed.href;
-
-    video.play().catch(() => {
-      $('playernote').textContent =
-        'Source selected, but automatic playback was blocked. Press Play in the video controls. If it still fails, the source may require a compatible player or a direct playable URL.';
+    video.load();
+    video.play().then(() => {
+      $('playernote').textContent = 'Playing · watch progress is saved on this device.';
+    }).catch(error => {
+      if (error?.name === 'NotAllowedError') {
+        $('playernote').textContent = 'Source selected. Press Play in the video controls to start.';
+      } else {
+        $('playernote').textContent = likelyUnsupported
+          ? 'Source selected, but iOS may not support .' + extension + ' playback. Try a compatible MP4 or HLS source.'
+          : 'Source selected, but playback did not start. Check the stream URL or try another source.';
+      }
     });
   }
-
-  $('playernote').textContent =
-    'Now playing · watch progress is saved on this device.';
 
   const key = identityType(item) + ':' + item.id;
 
