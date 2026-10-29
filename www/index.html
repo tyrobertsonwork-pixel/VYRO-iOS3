@@ -1624,17 +1624,39 @@ async function startStream(item) {
 
     // Delegate stream selection from the container. This is more reliable
     // in iOS WKWebView than attaching listeners to each freshly-rendered row.
-    $('streams').onclick = event => {
-      const button = event.target.closest('button[data-stream]');
-      if (!button || ! $('streams').contains(button)) return;
-      event.preventDefault();
-      event.stopPropagation();
+    let lastStreamActivation = 0;
+    const activateStream = event => {
+      const button = event.target?.closest?.('[data-stream]');
+      if (!button || !$('streams').contains(button)) return false;
+      const now = Date.now();
+      // A touch can produce both pointerup/touchend and click in WKWebView.
+      // Avoid starting the same source twice.
+      if (now - lastStreamActivation < 650) return true;
+      lastStreamActivation = now;
+      event.preventDefault?.();
+      event.stopPropagation?.();
       const selected = usable[Number(button.dataset.stream)];
       if (!selected) {
         $('playernote').textContent = 'That stream could not be selected. Please try another result.';
+        return true;
+      }
+      $('playernote').textContent = 'Opening selected source…';
+      playStream(selected, item);
+      return true;
+    };
+    // iOS WebView can occasionally miss click on newly rendered rows. Handle
+    // pointer/touch activation at the stream-list container as well.
+    $('streams').onpointerup = event => { activateStream(event); };
+    $('streams').ontouchend = event => {
+      if (!window.PointerEvent) activateStream(event);
+    };
+    $('streams').onclick = event => {
+      if (Date.now() - lastStreamActivation < 650) {
+        event.preventDefault();
+        event.stopPropagation();
         return;
       }
-      playStream(selected, item);
+      activateStream(event);
     };
   } catch (error) {
     $('playernote').textContent = error.message;
