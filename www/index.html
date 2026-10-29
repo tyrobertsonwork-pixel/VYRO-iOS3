@@ -1342,7 +1342,22 @@ async function xtreamRequest(action, extra = {}) {
     throw new Error('Provider returned HTTP ' + response.status + (contentType ? ' (' + contentType + ')' : '') + '. Check the exact server URL/port and ask the provider whether player API access is enabled.');
   }
   if (data === null) {
-    throw new Error('The server replied with a non-JSON page' + (contentType ? ' (' + contentType + ')' : '') + '. Use the Xtream server host URL, not an M3U playlist or web login URL.');
+    // Show a short, sanitized hint from HTML/text responses so we can distinguish
+    // a portal page, reverse-proxy/WAF block, and an incorrect API endpoint.
+    const hint = text
+      .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+      .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/&nbsp;|&#160;/gi, ' ')
+      .replace(/&amp;/gi, '&')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .slice(0, 180);
+    throw new Error('Xtream endpoint returned non-JSON' +
+      ' (HTTP ' + response.status +
+      (contentType ? ', ' + contentType : '') + ')' +
+      (hint ? ': “' + hint + '”' : '') +
+      '. Expected JSON from /player_api.php. If this is a proxy/security page, the provider must allow API requests from VYRO.');
   }
   if (data?.user_info?.auth === 0) {
     const status = data.user_info.status || data.user_info.message || 'credentials rejected';
