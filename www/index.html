@@ -1269,12 +1269,13 @@ h1 {font-size:clamp(42px,8vw,82px);font-weight:900;letter-spacing:-.075em;line-h
 </div>
 
 <div class="panel">
-<h3>Video source</h3>
-<p>Connect a compatible Stremio-style VOD add-on. It must allow browser requests and return direct playable stream URLs for movies or series.</p>
-<label for="manifest">Manifest URL</label>
-<input id="manifest" class="field" type="url" placeholder="https://…/manifest.json">
-<button id="saveaddon" class="btn primary">Save add-on</button>
-<button id="testaddon" class="btn">Test manifest</button>
+<h3>Streaming sources</h3>
+<p>Connect one or more compatible Stremio-style video-on-demand add-ons. VYRO checks all connected sources when you open a movie or series. Live TV is intentionally excluded.</p>
+<label for="manifests">Add-on manifest URLs</label>
+<textarea id="manifests" class="field" rows="4" placeholder="https://source-one.example/manifest.json&#10;https://source-two.example/manifest.json" style="padding:12px;min-height:105px;resize:vertical"></textarea>
+<p>Enter one manifest URL per line. Sources must permit browser requests (CORS) and return direct playable URLs. Your provider's own terms and access requirements still apply.</p>
+<button id="saveaddon" class="btn primary">Save sources</button>
+<button id="testaddon" class="btn">Test all sources</button>
 </div>
 
 <div class="panel">
@@ -1356,7 +1357,7 @@ function write(k, value) {
 }
 
 const state = {
-  settings: { key: '', manifest: '', player: 'auto' },
+  settings: { key: '', manifest: '', manifests: [], player: 'auto' },
   saved: read(KEYS.saved, []),
   progress: read(KEYS.progress, {}),
   genres: { movie: [], tv: [] },
@@ -1839,36 +1840,47 @@ function normalise(url) {
   return String(url || '').trim().replace(/\/+$/, '');
 }
 
-async function testManifest() {
-  const url = normalise($('manifest').value);
+function configuredManifests() {
+  const entered = $('manifests') ? $('manifests').value : '';
+  const fromTextarea = String(entered || '').split(/[\n,]+/)
+    .map(value => normalise(value))
+    .filter(Boolean);
+  const stored = Array.isArray(state.settings.manifests) ? state.settings.manifests : [];
+  const legacy = state.settings.manifest ? [state.settings.manifest] : [];
+  return [...new Set([...fromTextarea, ...stored, ...legacy].map(normalise).filter(Boolean))];
+}
 
-  if (!url) {
-    setStatus('Paste your add-on manifest URL first.');
+async function testManifest() {
+  const urls = configuredManifests();
+
+  if (!urls.length) {
+    setStatus('Paste at least one add-on manifest URL first.');
     return;
   }
 
-  try {
-    setStatus('Testing add-on…');
-
-    const response = await fetch(url, {
-      headers: { Accept: 'application/json' }
-    });
-
-    if (!response.ok) throw new Error('HTTP ' + response.status);
-
-    const manifest = await response.json();
-
-    if (!manifest.id || !manifest.resources) {
-      throw new Error('This does not look like a Stremio-compatible manifest.');
+  setStatus('Testing ' + urls.length + ' source' + (urls.length === 1 ? '' : 's') + '…');
+  const results = await Promise.all(urls.map(async url => {
+    try {
+      const response = await fetch(url, { headers: { Accept: 'application/json' } });
+      if (!response.ok) throw new Error('HTTP ' + response.status);
+      const manifest = await response.json();
+      if (!manifest.id || !manifest.resources) {
+        throw new Error('Not a Stremio-compatible manifest');
+      }
+      return { ok: true, name: manifest.name || manifest.id, url };
+    } catch (error) {
+      return { ok: false, url, error: error.message };
     }
+  }));
 
-    setStatus(
-      'Manifest responded: ' + (manifest.name || manifest.id) +
-      '. Playback still depends on compatible direct URLs.'
-    );
-  } catch (error) {
-    setStatus('Manifest test failed: ' + error.message + ' Check URL and CORS support.');
-  }
+  const good = results.filter(result => result.ok);
+  const bad = results.filter(result => !result.ok);
+  const summary = [
+    good.length + ' of ' + urls.length + ' sources responded successfully.',
+    ...good.map(result => '✓ ' + result.name),
+    ...bad.map(result => '✕ ' + result.url + ' — ' + result.error)
+  ];
+  setStatus(summary.join(' '));
 }
 
 async function externalIds(item) {
@@ -1882,10 +1894,10 @@ async function externalIds(item) {
 }
 
 async function fetchStreams(item) {
-  const manifest = normalise(state.settings.manifest);
+  const manifests = configuredManifests();
 
-  if (!manifest) {
-    throw new Error('Add your stream add-on manifest URL in Settings first.');
+  if (!manifests.length) {
+    throw new Error('Add one or more video-on-demand add-on manifest URLs in Settings first.');
   }
 
   const ids = await externalIds(item);
@@ -1895,33 +1907,52 @@ async function fetchStreams(item) {
   if (ids.imdb) idsToTry.push(encodeURIComponent(ids.imdb));
   idsToTry.push(encodeURIComponent('tmdb:' + ids.tmdb));
 
-  let lastError = 'No stream endpoint responded.';
-
-  for (const id of idsToTry) {
-    try {
-      const response = await fetch(
-        `${manifest}/stream/${type}/${id}.json`,
-        { headers: { Accept: 'application/json' } }
-      );
-
-      if (!response.ok) {
-        lastError = 'Add-on returned HTTP ' + response.status;
-        continue;
+  const requests = manifests.map(async (manifest, sourceIndex) => {
+    let lastError = '';
+    for (const id of idsToTry) {
+      try {
+        const response = await fetch(
+          `${manifest}/stream/${type}/${id}.json`,
+          { headers: { Accept: 'application/json' } }
+        );
+        if (!response.ok) {
+          lastError = 'HTTP ' + response.status;
+          continue;
+        }
+        const data = await response.json();
+        const streams = Array.isArray(data.streams)
+          ? data.streams
+          : Array.isArray(data.streams?.streams) ? data.streams.streams : [];
+        if (streams.length) {
+          return streams.map(stream => ({
+            ...stream,
+            _vyroSource: manifest,
+            _vyroSourceIndex: sourceIndex
+          }));
+        }
+        lastError = 'No streams returned';
+      } catch (error) {
+        lastError = error.message;
       }
-
-      const data = await response.json();
-
-      if (Array.isArray(data.streams)) return data.streams;
-      if (Array.isArray(data.streams?.streams)) return data.streams.streams;
-
-      lastError = 'Add-on response contained no stream list.';
-    } catch (error) {
-      lastError = error.message;
     }
-  }
+    return { _vyroError: lastError, _vyroSource: manifest };
+  });
+
+  const results = await Promise.all(requests);
+  const streams = results.flatMap(result => Array.isArray(result) ? result : []);
+  if (streams.length) return streams;
+
+  const failures = results.map(result =>
+    result && result._vyroSource
+      ? new URL(result._vyroSource).hostname + ': ' + (result._vyroError || 'no streams')
+      : ''
+  ).filter(Boolean);
 
   throw new Error(
-    lastError + '. Check add-on compatibility and browser CORS permissions.'
+    'No streams found across ' + manifests.length + ' source' +
+    (manifests.length === 1 ? '' : 's') + '. ' +
+    failures.join(' · ') +
+    '. Sources must support this title and allow browser CORS requests.'
   );
 }
 
@@ -2107,13 +2138,21 @@ function loadSettings() {
   };
 
   $('tmdbkey').value = state.settings.key || '';
-  $('manifest').value = state.settings.manifest || '';
+  const manifests = Array.isArray(state.settings.manifests) && state.settings.manifests.length
+    ? state.settings.manifests
+    : (state.settings.manifest ? [state.settings.manifest] : []);
+  $('manifests').value = manifests.join('\n');
   $('playerpref').value = state.settings.player || 'auto';
 }
 
 function saveSettings() {
   state.settings.key = $('tmdbkey').value.trim();
-  state.settings.manifest = normalise($('manifest').value);
+  state.settings.manifests = String($('manifests').value || '')
+    .split(/[\n,]+/)
+    .map(value => normalise(value))
+    .filter(Boolean)
+    .filter((value, index, values) => values.indexOf(value) === index);
+  state.settings.manifest = state.settings.manifests[0] || '';
   state.settings.player = $('playerpref').value;
 
   write(KEYS.settings, state.settings);
