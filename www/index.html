@@ -482,6 +482,126 @@ video { display: block; width: 100%; max-height: 65vh; aspect-ratio: 16 / 9; bor
 @media (min-width: 700px) { .toast { bottom: 28px; } }
 @media (prefers-reduced-motion: reduce) { .toast { transition: none; } }
 
+/* VYRO Cinema refresh — mobile-first editorial streaming UI */
+:root {
+  --bg: #070707;
+  --surface: #111111;
+  --surface-raised: #1a1a1a;
+  --line: rgba(255,255,255,.12);
+  --accent: #e8b989;
+  --accent-strong: #f2c99b;
+}
+.top {
+  background: rgba(8,8,8,.72);
+  border-bottom-color: rgba(255,255,255,.06);
+  backdrop-filter: saturate(160%) blur(24px);
+  -webkit-backdrop-filter: saturate(160%) blur(24px);
+}
+.topbtn {
+  border-radius: 14px;
+  background: rgba(255,255,255,.045);
+  border-color: rgba(255,255,255,.10);
+}
+.hero {
+  border-radius: 12px;
+  border-color: rgba(255,255,255,.08);
+  box-shadow: 0 20px 70px rgba(0,0,0,.22);
+}
+.poster {
+  border-radius: 10px;
+  border-color: rgba(255,255,255,.10);
+  box-shadow: 0 8px 24px rgba(0,0,0,.15);
+  transition: transform .18s ease, border-color .18s ease;
+}
+.card:active .poster { transform: scale(.975); border-color: rgba(232,185,137,.65); }
+.cardtitle { font-size: 13px; font-weight: 650; letter-spacing: -.02em; }
+.sectionhead { margin-bottom: 17px; }
+.sectionhead h2 { letter-spacing: -.04em; }
+.btn { border-radius: 11px; }
+.btn.primary { box-shadow: 0 8px 26px rgba(232,185,137,.12); }
+.panel, .dialog { border-radius: 14px; }
+.field { border-radius: 11px; }
+.chip { border-radius: 999px; }
+.stream { border-radius: 11px; }
+@media (max-width: 699px) {
+  body { padding-bottom: calc(104px + var(--safe)); }
+  .top {
+    gap: 10px;
+    padding: calc(var(--top) + 9px) 16px 9px;
+  }
+  .logo { gap: 9px; font-size: 13px; }
+  .mark { width: 35px; height: 35px; border-radius: 11px; }
+  .topbtn { min-width: 43px; min-height: 43px; border-radius: 14px; }
+  .shell { padding: 12px 0 20px; }
+  .hero {
+    min-height: clamp(500px, 69vh, 690px);
+    border-radius: 0 0 18px 18px;
+    border-left: 0;
+    border-right: 0;
+    border-top: 0;
+  }
+  .heroimg { background-position: 56% center; }
+  .hero:after {
+    background:
+      linear-gradient(0deg, #070707 0%, rgba(7,7,7,.92) 12%, rgba(7,7,7,.42) 42%, rgba(7,7,7,.08) 76%),
+      linear-gradient(90deg, rgba(7,7,7,.28), transparent 78%);
+  }
+  .herotext { padding: 24px 20px 27px; }
+  h1 { font-size: clamp(42px, 11.5vw, 60px); }
+  .desc { font-size: 14px; line-height: 1.58; max-width: 35ch; }
+  .actions { gap: 10px; }
+  .actions .btn { min-height: 48px; border-radius: 13px; font-size: 12px; }
+  .shell > .section { margin: 32px 18px; }
+  .sectionhead h2 { font-size: 23px; }
+  .sectionhead small { letter-spacing: .15em; }
+  .rail {
+    grid-auto-columns: clamp(142px, 42vw, 178px);
+    gap: 14px;
+    margin-right: -18px;
+    padding: 3px 18px 16px 2px;
+  }
+  .poster { border-radius: 11px; }
+  .poster .badge { top: 8px; left: 8px; border-radius: 8px; font-size: 9px; }
+  .cardtitle { margin-top: 10px; font-size: 13px; line-height: 1.32; }
+  .meta { font-size: 11px; }
+  .catalog { gap: 22px 13px; }
+  .catalog .poster { border-radius: 10px; }
+  .bottom {
+    right: 13px;
+    bottom: calc(10px + var(--safe));
+    left: 13px;
+    gap: 4px;
+    padding: 6px;
+    border: 1px solid rgba(255,255,255,.14);
+    border-radius: 32px;
+    background: rgba(34,34,34,.82);
+    box-shadow: 0 12px 42px rgba(0,0,0,.48), inset 0 1px 0 rgba(255,255,255,.07);
+    backdrop-filter: saturate(170%) blur(28px);
+    -webkit-backdrop-filter: saturate(170%) blur(28px);
+  }
+  .bottom button {
+    min-height: 54px;
+    border-radius: 26px;
+    font-size: 11px;
+    transition: background .16s ease, color .16s ease;
+  }
+  .bottom button b { font-size: 19px; margin-bottom: 3px; }
+  .bottom button.active {
+    color: var(--accent-strong);
+    background: linear-gradient(180deg, rgba(232,185,137,.17), rgba(232,185,137,.07));
+    box-shadow: inset 0 0 0 1px rgba(232,185,137,.12);
+  }
+  .overlay { padding-left: 0; padding-right: 0; }
+  .dialog { border-radius: 0 0 18px 18px; }
+  .detailhero { min-height: 260px; padding: 22px 20px; }
+  .detailbody { padding: 18px 20px; }
+  .panel { padding: 18px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .poster, .bottom button { transition: none; }
+}
+
+
 </style>
 </head>
 <body>
