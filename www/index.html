@@ -406,11 +406,16 @@ p { line-height: 1.65; }
 .tag { display: inline-block; margin: 0 4px 5px 0; padding: 5px 7px; border: 1px solid #ffffff20; border-radius: 3px; background: #ffffff07; font-size: 10px; }
 .player { z-index: 70; display: none; padding: 0; overflow-x: hidden; overflow-y: auto; align-items: flex-start; justify-content: flex-start; background: #000; -webkit-overflow-scrolling: touch; }
 .player.open { display: block; }
-.playershell { box-sizing: border-box; width: 100%; max-width: 1000px; min-height: 100%; margin: 0 auto; padding: 12px 12px calc(18px + env(safe-area-inset-bottom)); border: 1px solid #ffffff18; background: #10100f; }
-.playertop { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-bottom: 10px; }
+.playershell { box-sizing: border-box; width: 100%; max-width: 1000px; min-height: 100%; margin: 0 auto; padding: max(56px, calc(env(safe-area-inset-top, 0px) + 14px)) 14px calc(24px + env(safe-area-inset-bottom, 0px)); border: 1px solid #ffffff18; background: #10100f; }
+.playertop { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 48px; padding: 0 0 14px; }
+.playertop strong { min-width: 0; flex: 1; font-size: 18px; line-height: 1.25; }
+#closeplayer { flex: 0 0 auto; min-height: 42px; padding: 0 15px; border: 1px solid rgba(255,255,255,.18); border-radius: 14px; background: rgba(255,255,255,.07); color: #f5f2ec; font-weight: 700; }
 .playertop strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-video { display: block; width: 100%; max-height: 65vh; aspect-ratio: 16 / 9; border-radius: 3px; background: #000; }
-.note { margin: 10px 2px; color: var(--muted); font-size: 12px; line-height: 1.55; }
+video { display: block; width: 100%; max-height: 56vh; aspect-ratio: 16 / 9; border-radius: 10px; background: #000; object-fit: contain; }
+.note { margin: 12px 2px; color: var(--muted); font-size: 13px; line-height: 1.55; }
+#playernote { min-height: 24px; }
+#streams:empty { display: none; }
+#streams .btn { justify-self: start; min-height: 42px; margin-top: 4px; }
 .streams { display: grid; gap: 8px; margin-top: 12px; }
 .stream { position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; min-height: 64px; padding: 13px; border: 1px solid #ffffff19; border-radius: 4px; background: #ffffff07; color: var(--text); font: inherit; text-align: left; cursor: pointer; pointer-events: auto; touch-action: manipulation; -webkit-appearance: none; appearance: none; }
 .stream:active, .stream.stream-selected { background: #ffffff16; border-color: var(--accent); box-shadow: inset 3px 0 0 var(--accent); }
@@ -1698,6 +1703,7 @@ function streamUrl(stream) {
 }
 
 function openPlayer(item) {
+  state.streamItem = item;
   state.streamRequestId += 1;
   $('player').classList.add('open');
   document.body.style.overflow = 'hidden';
@@ -1713,6 +1719,7 @@ function openPlayer(item) {
 }
 
 async function startStream(item) {
+  state.streamItem = item;
   if (isXtreamItem(item)) {
     if (item.media_type === 'xtream_movie') {
       closeDetails();
@@ -1730,7 +1737,18 @@ async function startStream(item) {
   const requestId = state.streamRequestId;
 
   try {
-    const streams = await fetchStreams(item);
+    let lookupTimer;
+    let streams;
+    try {
+      streams = await Promise.race([
+        fetchStreams(item),
+        new Promise((_, reject) => {
+          lookupTimer = setTimeout(() => reject(new Error('Stream lookup timed out after 20 seconds. Check your add-on URLs and connection, then try again.')), 20000);
+        })
+      ]);
+    } finally {
+      clearTimeout(lookupTimer);
+    }
     // Ignore results from a title that was closed or replaced while requests
     // were in flight; stale responses must not populate the current player.
     if (requestId !== state.streamRequestId || !$('player').classList.contains('open')) return;
@@ -1802,6 +1820,7 @@ async function startStream(item) {
   } catch (error) {
     if (requestId !== state.streamRequestId || !$('player').classList.contains('open')) return;
     $('playernote').textContent = error.message;
+    $('streams').innerHTML = '<button class="btn" type="button" data-retry-stream>Try stream lookup again</button>';
   }
 }
 
@@ -2008,6 +2027,12 @@ function saveSettings() {
 
 function bind() {
   document.addEventListener('click', event => {
+    const retryStream = event.target.closest('[data-retry-stream]');
+    if (retryStream) {
+      if (state.streamItem) startStream(state.streamItem);
+      return;
+    }
+
     const pageButton = event.target.closest('[data-page]');
 
     if (pageButton) {
