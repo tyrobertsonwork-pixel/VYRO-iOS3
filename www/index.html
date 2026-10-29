@@ -885,6 +885,75 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
   }
 }
 
+
+/* Product-level mobile layout refinement: prioritize artwork and reduce web-form density. */
+@media (max-width: 700px) {
+  .top {
+    gap: 12px;
+    padding: calc(var(--top) + 8px) 16px 10px;
+  }
+  .mark { width: 48px; height: 48px; border-radius: 16px; }
+  .logo { gap: 9px; font-size: 12px; letter-spacing: .23em; }
+  .topbtn { width: 48px; height: 48px; min-width: 48px; border-radius: 16px; }
+  .shell { padding: 16px 16px 24px; }
+  #discover .shell { display: flex; flex-direction: column; }
+  #discover h1 { order: 0; margin: 5px 0 7px; font-size: clamp(37px, 10vw, 52px); line-height: 1; letter-spacing: -.065em; }
+  #discover .desc { order: 1; margin: 0 0 12px; font-size: 14px; }
+  #discover .searchrow { order: 2; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 8px 0 10px; }
+  #discover .searchrow .search { grid-column: 1 / -1; width: 100%; }
+  #discover .field { min-height: 43px; padding: 0 13px; border-radius: 14px; background: rgba(255,255,255,.055); border: 1px solid rgba(255,255,255,.14); font-size: 14px; color-scheme: dark; }
+  #discover #genres { order: 3; margin: 2px 0 8px; gap: 7px; padding: 2px 0 8px; }
+  #discover .chip { padding: 9px 13px; border-radius: 999px; font-size: 12px; white-space: nowrap; background: rgba(255,255,255,.035); }
+  #discover .chip.active { background: rgba(167,139,250,.16); border-color: rgba(196,181,253,.72); }
+  #discover #status { order: 4; margin: 0 0 10px; font-size: 12px; }
+  #discover #results { order: 5; gap: 16px 10px; }
+  #discover #xtreamlibrarypanel { order: 6; margin-top: 22px; padding: 17px; border-radius: 22px; }
+  #discover #xtreamlibrarypanel h3 { margin: 0 0 5px; font-size: 16px; }
+  #discover #xtreamlibrarypanel p { margin: 0 0 12px; font-size: 12px; line-height: 1.5; }
+  #discover #xtreamlibrarypanel .actions { gap: 7px; }
+  #discover #xtreamlibrarypanel .actions .btn { flex: 1; min-height: 40px; padding: 0 10px; border-radius: 13px; font-size: 12px; }
+  #discover #more { border-radius: 999px; }
+  .catalog { gap: 16px 10px; }
+  .card { border-radius: 15px; }
+  .poster { border-radius: 15px; border-color: rgba(255,255,255,.13); box-shadow: 0 9px 24px rgba(0,0,0,.22); }
+  .poster .badge { border-radius: 9px; }
+  .bottom {
+    left: 50%;
+    right: auto;
+    bottom: calc(9px + var(--safe));
+    width: calc(100% - 28px);
+    max-width: 520px;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 5px;
+    padding: 6px;
+    border: 1px solid rgba(255,255,255,.2);
+    border-radius: 23px;
+    background: linear-gradient(145deg, rgba(33,29,53,.91), rgba(12,11,26,.94));
+    box-shadow: 0 12px 38px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.16);
+    -webkit-backdrop-filter: saturate(180%) blur(30px);
+    backdrop-filter: saturate(180%) blur(30px);
+  }
+  .bottom button {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    height: 58px;
+    min-height: 58px;
+    padding: 5px 2px;
+    border: 1px solid transparent;
+    border-radius: 16px;
+    font-size: 10px;
+    line-height: 1.05;
+  }
+  .bottom button b { margin: 0; font-size: 19px; line-height: 1; }
+  .bottom button.active { border-color: rgba(196,181,253,.2); background: linear-gradient(145deg, rgba(196,181,253,.2), rgba(139,92,246,.08)); }
+  body { padding-bottom: calc(92px + var(--safe)); }
+}
+
 </style>
 </head>
 <body>
