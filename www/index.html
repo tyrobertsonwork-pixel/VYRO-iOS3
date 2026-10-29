@@ -452,9 +452,37 @@ video { display: block; width: 100%; max-height: 65vh; aspect-ratio: 16 / 9; bor
 @media (prefers-reduced-motion: reduce) {
   *, *:before, *:after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
+
+/* Small, accessible feedback for failures that would otherwise be hidden in the console. */
+.toast {
+  position: fixed;
+  z-index: 10000;
+  left: 50%;
+  bottom: calc(82px + env(safe-area-inset-bottom));
+  width: min( calc(100vw - 32px), 440px );
+  padding: 13px 16px;
+  border: 1px solid #ffffff20;
+  border-radius: 8px;
+  background: #191917;
+  color: var(--text);
+  box-shadow: 0 18px 60px #0009;
+  font-size: 13px;
+  line-height: 1.45;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 10px);
+  transition: opacity .2s ease, transform .2s ease;
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+.toast.error { border-color: #bd777766; }
+.toast.error:before { content: "NOTICE"; display: block; margin-bottom: 4px; color: #e4a39b; font-size: 9px; font-weight: 800; letter-spacing: .16em; }
+@media (min-width: 700px) { .toast { bottom: 28px; } }
+@media (prefers-reduced-motion: reduce) { .toast { transition: none; } }
+
 </style>
 </head>
 <body>
+<div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
 <header class="top">
 <button class="logo" data-page="home"><span class="mark">V</span><span>VYRO</span></button>
@@ -744,8 +772,22 @@ function apiKey() {
   return state.settings.key.trim();
 }
 
+let toastTimer;
+
+function showToast(message, kind = 'info') {
+  const toast = $('toast');
+  if (!toast || !message) return;
+  toast.textContent = String(message);
+  toast.classList.toggle('error', kind === 'error');
+  toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('show'), kind === 'error' ? 6500 : 3200);
+}
+
 function setStatus(message) {
   $('settingsstatus').textContent = message;
+  if (/\b(saved|connected|cleared|loaded)\b/i.test(message)) showToast(message);
+  if (/\b(error|failed|could not|invalid|unable)\b/i.test(message)) showToast(message, 'error');
 }
 
 async function tmdb(path, params = {}) {
@@ -1618,6 +1660,9 @@ function bind() {
     if (pageButton) {
       event.preventDefault();
       showPage(pageButton.dataset.page);
+      if (pageButton.getAttribute('aria-label') === 'Search') {
+        setTimeout(() => $('query')?.focus(), 80);
+      }
       return;
     }
 
@@ -1747,9 +1792,12 @@ function restore() {
 
 window.addEventListener('error', event => {
   console.error('VYRO runtime error:', event.error || event.message);
+  showToast('Something went wrong. Try that action again. If it keeps happening, reload VYRO.', 'error');
 });
 window.addEventListener('unhandledrejection', event => {
   console.error('VYRO async error:', event.reason);
+  const reason = event.reason?.message || '';
+  showToast(reason ? 'Could not complete that request: ' + reason : 'Could not complete that request. Check your connection and try again.', 'error');
 });
 
 restore();
