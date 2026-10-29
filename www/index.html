@@ -1281,33 +1281,89 @@ function xtreamConfig() {
   const c = state.settings.xtream || {};
   return { server: normalise(c.server), username: String(c.username || '').trim(), password: String(c.password || '') };
 }
+function normaliseXtreamServer(value) {
+  let raw = String(value || '').trim();
+  if (!raw) throw new Error('Enter your provider server URL.');
+  if (!/^[a-z][a-z0-9+.-]*:\/\//i.test(raw)) raw = 'http://' + raw;
+  let url;
+  try { url = new URL(raw); } catch { throw new Error('Server URL is invalid. Enter the host and port supplied by your provider.'); }
+  if (!['http:', 'https:'].includes(url.protocol)) throw new Error('Server URL must start with http:// or https://.');
+  // Accept a base URL or a pasted API endpoint without appending the API path twice.
+  url.pathname = url.pathname.replace(/\/(?:player_api(?:\.php)?|get\.php)\/?$/i, '').replace(/\/+$/, '');
+  url.search = '';
+  url.hash = '';
+  return url.origin + url.pathname;
+}
 function xtreamApiUrl(action, extra = {}) {
   const c = xtreamConfig();
-  if (!c.server || !c.username || !c.password) throw new Error('Add your Xtream server URL, username and password in Settings first.');
-  const url = new URL(c.server.replace(/\/+$/, '') + '/player_api.php');
+  if (!c.server || !c.username || !c.password) throw new Error('Enter your Xtream server URL, username and password in Settings first.');
+  const url = new URL(normaliseXtreamServer(c.server) + '/player_api.php');
   url.searchParams.set('username', c.username);
   url.searchParams.set('password', c.password);
   if (action) url.searchParams.set('action', action);
   Object.entries(extra).forEach(([key, value]) => url.searchParams.set(key, String(value)));
   return url.toString();
 }
+function explainXtreamFetchError(error) {
+  if (error?.name === 'AbortError' || error?.name === 'TimeoutError') return 'The provider did not respond within 12 seconds. Check the host/port or whether the server is online.';
+  const message = String(error?.message || error || 'Unknown error');
+  if (/failed to fetch|load failed|network request failed|networkerror/i.test(message)) {
+    return 'The app could not read the provider response. Common causes are a wrong host/port, an unreachable server, HTTP blocked by iOS, or the provider blocking WebView CORS. The app cannot bypass provider CORS by itself.';
+  }
+  if (/json|unexpected token|not valid json/i.test(message)) return 'The server returned something other than JSON. Check that this is the Xtream server URL, not a playlist URL or web portal login page.';
+  return message;
+}
 async function xtreamRequest(action, extra = {}) {
-  const response = await fetch(xtreamApiUrl(action, extra), { headers: { Accept: 'application/json' } });
-  if (!response.ok) throw new Error('Provider returned HTTP ' + response.status);
-  const data = await response.json();
-  if (data?.user_info?.auth === 0) throw new Error('Provider rejected these credentials.');
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 12000);
+  let response;
+  try {
+    response = await fetch(xtreamApiUrl(action, extra), {
+      headers: { Accept: 'application/json' },
+      signal: controller.signal,
+      cache: 'no-store'
+    });
+  } catch (error) {
+    throw new Error(explainXtreamFetchError(error));
+  } finally {
+    clearTimeout(timeout);
+  }
+  if (!response.ok) throw new Error('Provider returned HTTP ' + response.status + '. Check the URL, port and account status.');
+  const contentType = response.headers.get('content-type') || '';
+  const text = await response.text();
+  let data;
+  try { data = JSON.parse(text); } catch {
+    throw new Error('The server replied with a non-JSON page' + (contentType ? ' (' + contentType + ')' : '') + '. Use the Xtream server host URL, not an M3U playlist or web login URL.');
+  }
+  if (data?.user_info?.auth === 0) {
+    const status = data.user_info.status || data.user_info.message || 'credentials rejected';
+    throw new Error('Provider authentication failed: ' + status + '. Recheck username, password and expiry.');
+  }
   if (!Array.isArray(data) && data?.error) throw new Error(String(data.error));
   return data;
 }
 async function testXtream() {
-  state.settings.xtream = { server: normalise($('xtreamserver').value), username: $('xtreamuser').value.trim(), password: $('xtreampass').value };
+  state.settings.xtream = {
+    server: normaliseXtreamServer($('xtreamserver').value),
+    username: $('xtreamuser').value.trim(),
+    password: $('xtreampass').value
+  };
   try {
-    setStatus('Testing Xtream connection…');
-    const data = await xtreamRequest('');
-    if (data?.user_info?.auth === 0) throw new Error('Provider rejected these credentials.');
-    setStatus('Xtream connection responded successfully. Try loading movies or series in Discover.');
+    setStatus('Checking Xtream login…');
+    const account = await xtreamRequest('');
+    if (!account?.user_info || account.user_info.auth !== 1) {
+      throw new Error('The endpoint responded, but did not return a valid Xtream account response.');
+    }
+    setStatus('Login accepted. Checking movie and series catalogues…');
+    const [movies, series] = await Promise.all([
+      xtreamRequest('get_vod_streams'),
+      xtreamRequest('get_series')
+    ]);
+    if (!Array.isArray(movies)) throw new Error('Login worked, but the movie endpoint did not return a list.');
+    if (!Array.isArray(series)) throw new Error('Login worked, but the series endpoint did not return a list.');
+    setStatus('Xtream backend OK · login accepted · ' + movies.length.toLocaleString() + ' movies · ' + series.length.toLocaleString() + ' series. Tap Load provider movies or Load provider series in Discover.');
   } catch (error) {
-    setStatus('Xtream test failed: ' + error.message + ' The provider may block browser CORS requests.');
+    setStatus('Xtream diagnostic failed: ' + explainXtreamFetchError(error));
   }
 }
 function xtreamTitle(raw, kind) {
@@ -1324,16 +1380,21 @@ function xtreamTitle(raw, kind) {
 async function loadXtreamLibrary(kind) {
   $('xtreamresults').innerHTML = '<div class="empty">Loading provider catalogue…</div>';
   $('xtreamstatus').textContent = 'Contacting provider…';
+  $('xtreammovies').disabled = true;
+  $('xtreamseries').disabled = true;
   try {
     const data = await xtreamRequest(kind === 'series' ? 'get_series' : 'get_vod_streams');
-    if (!Array.isArray(data)) throw new Error('Provider did not return a VOD list.');
+    if (!Array.isArray(data)) throw new Error('The provider responded, but did not return a valid ' + kind + ' list.');
     const items = data.map(item => xtreamTitle(item, kind));
     state.xtreamItems = items;
-    renderCatalog('xtreamresults', items, 'No titles returned by this provider.');
-    $('xtreamstatus').textContent = items.length + ' provider ' + kind + ' loaded.';
+    renderCatalog('xtreamresults', items, 'The provider returned an empty ' + kind + ' catalogue.');
+    $('xtreamstatus').textContent = items.length.toLocaleString() + ' provider ' + kind + ' loaded.';
   } catch (error) {
-    $('xtreamresults').innerHTML = '<div class="empty">' + esc(error.message) + '</div>';
-    $('xtreamstatus').textContent = 'Could not load provider library.';
+    $('xtreamresults').innerHTML = '<div class="empty">' + esc(explainXtreamFetchError(error)) + '<br><button class="btn" type="button" data-retry-xtream="' + esc(kind) + '">Try again</button></div>';
+    $('xtreamstatus').textContent = 'Could not load provider ' + kind + '.';
+  } finally {
+    $('xtreammovies').disabled = false;
+    $('xtreamseries').disabled = false;
   }
 }
 async function openXtreamDetails(item) {
@@ -1776,6 +1837,10 @@ function bind() {
   $('testxtream').addEventListener('click', testXtream);
   $('xtreammovies').addEventListener('click', () => loadXtreamLibrary('movie'));
   $('xtreamseries').addEventListener('click', () => loadXtreamLibrary('series'));
+  document.addEventListener('click', event => {
+    const retry = event.target.closest('[data-retry-xtream]');
+    if (retry) loadXtreamLibrary(retry.dataset.retryXtream);
+  });
 
   $('closedetail').addEventListener('click', closeDetails);
   $('closeplayer').addEventListener('click', closePlayer);
