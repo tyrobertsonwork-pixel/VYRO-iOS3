@@ -1343,12 +1343,15 @@ async function xtreamRequest(action, extra = {}) {
   return data;
 }
 async function testXtream() {
-  state.settings.xtream = {
-    server: normaliseXtreamServer($('xtreamserver').value),
-    username: $('xtreamuser').value.trim(),
-    password: $('xtreampass').value
-  };
   try {
+    state.settings.xtream = {
+      server: normaliseXtreamServer($('xtreamserver').value),
+      username: $('xtreamuser').value.trim(),
+      password: $('xtreampass').value
+    };
+    if (!state.settings.xtream.username || !state.settings.xtream.password) {
+      throw new Error('Enter your provider username and password.');
+    }
     setStatus('Checking Xtream login…');
     const account = await xtreamRequest('');
     if (!account?.user_info || account.user_info.auth !== 1) {
