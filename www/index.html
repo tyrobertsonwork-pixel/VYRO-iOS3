@@ -411,8 +411,11 @@ p { line-height: 1.65; }
 video { display: block; width: 100%; max-height: 65vh; aspect-ratio: 16 / 9; border-radius: 3px; background: #000; }
 .note { margin: 10px 2px; color: var(--muted); font-size: 12px; line-height: 1.55; }
 .streams { display: grid; gap: 8px; margin-top: 12px; }
-.stream { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 13px; border: 1px solid #ffffff19; border-radius: 4px; background: #ffffff07; text-align: left; }
+.stream { position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; min-height: 64px; padding: 13px; border: 1px solid #ffffff19; border-radius: 4px; background: #ffffff07; color: var(--text); font: inherit; text-align: left; cursor: pointer; pointer-events: auto; touch-action: manipulation; -webkit-appearance: none; appearance: none; }
+.stream:active { background: #ffffff16; border-color: var(--accent); }
+.streamcopy { min-width: 0; overflow-wrap: anywhere; }
 .stream small { display: block; margin-top: 4px; color: var(--muted); }
+.streamplay { flex: 0 0 auto; padding: 8px; }
 @media (min-width: 700px) {
   body { padding-bottom: 0; }
   .shell { padding: 26px 36px; }
@@ -1610,20 +1613,29 @@ async function startStream(item) {
       `${usable.length} streams available. Choose one to play.`;
 
     $('streams').innerHTML = usable.map((stream, index) => `
-      <button class="stream" data-stream="${index}">
-        <span>
+      <button class="stream" type="button" data-stream="${index}" aria-label="Play ${esc(stream.name || stream.title || stream.description || 'Stream ' + (index + 1))}">
+        <span class="streamcopy">
           <strong>${esc(stream.name || stream.title || stream.description || 'Stream ' + (index + 1))}</strong>
           <small>${esc(stream.behaviorHints?.filename || stream.description || (stream._vyroSource ? new URL(stream._vyroSource).hostname : 'Available source'))}</small>
         </span>
-        <span>▶</span>
+        <span class="streamplay" aria-hidden="true">▶</span>
       </button>
     `).join('');
 
-    $('streams').querySelectorAll('[data-stream]').forEach(button => {
-      button.addEventListener('click', () => {
-        playStream(usable[Number(button.dataset.stream)], item);
-      });
-    });
+    // Delegate stream selection from the container. This is more reliable
+    // in iOS WKWebView than attaching listeners to each freshly-rendered row.
+    $('streams').onclick = event => {
+      const button = event.target.closest('button[data-stream]');
+      if (!button || ! $('streams').contains(button)) return;
+      event.preventDefault();
+      event.stopPropagation();
+      const selected = usable[Number(button.dataset.stream)];
+      if (!selected) {
+        $('playernote').textContent = 'That stream could not be selected. Please try another result.';
+        return;
+      }
+      playStream(selected, item);
+    };
   } catch (error) {
     $('playernote').textContent = error.message;
   }
