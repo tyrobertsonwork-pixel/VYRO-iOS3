@@ -615,6 +615,42 @@ video { display: block; width: 100%; max-height: 56vh; aspect-ratio: 16 / 9; bor
 }
 
 
+
+/* Full-screen, artwork-led title details inspired by native streaming apps. */
+#detail.overlay { padding: 0 0 calc(24px + env(safe-area-inset-bottom, 0px)); background: #050505; overscroll-behavior: contain; }
+#detail .dialog { width: 100%; max-width: 100%; min-height: 100%; margin: 0; overflow: visible; border: 0; border-radius: 0; background: #050505; }
+#detail .dialogtop { display: none; }
+.cinema-hero { position: relative; display: flex; align-items: flex-end; min-height: min(74svh, 760px); padding: 0 22px 24px; overflow: hidden; isolation: isolate; background: #080808; }
+.cinema-art { position: absolute; z-index: -2; inset: 0; background-image: var(--detail-art); background-position: center 28%; background-size: cover; transform: scale(1.01); }
+.cinema-hero:after { content: ""; position: absolute; z-index: -1; inset: 0; background: linear-gradient(0deg,#050505 0%,rgba(5,5,5,.86) 13%,rgba(5,5,5,.16) 54%,rgba(5,5,5,.18) 100%); }
+.cinema-close { position: absolute; z-index: 3; top: calc(env(safe-area-inset-top, 0px) + 16px); right: 18px; display: grid; place-items: center; width: 48px; height: 48px; border: 1px solid rgba(255,255,255,.18); border-radius: 50%; background: rgba(40,40,40,.78); color: white; font-size: 32px; font-weight: 300; line-height: 1; backdrop-filter: blur(18px); }
+.cinema-title { width: 100%; max-width: 780px; margin: 0 auto; }
+.cinema-title .eyebrow { margin-bottom: 10px; }
+.cinema-title h1 { margin: 0; max-width: 100%; font-size: clamp(42px, 11vw, 72px); line-height: .98; letter-spacing: -.065em; overflow-wrap: anywhere; }
+.cinema-info { width: 100%; max-width: 780px; margin: 0 auto; padding: 0 22px; }
+.cinema-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 18px; margin: 0 0 12px; color: #c7c7c7; font-size: 15px; }
+.cinema-meta .score { padding: 7px 12px; border-radius: 12px; background: #262626; color: white; font-weight: 750; }
+.cinema-runtime { color: #aaa; font-size: 13px; }
+.cinema-genres { display: flex; flex-wrap: wrap; gap: 7px; margin: 12px 0 17px; }
+.cinema-genres .tag { margin: 0; padding: 6px 10px; border-radius: 7px; font-size: 12px; }
+.cinema-actions { display: grid; grid-template-columns: minmax(0,1fr) 54px minmax(0,1.35fr); gap: 10px; margin: 16px 0 24px; }
+.cinema-actions button { min-width: 0; min-height: 54px; border-radius: 999px; font-size: 14px; font-weight: 700; }
+.cinema-play { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 0 12px; border: 1px solid var(--accent); background: var(--accent); color: #1b130b; }
+.cinema-icon-action { border: 1px solid #ffffff28; background: #1b1b1b; color: white; font-size: 25px !important; }
+.cinema-secondary { padding: 0 12px; border: 1px solid #ffffff28; background: #1c1c1c; color: #f4f4f4; }
+.cinema-synopsis { margin: 18px 0 26px; color: #ededed; font-size: 16px; line-height: 1.62; letter-spacing: -.015em; }
+.cinema-section { margin: 28px 0 34px; }
+.cinema-section h3 { margin: 0 0 15px; color: #858585; font-size: 12px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+.cinema-cast { margin: 0; color: #c8c8c8; font-size: 14px; line-height: 1.7; overflow-wrap: anywhere; }
+.cinema-ratings { display: flex; gap: 22px; overflow-x: auto; padding-bottom: 8px; }
+.cinema-rating { flex: 0 0 auto; min-width: 88px; color: #aaa; font-size: 12px; }
+.cinema-rating strong { display: block; margin-top: 6px; color: white; font-size: 20px; }
+.cinema-recommendations { max-width: 100%; margin: 32px 0 0; padding-left: 22px; overflow: hidden; }
+.cinema-recommendations .sectionhead { padding-right: 22px; }
+.cinema-recommendations .rail { grid-auto-columns: clamp(132px, 39vw, 170px); padding-right: 22px; }
+@media (min-width: 700px) { #detail.overlay { padding-bottom: 32px; } .cinema-hero { min-height: min(68vh, 680px); padding: 0 48px 38px; } .cinema-info { padding: 0 48px; } .cinema-recommendations { padding-left: max(48px, calc((100vw - 780px)/2)); } .cinema-recommendations .sectionhead { padding-right: 48px; } .cinema-recommendations .rail { grid-auto-columns: 170px; } }
+@media (max-width: 380px) { .cinema-hero { min-height: 62svh; padding: 0 18px 20px; } .cinema-info { padding: 0 18px; } .cinema-actions { grid-template-columns: minmax(0,1fr) 48px; } .cinema-secondary { grid-column: 1 / -1; } .cinema-recommendations { padding-left: 18px; } }
+
 </style>
 </head>
 <body>
@@ -1282,31 +1318,31 @@ async function openDetails(item) {
 
   const type = typeOf(item);
 
+  const poster = posterOf(item);
+  const backdrop = backdropOf(item) || poster;
+  const saved = state.saved.some(saved =>
+    String(saved.id) === String(item.id) && identityType(saved) === identityType(item)
+  );
   $('detailcontent').innerHTML = `
-    <div class="detailhero" style="background-image:url('${esc(backdropOf(item))}')">
-      <h2>${esc(titleOf(item))}</h2>
-    </div>
-    <div class="detailbody">
-      <img loading="lazy" decoding="async" src="${esc(posterOf(item))}" alt="">
-      <div>
-        <div class="meta">★ ${ratingOf(item)} · ${esc(yearOf(item))} · ${type === 'tv' ? 'Series' : 'Movie'}</div>
-        <p id="synopsis">${esc(item.overview || 'Loading synopsis…')}</p>
-        <div id="tags"></div>
-        <div class="actions">
-          <button id="playtitle" class="btn primary">▶ Find a stream</button>
-          <button id="savetitle" class="btn">${
-            state.saved.some(saved =>
-              String(saved.id) === String(item.id) && identityType(saved) === identityType(item)
-            ) ? '✓ Saved' : '＋ My List'
-          }</button>
-        </div>
-        <p id="cast" class="note"></p>
-      </div>
-    </div>
-    <section class="section" style="padding:0 15px">
-      <div class="sectionhead"><h2>More like this</h2></div>
-      <div id="similar" class="rail"></div>
+    <section class="cinema-hero" style="--detail-art:url('${esc(backdrop)}')">
+      <div class="cinema-art" role="img" aria-label="${esc(titleOf(item))} artwork"></div>
+      <button id="closedetailhero" class="cinema-close" type="button" aria-label="Close details">×</button>
+      <div class="cinema-title"><div class="eyebrow">NOW SHOWING ON VYRO</div><h1>${esc(titleOf(item))}</h1></div>
     </section>
+    <section class="cinema-info">
+      <div class="cinema-meta"><span class="score">★ ${esc(ratingOf(item))}</span><span>${esc(yearOf(item))}</span><span>${type === 'tv' ? 'Series' : 'Movie'}</span></div>
+      <div id="runtime" class="cinema-runtime"></div>
+      <div id="tags" class="cinema-genres"></div>
+      <div class="cinema-actions">
+        <button id="playtitle" class="cinema-play" type="button">▶ <span>${type === 'tv' ? 'Find an episode' : 'Play movie'}</span></button>
+        <button id="savetitle" class="cinema-icon-action" type="button" aria-label="${saved ? 'Remove from My List' : 'Add to My List'}">${saved ? '♥' : '♡'}</button>
+        <button id="othersources" class="cinema-secondary" type="button">Other sources</button>
+      </div>
+      <p id="synopsis" class="cinema-synopsis">${esc(item.overview || 'Loading synopsis…')}</p>
+      <section class="cinema-section" id="ratingssection" hidden><h3>Ratings</h3><div id="externalratings" class="cinema-ratings"></div></section>
+      <section class="cinema-section" id="castsection"><h3>Cast</h3><p id="cast" class="cinema-cast">Loading cast…</p></section>
+    </section>
+    <section class="cinema-recommendations"><div class="sectionhead"><h2>More like this</h2></div><div id="similar" class="rail"></div></section>
   `;
 
   $('playtitle').onclick = () => startStream(item);
@@ -1578,15 +1614,19 @@ async function openXtreamDetails(item) {
   const isSeries = item.media_type === 'xtream_series';
   const poster = item._xtreamPoster || '';
   $('detailcontent').innerHTML = `
-    <div class="detailhero" style="background-image:url('${esc(poster)}')"><h2>${esc(titleOf(item))}</h2></div>
-    <div class="detailbody">${poster ? '<img loading="lazy" src="' + esc(poster) + '" alt="">' : ''}
-      <div><div class="meta">${isSeries ? 'SERIES' : 'MOVIE'} ${esc(item._xtreamYear || '')}</div>
-        <p>From your connected Xtream provider.</p>
-        <div class="actions"><button id="playtitle" class="btn primary">${isSeries ? 'Choose episode' : '▶ Play movie'}</button>
-        <button id="savetitle" class="btn">${state.saved.some(x => String(x.id) === String(item.id) && x.media_type === item.media_type) ? '✓ Saved' : '＋ My List'}</button></div>
-        <div id="xtreamepisodes"></div>
-      </div>
-    </div>`;
+    <section class="cinema-hero" style="--detail-art:url('${esc(poster)}')">
+      <div class="cinema-art" role="img" aria-label="${esc(titleOf(item))} artwork"></div>
+      <button id="closedetailhero" class="cinema-close" type="button" aria-label="Close details">×</button>
+      <div class="cinema-title"><div class="eyebrow">YOUR PROVIDER LIBRARY</div><h1>${esc(titleOf(item))}</h1></div>
+    </section>
+    <section class="cinema-info">
+      <div class="cinema-meta"><span class="score">${item._xtreamRating ? '★ ' + esc(item._xtreamRating) : 'PROVIDER'}</span><span>${esc(item._xtreamYear || '—')}</span><span>${isSeries ? 'Series' : 'Movie'}</span></div>
+      <div class="cinema-actions"><button id="playtitle" class="cinema-play" type="button">▶ <span>${isSeries ? 'Choose episode' : 'Play movie'}</span></button>
+        <button id="savetitle" class="cinema-icon-action" type="button" aria-label="Add to My List">${state.saved.some(x => String(x.id) === String(item.id) && x.media_type === item.media_type) ? '♥' : '♡'}</button>
+        ${isSeries ? '' : '<button id="othersources" class="cinema-secondary" type="button">Other sources</button>'}</div>
+      <p class="cinema-synopsis">From your connected Xtream provider.</p>
+      ${isSeries ? '<section class="cinema-section"><h3>Episodes</h3><div id="xtreamepisodes"></div></section>' : ''}
+    </section>`;
   $('savetitle').onclick = () => toggleSave(item);
   $('playtitle').onclick = () => isSeries ? loadXtreamEpisodes(item) : playXtreamMovie(item);
 }
