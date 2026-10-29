@@ -64,7 +64,7 @@ const path = require('path');
       await page.evaluate(() => {
         document.querySelector('#detailcontent').innerHTML =
           '<div class="detailhero"><h2>Layout test title</h2></div><div class="detailbody"><img alt="" src=""><div><p>' +
-          'Long synopsis text '.repeat(120) +
+          'Long synopsis text '.repeat(800) +
           '</p><div class="actions"><button class="btn">Play</button><button class="btn">Save</button></div></div></div>';
         document.querySelector('#detail').classList.add('open');
       });
