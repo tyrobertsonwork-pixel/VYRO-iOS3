@@ -1647,6 +1647,10 @@ async function startStream(item) {
         row.classList.toggle('stream-selected', row === targetButton);
       });
       $('playernote').textContent = 'Selected source ' + (index + 1) + ' of ' + usable.length + '. Opening playback…';
+      // The player overlay itself scrolls. Source lists can be long, so after
+      // selecting a row return to the video area; otherwise playback can start
+      // off-screen and make the tap look like it did nothing.
+      $('player').scrollTo({ top: 0, behavior: 'smooth' });
       playStream(selected, item);
     };
     // Bind directly to every row as well as delegated events. This avoids
@@ -1728,7 +1732,7 @@ function playStream(stream, item) {
 
     video.play().catch(() => {
       $('playernote').textContent =
-        'Press Play. This source may not support browser playback.';
+        'Source selected, but automatic playback was blocked. Press Play in the video controls. If it still fails, the source may require a compatible player or a direct playable URL.';
     });
   }
 
