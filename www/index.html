@@ -412,7 +412,7 @@ video { display: block; width: 100%; max-height: 65vh; aspect-ratio: 16 / 9; bor
 .note { margin: 10px 2px; color: var(--muted); font-size: 12px; line-height: 1.55; }
 .streams { display: grid; gap: 8px; margin-top: 12px; }
 .stream { position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; min-height: 64px; padding: 13px; border: 1px solid #ffffff19; border-radius: 4px; background: #ffffff07; color: var(--text); font: inherit; text-align: left; cursor: pointer; pointer-events: auto; touch-action: manipulation; -webkit-appearance: none; appearance: none; }
-.stream:active { background: #ffffff16; border-color: var(--accent); }
+.stream:active, .stream.stream-selected { background: #ffffff16; border-color: var(--accent); box-shadow: inset 3px 0 0 var(--accent); }
 .streamcopy { min-width: 0; overflow-wrap: anywhere; }
 .stream small { display: block; margin-top: 4px; color: var(--muted); }
 .streamplay { flex: 0 0 auto; padding: 8px; }
@@ -1625,38 +1625,43 @@ async function startStream(item) {
     // Delegate stream selection from the container. This is more reliable
     // in iOS WKWebView than attaching listeners to each freshly-rendered row.
     let lastStreamActivation = 0;
-    const activateStream = event => {
-      const button = event.target?.closest?.('[data-stream]');
-      if (!button || !$('streams').contains(button)) return false;
-      const now = Date.now();
-      // A touch can produce both pointerup/touchend and click in WKWebView.
-      // Avoid starting the same source twice.
-      if (now - lastStreamActivation < 650) return true;
-      lastStreamActivation = now;
-      event.preventDefault?.();
-      event.stopPropagation?.();
-      const selected = usable[Number(button.dataset.stream)];
+    let activeStreamIndex = -1;
+    const activateStream = (event, button) => {
+      const targetButton = button || event.target?.closest?.('button[data-stream]');
+      if (!targetButton || !$('streams').contains(targetButton)) return;
+      const index = Number(targetButton.dataset.stream);
+      const selected = usable[index];
       if (!selected) {
-        $('playernote').textContent = 'That stream could not be selected. Please try another result.';
-        return true;
-      }
-      $('playernote').textContent = 'Opening selected source…';
-      playStream(selected, item);
-      return true;
-    };
-    // iOS WebView can occasionally miss click on newly rendered rows. Handle
-    // pointer/touch activation at the stream-list container as well.
-    $('streams').onpointerup = event => { activateStream(event); };
-    $('streams').ontouchend = event => {
-      if (!window.PointerEvent) activateStream(event);
-    };
-    $('streams').onclick = event => {
-      if (Date.now() - lastStreamActivation < 650) {
-        event.preventDefault();
-        event.stopPropagation();
+        $('playernote').textContent = 'This source has no selectable stream data.';
         return;
       }
-      activateStream(event);
+      const now = Date.now();
+      // Ignore duplicate click events generated after the same touch/pointer gesture.
+      if (activeStreamIndex === index && now - lastStreamActivation < 800) return;
+      activeStreamIndex = index;
+      lastStreamActivation = now;
+      event?.preventDefault?.();
+      event?.stopPropagation?.();
+      $('streams').querySelectorAll('button[data-stream]').forEach(row => {
+        row.setAttribute('aria-pressed', String(row === targetButton));
+        row.classList.toggle('stream-selected', row === targetButton);
+      });
+      $('playernote').textContent = 'Selected source ' + (index + 1) + ' of ' + usable.length + '. Opening playback…';
+      playStream(selected, item);
+    };
+    // Bind directly to every row as well as delegated events. This avoids
+    // relying on a single bubbling path in WKWebView.
+    $('streams').querySelectorAll('button[data-stream]').forEach(button => {
+      button.addEventListener('click', event => activateStream(event, button));
+      button.addEventListener('pointerup', event => activateStream(event, button));
+      button.addEventListener('touchend', event => {
+        if (!window.PointerEvent) activateStream(event, button);
+      }, { passive: false });
+    });
+    $('streams').onclick = event => activateStream(event);
+    $('streams').onpointerup = event => activateStream(event);
+    $('streams').ontouchend = event => {
+      if (!window.PointerEvent) activateStream(event);
     };
   } catch (error) {
     $('playernote').textContent = error.message;
