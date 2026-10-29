@@ -1225,6 +1225,15 @@ h1 {font-size:clamp(42px,8vw,82px);font-weight:900;letter-spacing:-.075em;line-h
 <div class="shell">
 <h1>Discover.</h1>
 <p class="desc">Find your next obsession.</p>
+<div class="panel" id="xtreamlibrarypanel">
+<h3>Provider library</h3>
+<p id="xtreamstatus">Connect an Xtream source in Settings to browse its VOD library.</p>
+<div class="actions">
+<button id="xtreammovies" class="btn">Load provider movies</button>
+<button id="xtreamseries" class="btn">Load provider series</button>
+</div>
+<div id="xtreamresults" class="catalog" style="margin-top:16px"></div>
+</div>
 <div class="searchrow">
 <input id="query" class="field search" placeholder="Search movies and series…" autocomplete="off">
 <select id="kind" class="field">
@@ -1266,6 +1275,20 @@ h1 {font-size:clamp(42px,8vw,82px);font-weight:900;letter-spacing:-.075em;line-h
 <label for="tmdbkey">TMDB API key (v3)</label>
 <input id="tmdbkey" class="field" type="password" autocomplete="off" placeholder="Enter API key">
 <button id="savetmdb" class="btn primary">Save settings</button>
+</div>
+
+<div class="panel">
+<h3>Xtream Codes · VOD library</h3>
+<p>Connect an Xtream-compatible provider to browse its movies and series catalogue. VYRO does not load live TV.</p>
+<label for="xtreamserver">Server URL</label>
+<input id="xtreamserver" class="field" type="url" placeholder="https://provider.example:port">
+<label for="xtreamuser">Username</label>
+<input id="xtreamuser" class="field" type="text" autocomplete="off" placeholder="Provider username">
+<label for="xtreampass">Password</label>
+<input id="xtreampass" class="field" type="password" autocomplete="off" placeholder="Provider password">
+<button id="savextream" class="btn primary">Save Xtream connection</button>
+<button id="testxtream" class="btn">Test connection</button>
+<p>Credentials are saved locally on this device. The provider must allow browser requests (CORS); use only a service you are authorized to access.</p>
 </div>
 
 <div class="panel">
@@ -1357,7 +1380,7 @@ function write(k, value) {
 }
 
 const state = {
-  settings: { key: '', manifest: '', manifests: [], player: 'auto' },
+  settings: { key: '', manifest: '', manifests: [], xtream: { server: '', username: '', password: '' }, player: 'auto' },
   saved: read(KEYS.saved, []),
   progress: read(KEYS.progress, {}),
   genres: { movie: [], tv: [] },
@@ -1391,7 +1414,12 @@ function titleOf(item) {
 }
 
 function typeOf(item) {
+  if (item?.media_type === 'xtream_series') return 'tv';
+  if (item?.media_type === 'xtream_movie') return 'movie';
   return item?.media_type === 'tv' || item?.first_air_date ? 'tv' : 'movie';
+}
+function isXtreamItem(item) {
+  return item?.media_type === 'xtream_movie' || item?.media_type === 'xtream_series';
 }
 
 function yearOf(item) {
@@ -1407,11 +1435,11 @@ function img(path, size = 'w500') {
 }
 
 function posterOf(item) {
-  return img(item?.poster_path, 'w342');
+  return item?._xtreamPoster || img(item?.poster_path, 'w342');
 }
 
 function backdropOf(item) {
-  return img(item?.backdrop_path, 'w1280');
+  return item?._xtreamPoster || img(item?.backdrop_path, 'w1280');
 }
 
 function apiKey() {
@@ -1745,6 +1773,7 @@ async function loadDiscover(reset = false) {
 }
 
 async function openDetails(item) {
+  if (isXtreamItem(item)) { await openXtreamDetails(item); return; }
   state.detail = item;
 
   $('detail').classList.add('open');
@@ -1884,6 +1913,109 @@ async function testManifest() {
   setStatus(summary.join(' '));
 }
 
+function xtreamConfig() {
+  const c = state.settings.xtream || {};
+  return { server: normalise(c.server), username: String(c.username || '').trim(), password: String(c.password || '') };
+}
+function xtreamApiUrl(action, extra = {}) {
+  const c = xtreamConfig();
+  if (!c.server || !c.username || !c.password) throw new Error('Add your Xtream server URL, username and password in Settings first.');
+  const url = new URL(c.server.replace(/\/+$/, '') + '/player_api.php');
+  url.searchParams.set('username', c.username);
+  url.searchParams.set('password', c.password);
+  if (action) url.searchParams.set('action', action);
+  Object.entries(extra).forEach(([key, value]) => url.searchParams.set(key, String(value)));
+  return url.toString();
+}
+async function xtreamRequest(action, extra = {}) {
+  const response = await fetch(xtreamApiUrl(action, extra), { headers: { Accept: 'application/json' } });
+  if (!response.ok) throw new Error('Provider returned HTTP ' + response.status);
+  const data = await response.json();
+  if (data?.user_info?.auth === 0) throw new Error('Provider rejected these credentials.');
+  if (!Array.isArray(data) && data?.error) throw new Error(String(data.error));
+  return data;
+}
+async function testXtream() {
+  state.settings.xtream = { server: normalise($('xtreamserver').value), username: $('xtreamuser').value.trim(), password: $('xtreampass').value };
+  try {
+    setStatus('Testing Xtream connection…');
+    const data = await xtreamRequest('');
+    if (data?.user_info?.auth === 0) throw new Error('Provider rejected these credentials.');
+    setStatus('Xtream connection responded successfully. Try loading movies or series in Discover.');
+  } catch (error) {
+    setStatus('Xtream test failed: ' + error.message + ' The provider may block browser CORS requests.');
+  }
+}
+function xtreamTitle(raw, kind) {
+  const title = raw.name || raw.title || 'Untitled';
+  return {
+    id: String(raw.stream_id ?? raw.series_id ?? raw.id),
+    media_type: kind === 'series' ? 'xtream_series' : 'xtream_movie',
+    title, name: title, poster_path: '', backdrop_path: '',
+    _xtreamPoster: raw.stream_icon || raw.cover || raw.movie_image || '',
+    _xtreamYear: String(raw.releaseDate || raw.release_date || raw.year || '').slice(0, 4),
+    _xtreamRating: raw.rating || '', _xtreamRaw: raw
+  };
+}
+async function loadXtreamLibrary(kind) {
+  $('xtreamresults').innerHTML = '<div class="empty">Loading provider catalogue…</div>';
+  $('xtreamstatus').textContent = 'Contacting provider…';
+  try {
+    const data = await xtreamRequest(kind === 'series' ? 'get_series' : 'get_vod_streams');
+    if (!Array.isArray(data)) throw new Error('Provider did not return a VOD list.');
+    const items = data.map(item => xtreamTitle(item, kind));
+    renderCatalog('xtreamresults', items, 'No titles returned by this provider.');
+    $('xtreamstatus').textContent = items.length + ' provider ' + kind + ' loaded.';
+  } catch (error) {
+    $('xtreamresults').innerHTML = '<div class="empty">' + esc(error.message) + '</div>';
+    $('xtreamstatus').textContent = 'Could not load provider library.';
+  }
+}
+async function openXtreamDetails(item) {
+  state.detail = item;
+  $('detail').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  const isSeries = item.media_type === 'xtream_series';
+  const poster = item._xtreamPoster || '';
+  $('detailcontent').innerHTML = `
+    <div class="detailhero" style="background-image:url('${esc(poster)}')"><h2>${esc(titleOf(item))}</h2></div>
+    <div class="detailbody">${poster ? '<img loading="lazy" src="' + esc(poster) + '" alt="">' : ''}
+      <div><div class="meta">${isSeries ? 'SERIES' : 'MOVIE'} ${esc(item._xtreamYear || '')}</div>
+        <p>From your connected Xtream provider.</p>
+        <div class="actions"><button id="playtitle" class="btn primary">${isSeries ? 'Choose episode' : '▶ Play movie'}</button>
+        <button id="savetitle" class="btn">${state.saved.some(x => String(x.id) === String(item.id) && x.media_type === item.media_type) ? '✓ Saved' : '＋ My List'}</button></div>
+        <div id="xtreamepisodes"></div>
+      </div>
+    </div>`;
+  $('savetitle').onclick = () => toggleSave(item);
+  $('playtitle').onclick = () => isSeries ? loadXtreamEpisodes(item) : playXtreamMovie(item);
+}
+function xtreamStreamUrl(id, kind, extension) {
+  const c = xtreamConfig();
+  const ext = String(extension || 'mp4').replace(/[^a-z0-9]/gi, '') || 'mp4';
+  return c.server.replace(/\/+$/, '') + '/' + kind + '/' + encodeURIComponent(c.username) + '/' + encodeURIComponent(c.password) + '/' + encodeURIComponent(String(id)) + '.' + ext;
+}
+function playXtreamMovie(item) {
+  const raw = item._xtreamRaw || {};
+  const url = xtreamStreamUrl(raw.stream_id ?? raw.id ?? item.id, 'movie', raw.container_extension || 'mp4');
+  closeDetails(); openPlayer(item); playStream({ url, name: 'Xtream provider' }, item);
+}
+async function loadXtreamEpisodes(item) {
+  const box = $('xtreamepisodes');
+  box.innerHTML = '<p class="note">Loading seasons and episodes…</p>';
+  try {
+    const data = await xtreamRequest('get_series_info', { series_id: item.id });
+    const episodes = data?.episodes || {};
+    const rows = Object.entries(episodes).flatMap(([season, list]) => (Array.isArray(list) ? list : []).map(ep => ({ ...ep, season })));
+    if (!rows.length) { box.innerHTML = '<p class="note">No episodes returned by this provider.</p>'; return; }
+    box.innerHTML = '<div class="streams">' + rows.map((ep, i) => `<button class="stream" data-episode="${i}"><span><strong>S${esc(ep.season)} · E${esc(ep.episode_num || i + 1)} — ${esc(ep.title || ep.info?.name || 'Episode')}</strong><small>${esc(ep.container_extension || 'Provider stream')}</small></span><span>▶</span></button>`).join('') + '</div>';
+    box.querySelectorAll('[data-episode]').forEach(button => button.addEventListener('click', () => {
+      const ep = rows[Number(button.dataset.episode)];
+      closeDetails(); openPlayer(item);
+      playStream({ url: xtreamStreamUrl(ep.id, 'series', ep.container_extension || 'mp4'), name: 'Xtream episode' }, item);
+    }));
+  } catch (error) { box.innerHTML = '<p class="note">' + esc(error.message) + '</p>'; }
+}
 async function externalIds(item) {
   const type = typeOf(item);
   const data = await tmdb(`/${type}/${item.id}/external_ids`);
@@ -2143,11 +2275,20 @@ function loadSettings() {
     ? state.settings.manifests
     : (state.settings.manifest ? [state.settings.manifest] : []);
   $('manifests').value = manifests.join('\n');
+  const xtream = state.settings.xtream || {};
+  $('xtreamserver').value = xtream.server || '';
+  $('xtreamuser').value = xtream.username || '';
+  $('xtreampass').value = xtream.password || '';
   $('playerpref').value = state.settings.player || 'auto';
 }
 
 function saveSettings() {
   state.settings.key = $('tmdbkey').value.trim();
+  state.settings.xtream = {
+    server: normalise($('xtreamserver').value),
+    username: $('xtreamuser').value.trim(),
+    password: $('xtreampass').value
+  };
   state.settings.manifests = String($('manifests').value || '')
     .split(/[\n,]+/)
     .map(value => normalise(value))
@@ -2247,6 +2388,10 @@ function bind() {
   $('savetmdb').addEventListener('click', saveSettings);
   $('saveaddon').addEventListener('click', saveSettings);
   $('testaddon').addEventListener('click', testManifest);
+  $('savextream').addEventListener('click', saveSettings);
+  $('testxtream').addEventListener('click', testXtream);
+  $('xtreammovies').addEventListener('click', () => loadXtreamLibrary('movie'));
+  $('xtreamseries').addEventListener('click', () => loadXtreamLibrary('series'));
 
   $('closedetail').addEventListener('click', closeDetails);
   $('closeplayer').addEventListener('click', closePlayer);
