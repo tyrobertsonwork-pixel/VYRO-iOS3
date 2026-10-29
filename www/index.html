@@ -1079,6 +1079,83 @@ h1 { font-size:clamp(43px,8vw,88px);font-weight:900;letter-spacing:-.075em;line-
 }
 @media (prefers-reduced-motion:reduce) { *,*:before,*:after { animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important; } }
 
+
+/* VYRO — unified movies & series experience */
+:root {
+  --bg:#06080d; --panel:#0d131e; --line:#9dbbe51c; --text:#f4f7ff; --muted:#9aa8bd; --accent:#70dcff;
+}
+body {
+  background:radial-gradient(ellipse at 50% -18%,#244a7b35,transparent 43%),#06080d;
+  letter-spacing:-.018em;
+}
+.top {
+  background:#06080de8;border-bottom:1px solid #9dbbe512;
+  backdrop-filter:blur(22px) saturate(145%);-webkit-backdrop-filter:blur(22px) saturate(145%);
+}
+.mark {
+  background:linear-gradient(145deg,#b3f3ff,#64bfff 52%,#8275ff);
+  color:#07111d;box-shadow:0 0 0 1px #c7f4ff45,0 0 24px #56c7ff28;
+}
+.logo {letter-spacing:.28em}
+.navtop button.active,.navtop button:hover {background:#76dfff14;color:#e8f9ff;border:1px solid #8ddfff22}
+.hero {
+  min-height:clamp(480px,55vw,680px);border-radius:26px;border:1px solid #9ccfff20;
+  background:linear-gradient(125deg,#111c2d,#090c14 68%);box-shadow:0 30px 85px #0007;isolation:isolate;
+}
+.hero:after {
+  background:linear-gradient(0deg,#06080d 0%,#06080de8 12%,#06080d75 38%,#06080d08 78%),linear-gradient(90deg,#06080d8a,transparent 82%);
+}
+.heroimg {background-position:center 28%;filter:saturate(.9) contrast(1.04)}
+.herotext {padding:clamp(24px,4vw,48px);max-width:790px}
+.eyebrow {
+  display:inline-flex;align-items:center;gap:8px;padding:8px 11px;border:1px solid #8cddff30;
+  border-radius:999px;background:#08111dbd;color:#a8eaff;font-size:9px;letter-spacing:.19em;
+}
+.eyebrow:before {content:"";width:6px;height:6px;border-radius:50%;background:#6fe5ff;box-shadow:0 0 11px #6fe5ff}
+h1 {font-size:clamp(42px,8vw,82px);font-weight:900;letter-spacing:-.075em;line-height:.94}
+.desc {color:#d2dced;line-height:1.7}
+.btn {border-radius:13px;border-color:#a4cfff20;background:#b8d9ff09;transition:transform .18s,background .18s,border-color .18s}
+.btn:hover {background:#7ddaff17;border-color:#7ddaff55;transform:translateY(-1px)}
+.btn.primary {background:linear-gradient(115deg,#b1f3ff,#65c8ff 52%,#8c83ff);color:#06101b;border-color:transparent;box-shadow:0 8px 26px #49c8ff25}
+.section {margin:39px 0}
+.sectionhead {margin-bottom:16px}
+.sectionhead small {color:#80dfff;font-size:9px;letter-spacing:.19em}
+.sectionhead h2 {font-size:clamp(20px,3vw,26px);font-weight:850;letter-spacing:-.05em}
+.rail {grid-auto-columns:clamp(135px,16vw,185px);gap:15px;padding:4px 2px 17px;scroll-snap-type:x mandatory}
+.card {border-radius:16px;transition:transform .22s ease}
+.card:hover {transform:translateY(-4px)}
+.poster {border-radius:15px;border:1px solid #9ccfff18;box-shadow:0 10px 26px #0005;transition:border-color .2s,box-shadow .2s}
+.card:hover .poster {border-color:#75dfff70;box-shadow:0 14px 34px #0008,0 0 22px #57c7ff15}
+.poster img {transition:transform .4s ease}
+.card:hover .poster img {transform:scale(1.045)}
+.poster .badge {border:1px solid #b4eaff30;background:#070d18dc;color:#b4efff;backdrop-filter:blur(10px)}
+.cardtitle {font-weight:760}
+.field,input.field,select.field {background:#0d1522;border:1px solid #9ccfff27;border-radius:13px;color:#f4f7ff}
+.panel,.empty,.resume,.stream {
+  border:1px solid #9ccfff20;border-radius:19px;
+  background:linear-gradient(145deg,#111b2be8,#090d16f2);box-shadow:inset 0 1px #ffffff08,0 15px 35px #0002;
+}
+.panel {padding:22px;margin:17px 0}
+.overlay {background:#01040aeb;backdrop-filter:blur(22px)}
+.dialog,.playershell {background:#080d17;border:1px solid #a5d4ff20;border-radius:24px;box-shadow:0 28px 90px #000a}
+.bottom {background:#070b13ed;border:1px solid #b6dfff18;border-bottom:0;backdrop-filter:blur(22px);box-shadow:0 -10px 35px #0004}
+.bottom button.active {color:#b5f0ff;background:#69d8ff12}
+.bottom button.active b {color:#75deff}
+@media(max-width:699px) {
+ .hero {min-height:clamp(455px,68vh,600px);border-radius:22px}
+ .hero:after {background:linear-gradient(0deg,#06080d 0%,#06080de0 13%,#06080d65 43%,transparent 75%)}
+ .heroimg {background-position:58% center}
+ .herotext {padding:20px}
+ h1 {font-size:clamp(41px,11.5vw,64px)}
+ .actions {display:grid;grid-template-columns:1.15fr 1fr}
+ .actions .btn {padding:0 10px;font-size:12px}
+ .rail {grid-auto-columns:clamp(128px,39vw,162px);gap:12px}
+ .section {margin:32px 0}
+ .sectionhead h2 {font-size:21px}
+ .panel {padding:18px}
+}
+@media(prefers-reduced-motion:reduce) {*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
 </style>
 </head>
 <body>
@@ -1102,13 +1179,13 @@ h1 { font-size:clamp(43px,8vw,88px);font-weight:900;letter-spacing:-.075em;line-
 <div class="hero">
 <div id="heroimg" class="heroimg"></div>
 <div class="herotext">
-<div class="eyebrow">VYRO SELECTS · TONIGHT’S FEATURE</div>
-<h1 id="herotitle">Cinema, reimagined.</h1>
+<div class="eyebrow">YOUR LIBRARY · YOUR NEXT FAVOURITE</div>
+<h1 id="herotitle">Your next<br>great watch.</h1>
 <div id="herometa" class="meta"></div>
-<p id="herodesc" class="desc">Discover your next favourite story.</p>
+<p id="herodesc" class="desc">Movies and series, brought together in one beautifully simple place.</p>
 <div class="actions">
-<button id="heroplay" class="btn primary">▶ Find a stream</button>
-<button id="heroinfo" class="btn">More info</button>
+<button id="heroplay" class="btn primary">▶ Explore titles</button>
+<button id="heroinfo" class="btn">Discover more</button>
 </div>
 </div>
 </div>
@@ -1122,7 +1199,7 @@ h1 { font-size:clamp(43px,8vw,88px);font-weight:900;letter-spacing:-.075em;line-
 
 <section class="section">
 <div class="sectionhead">
-<div><small>What's worth watching</small><h2>Trending now</h2></div>
+<div><small>Picked from the culture</small><h2>Trending now</h2></div>
 <button class="btn" data-page="discover">Explore</button>
 </div>
 <div id="trending" class="rail">
@@ -1135,6 +1212,11 @@ h1 { font-size:clamp(43px,8vw,88px);font-weight:900;letter-spacing:-.075em;line-
 <div><small>Critic favourites</small><h2>Top rated</h2></div>
 </div>
 <div id="popular" class="rail"></div>
+</section>
+
+<section class="section">
+<div class="sectionhead"><div><small>Binge-worthy stories</small><h2>Popular series</h2></div><button class="btn" data-page="discover">Browse all</button></div>
+<div id="popularseries" class="rail"><div class="empty">Connect your catalogue to explore series.</div></div>
 </section>
 </div>
 </section>
@@ -1176,19 +1258,19 @@ h1 { font-size:clamp(43px,8vw,88px);font-weight:900;letter-spacing:-.075em;line-
 <section id="settings" class="page">
 <div class="shell">
 <h1>Settings.</h1>
-<p class="desc">Your catalogue and streaming sources.</p>
+<p class="desc">Bring your movie and series catalogue together, then watch from compatible sources.</p>
 
 <div class="panel">
-<h3>TMDB catalogue</h3>
-<p>Connect TMDB to load live movie and series information, artwork and search results.</p>
+<h3>Discover movies &amp; series</h3>
+<p>Connect TMDB for rich artwork, descriptions, ratings, cast details and discovery across movies and series.</p>
 <label for="tmdbkey">TMDB API key (v3)</label>
 <input id="tmdbkey" class="field" type="password" autocomplete="off" placeholder="Enter API key">
 <button id="savetmdb" class="btn primary">Save settings</button>
 </div>
 
 <div class="panel">
-<h3>Streaming add-on</h3>
-<p>Use a compatible Stremio-style add-on manifest URL. The source must permit browser requests and return playable stream URLs.</p>
+<h3>Video source</h3>
+<p>Connect a compatible Stremio-style VOD add-on. It must allow browser requests and return direct playable stream URLs for movies or series.</p>
 <label for="manifest">Manifest URL</label>
 <input id="manifest" class="field" type="url" placeholder="https://…/manifest.json">
 <button id="saveaddon" class="btn primary">Save add-on</button>
@@ -1211,7 +1293,7 @@ h1 { font-size:clamp(43px,8vw,88px);font-weight:900;letter-spacing:-.075em;line-
 <button id="clearsaved" class="btn">Clear My List</button>
 </div>
 
-<div id="settingsstatus" class="note">Add your API key and a compatible stream add-on to enable live content and playback.</div>
+<div id="settingsstatus" class="note">Connect your catalogue and a compatible video source to enable discovery and playback.</div>
 </div>
 </section>
 </main>
@@ -1458,13 +1540,16 @@ function showPage(name) {
 
 async function initHome() {
   if (!apiKey()) {
-    $('herotitle').textContent = 'Cinema, reimagined.';
-    $('herodesc').textContent = 'Connect your catalogue in Settings to discover movies and series.';
+    $('herotitle').innerHTML = 'Your next<br>great watch.';
+    $('herodesc').textContent = 'Connect your catalogue to discover movies and series, build your watchlist and keep your viewing progress together.';
     $('heroimg').style.backgroundImage =
       'url(https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1600&q=80)';
 
     renderRail('trending', []);
     renderRail('popular', []);
+    renderRail('popularseries', []);
+    $('heroplay').onclick = () => showPage('discover');
+    $('heroinfo').onclick = () => showPage('settings');
     renderContinue();
     return;
   }
@@ -1472,9 +1557,10 @@ async function initHome() {
   $('herodesc').textContent = 'Discover your next favourite story.';
 
   try {
-    const [trendingData, topData] = await Promise.all([
+    const [trendingData, topData, seriesData] = await Promise.all([
       tmdb('/trending/all/week', { page: 1 }),
-      tmdb('/movie/top_rated', { page: 1 })
+      tmdb('/movie/top_rated', { page: 1 }),
+      tmdb('/tv/popular', { page: 1 })
     ]);
 
     const trending = (trendingData.results || [])
@@ -1485,6 +1571,8 @@ async function initHome() {
 
     renderRail('trending', trending.slice(0, 20), 'TRENDING');
     renderRail('popular', popular.slice(0, 20), 'TOP RATED');
+    const series = (seriesData.results || []).map(item => ({ ...item, media_type: 'tv' }));
+    renderRail('popularseries', series.slice(0, 20), 'SERIES');
 
     const hero = trending.find(item => item.backdrop_path) || trending[0];
 
@@ -1497,12 +1585,14 @@ async function initHome() {
         `★ ${ratingOf(hero)} · ${yearOf(hero)} · ${typeOf(hero) === 'tv' ? 'SERIES' : 'MOVIE'}`;
       $('herodesc').textContent = hero.overview || 'A story worth staying up for.';
 
+      $('heroplay').textContent = '▶ View title';
       $('heroplay').onclick = () => openDetails(hero);
       $('heroinfo').onclick = () => openDetails(hero);
     }
 
     renderContinue();
   } catch (error) {
+    renderRail('popularseries', []);
     setStatus('Catalogue error: ' + error.message);
   }
 }
