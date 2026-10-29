@@ -1383,6 +1383,7 @@ const state = {
   settings: { key: '', manifest: '', manifests: [], xtream: { server: '', username: '', password: '' }, player: 'auto' },
   saved: read(KEYS.saved, []),
   progress: read(KEYS.progress, {}),
+  xtreamItems: [],
   genres: { movie: [], tv: [] },
   page: 1,
   results: [],
@@ -1423,10 +1424,11 @@ function isXtreamItem(item) {
 }
 
 function yearOf(item) {
-  return String(item?.release_date || item?.first_air_date || '').slice(0, 4) || '—';
+  return String(item?._xtreamYear || item?.release_date || item?.first_air_date || '').slice(0, 4) || '—';
 }
 
 function ratingOf(item) {
+  if (item?._xtreamRating !== undefined && item?._xtreamRating !== '') return String(item._xtreamRating);
   return Number(item?.vote_average || 0).toFixed(1);
 }
 
@@ -1964,6 +1966,7 @@ async function loadXtreamLibrary(kind) {
     const data = await xtreamRequest(kind === 'series' ? 'get_series' : 'get_vod_streams');
     if (!Array.isArray(data)) throw new Error('Provider did not return a VOD list.');
     const items = data.map(item => xtreamTitle(item, kind));
+    state.xtreamItems = items;
     renderCatalog('xtreamresults', items, 'No titles returned by this provider.');
     $('xtreamstatus').textContent = items.length + ' provider ' + kind + ' loaded.';
   } catch (error) {
@@ -2331,6 +2334,7 @@ function bind() {
       const item = [
         ...state.results,
         ...state.saved,
+        ...state.xtreamItems,
         state.hero
       ].filter(Boolean).find(candidate =>
         Number(candidate.id) === id && typeOf(candidate) === type
