@@ -954,6 +954,63 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
   body { padding-bottom: calc(92px + var(--safe)); }
 }
 
+
+/* App-shell pass: compact native-feeling navigation and immersive mobile browsing. */
+@media (max-width: 700px) {
+  /* Capacitor already places the web content below the iOS status area in this build;
+     don't add the safe-area inset a second time to the header. */
+  .top {
+    position: sticky;
+    top: 0;
+    gap: 10px;
+    min-height: 70px;
+    padding: 9px 16px 10px;
+    background: rgba(12,10,27,.82);
+    border-bottom: 1px solid rgba(255,255,255,.08);
+    -webkit-backdrop-filter: saturate(180%) blur(28px);
+    backdrop-filter: saturate(180%) blur(28px);
+  }
+  .navtop { display: none; }
+  .mark { width: 42px; height: 42px; border-radius: 14px; }
+  .topbtn { width: 44px; height: 44px; min-width: 44px; padding: 0; border-radius: 15px; }
+  .shell { padding: 12px 16px 22px; }
+  .hero {
+    min-height: min(66svh, 590px);
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 25px;
+    box-shadow: 0 22px 50px rgba(0,0,0,.25);
+  }
+  .herotext { padding: 24px 20px; }
+  .hero h1 { font-size: clamp(38px, 10vw, 54px); line-height: .98; }
+  .eyebrow { font-size: 9px; letter-spacing: .15em; }
+  .section { margin-top: 25px; }
+  .sectionhead { align-items: center; margin-bottom: 12px; }
+  .sectionhead h2 { font-size: 21px; letter-spacing: -.04em; }
+  .sectionhead small { font-size: 10px; letter-spacing: .12em; text-transform: uppercase; }
+  .rail { gap: 12px; padding: 2px 1px 12px; }
+  .rail .card { flex: 0 0 36%; max-width: 160px; }
+  .rail .poster { border-radius: 15px; }
+  #discover .shell { padding-top: 13px; }
+  #discover h1, #mylist h1, #settings h1 {
+    margin: 5px 0 6px;
+    font-size: 28px;
+    line-height: 1.1;
+    letter-spacing: -.055em;
+  }
+  #discover .desc, #mylist .desc, #settings .desc { margin: 0 0 14px; font-size: 13px; }
+  #discover #xtreamlibrarypanel { margin-top: 20px; }
+  #discover #status { padding-left: 2px; color: rgba(238,234,255,.64); }
+  .bottom { bottom: calc(8px + var(--safe)); width: calc(100% - 30px); max-width: 440px; }
+  body { padding-bottom: calc(100px + var(--safe)); }
+}
+@media (max-width: 380px) {
+  .logo { font-size: 11px; }
+  .top { padding-left: 12px; padding-right: 12px; }
+  .shell { padding-left: 12px; padding-right: 12px; }
+  #discover #results { gap: 13px 8px; }
+  .bottom { width: calc(100% - 22px); }
+}
+
 </style>
 </head>
 <body>
