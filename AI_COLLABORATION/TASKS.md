@@ -13,7 +13,8 @@ Use this file to hand work between Claude and ChatGPT without a paid API connect
 - [x] First task: inspect the current VYRO app and produce a feature-preserving technical/UI audit. Audit recorded in `AI_COLLABORATION/CHATGPT_REVIEW.md` (2026-10-31).
 
 ## In progress
-- [x] Streaming reliability stage 1: cancel in-flight Stremio manifest requests on timeout/player close and flush watch progress on pagehide/background. Commit: `7d5d4e07e052362d89e58fcf5dde3a370617f346`. Awaiting real-device playback verification.
+- [x] Streaming reliability stage 1: cancel in-flight Stremio manifest requests on timeout/player close and flush watch progress on pagehide/background. Commit: `7d5d4e07e052362d89e58fcf5dde3a370617f346`.
+- [x] Streaming reliability stage 2: bounded HLS network/media recovery and one guarded native iOS HLS fallback. Commit: `1b00522464f4e9815c2cd10df11898f1b6c0f5d0`. Awaiting real-device playback verification.
 
 ## Awaiting review
 _None._
