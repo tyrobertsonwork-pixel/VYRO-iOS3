@@ -68,3 +68,35 @@ Independent feature-preserving technical/UI audit of the current VYRO app. Revie
 
 ### What to review next
 Ty should approve one focused next task. Recommended first engineering task: add a reproducible baseline test run and document the exact iPhone/provider playback failures before changing networking or credentials. Keep the existing feature set intact.
+
+
+## Streaming reliability — stage 1 — 2026-10-31
+
+### Branch and commit
+- Branch: `ai-collaboration`
+- Commit: `7d5d4e07e052362d89e58fcf5dde3a370617f346`
+
+### File changed
+- `www/index.html`
+
+### Changes
+- Added a dedicated AbortController for Stremio stream discovery.
+- Passed its signal to each add-on manifest stream request so a timed-out lookup or closing/replacing the player cancels outstanding network requests rather than leaving them running.
+- Kept the existing 20-second lookup limit and changed it to abort the underlying requests at timeout.
+- Kept the existing HTTP/HTTPS stream URL validation unchanged.
+- Added a `pagehide` and document-hidden flush for watch progress; existing five-second persistence and player-close flush remain.
+
+### Checks actually run
+- Retrieved the committed HTML from `ai-collaboration` after the commit.
+- Extracted the inline application script and compiled it with JavaScript `new Function`: PASS (one inline application script).
+- Targeted source assertions: controller state, timeout abort, player-close abort, pagehide and visibility flush all present.
+- The first signal regex assertion was too strict and returned false; direct source inspection confirms `{ headers: { Accept: 'application/json' }, signal }` is present in the manifest fetch.
+- No GitHub Actions run, npm install, Playwright, Xcode build, simulator or physical iPhone playback test was run. No runtime success is claimed.
+
+### Remaining work
+- Add bounded HLS fatal-error recovery and carefully test native HLS fallback.
+- Decide on local HLS.js bundling only after checking package/dependency/build impact.
+- Verify on an actual iPhone with known legal MP4/HLS test sources and the user's configured provider.
+
+### Approval recommendation
+Needs manual iPhone testing; this is a focused reliability improvement, not a complete streaming fix.
