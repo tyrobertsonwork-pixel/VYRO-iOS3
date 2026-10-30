@@ -100,3 +100,29 @@ Ty should approve one focused next task. Recommended first engineering task: add
 
 ### Approval recommendation
 Needs manual iPhone testing; this is a focused reliability improvement, not a complete streaming fix.
+
+
+## Streaming reliability — stage 2 — 2026-10-31
+
+### Branch and commit
+- Branch: `ai-collaboration`
+- Commit: `1b00522464f4e9815c2cd10df11898f1b6c0f5d0`
+
+### File changed
+- `www/index.html`
+
+### Changes
+- Added one bounded retry for fatal HLS network errors using `startLoad()`.
+- Added one bounded decoder recovery attempt for fatal HLS media errors using `recoverMediaError()`.
+- If HLS.js recovery remains fatal and WebKit advertises native HLS support, destroy the HLS.js instance and attempt the same stream URL through the native iOS video element once.
+- Kept the existing player preference behavior and existing non-HLS playback path.
+
+### Checks actually run
+- Fetched the updated committed HTML from `ai-collaboration`.
+- Compiled the inline app script with JavaScript `new Function`: PASS.
+- Targeted source checks for abort-signal propagation, 20-second abort, HLS network recovery, media recovery, native HLS fallback and pagehide persistence: all PASS.
+- No HLS.js runtime simulation, GitHub Actions run, iOS build, simulator or physical iPhone test was performed. The fallback is implemented but remains unverified on-device.
+
+### Remaining
+- Local HLS.js bundling is not included yet; current CDN dependency remains.
+- Provider-specific CORS, auth headers, redirects, codecs and actual playback require device testing.
