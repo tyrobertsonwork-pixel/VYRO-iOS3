@@ -1040,6 +1040,161 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
 }
 
+
+/* FINAL CONTROL SYSTEM — quiet, modern liquid glass; remove legacy bevel/office-style button treatments. */
+:root {
+  --control-glass: rgba(255,255,255,.065);
+  --control-glass-hover: rgba(255,255,255,.105);
+  --control-stroke: rgba(255,255,255,.13);
+  --control-stroke-active: rgba(196,181,253,.42);
+  --control-text: #f7f5ff;
+  --control-muted: #aaa6bd;
+  --control-accent: #b9a0ff;
+}
+button, .btn, .topbtn, .chip, .cinema-play, .cinema-icon-action, .cinema-secondary {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif;
+  -webkit-appearance: none;
+  appearance: none;
+  text-shadow: none;
+  outline-offset: 3px;
+}
+.btn, button.btn {
+  min-height: 46px;
+  padding: 0 18px;
+  border: 1px solid var(--control-stroke);
+  border-radius: 15px;
+  background: rgba(255,255,255,.055);
+  color: var(--control-text);
+  box-shadow: none;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -.018em;
+  line-height: 1;
+  transition: background .18s ease, border-color .18s ease, transform .18s cubic-bezier(.2,.8,.2,1), color .18s ease;
+  -webkit-backdrop-filter: saturate(155%) blur(18px);
+  backdrop-filter: saturate(155%) blur(18px);
+}
+.btn:hover, button.btn:hover {
+  background: var(--control-glass-hover);
+  border-color: rgba(255,255,255,.2);
+  box-shadow: none;
+}
+.btn:active, button.btn:active {
+  transform: scale(.975);
+  background: rgba(255,255,255,.12);
+}
+.btn.primary, .btn.primary:hover, .cinema-play {
+  min-height: 48px;
+  padding: 0 21px;
+  border: 1px solid rgba(255,255,255,.2);
+  border-radius: 16px;
+  background: #c4b5fd;
+  color: #171126;
+  box-shadow: 0 5px 20px rgba(167,139,250,.18);
+  font-size: 14px;
+  font-weight: 700;
+}
+.btn.primary:active, .cinema-play:active {
+  transform: scale(.97);
+  background: #b6a3fa;
+  box-shadow: 0 2px 10px rgba(167,139,250,.16);
+}
+.topbtn {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  min-width: 46px;
+  height: 46px;
+  min-height: 46px;
+  padding: 0;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 16px;
+  background: rgba(255,255,255,.055);
+  color: #f1edff;
+  box-shadow: none;
+  -webkit-backdrop-filter: blur(22px) saturate(165%);
+  backdrop-filter: blur(22px) saturate(165%);
+}
+.topbtn:active { transform: scale(.95); background: rgba(255,255,255,.13); }
+.chip {
+  padding: 9px 15px;
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 999px;
+  background: rgba(255,255,255,.045);
+  color: #c9c4d8;
+  font-size: 12px;
+  font-weight: 550;
+  letter-spacing: 0;
+  box-shadow: none;
+}
+.chip.active {
+  border-color: rgba(196,181,253,.42);
+  background: rgba(167,139,250,.16);
+  color: #e5dcff;
+}
+.field, input.field, select.field {
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 15px;
+  background: rgba(255,255,255,.045);
+  color: #f7f5ff;
+  box-shadow: none;
+  font-size: 14px;
+}
+.field:focus, input.field:focus, select.field:focus {
+  border-color: rgba(196,181,253,.55);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(167,139,250,.1);
+}
+.cinema-icon-action, .cinema-secondary {
+  min-width: 48px;
+  min-height: 48px;
+  padding: 0 16px;
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 16px;
+  background: rgba(255,255,255,.065);
+  color: #f7f5ff;
+  box-shadow: none;
+  font-size: 14px !important;
+  font-weight: 600;
+  -webkit-backdrop-filter: blur(18px) saturate(155%);
+  backdrop-filter: blur(18px) saturate(155%);
+}
+.bottom {
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(17,14,32,.78);
+  box-shadow: 0 10px 34px rgba(0,0,0,.28);
+  -webkit-backdrop-filter: blur(32px) saturate(180%);
+  backdrop-filter: blur(32px) saturate(180%);
+}
+.bottom button {
+  border: 1px solid transparent;
+  border-radius: 15px;
+  background: transparent;
+  color: var(--control-muted);
+  font-size: 10px;
+  font-weight: 550;
+  letter-spacing: .005em;
+  box-shadow: none;
+}
+.bottom button.active {
+  border-color: rgba(196,181,253,.18);
+  background: rgba(167,139,250,.13);
+  color: #e3d9ff;
+  box-shadow: none;
+}
+.bottom button.active svg { filter: none; }
+#xtreamlibrarypanel .btn, #settings .btn { min-height: 44px; }
+@media (hover: none) {
+  .btn:hover, button.btn:hover { background: rgba(255,255,255,.055); }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .btn, .topbtn, .cinema-icon-action, .cinema-secondary, .bottom {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background: #19162a;
+  }
+}
+
 </style>
 </head>
 <body>
