@@ -2572,14 +2572,49 @@ function playStream(stream, item) {
       });
     });
 
+    let networkRecoveryAttempted = false;
+    let mediaRecoveryAttempted = false;
+    let nativeFallbackAttempted = false;
     state.hls.on(Hls.Events.ERROR, (_, data) => {
-      if (data.fatal) {
-        $('playernote').textContent = data.type === Hls.ErrorTypes.NETWORK_ERROR
-          ? 'HLS network error. The source may be offline or blocking requests.'
-          : data.type === Hls.ErrorTypes.MEDIA_ERROR
-            ? 'HLS media decode error. Try another source or format.'
-            : 'HLS playback failed. Try another source.';
+      if (!data.fatal || !state.hls) return;
+
+      if (data.type === Hls.ErrorTypes.NETWORK_ERROR && !networkRecoveryAttempted) {
+        networkRecoveryAttempted = true;
+        $('playernote').textContent = 'Connection interrupted. Retrying HLS stream…';
+        state.hls.startLoad();
+        return;
       }
+
+      if (data.type === Hls.ErrorTypes.MEDIA_ERROR && !mediaRecoveryAttempted) {
+        mediaRecoveryAttempted = true;
+        $('playernote').textContent = 'Recovering the video decoder…';
+        state.hls.recoverMediaError();
+        return;
+      }
+
+      // Safari/iOS can often play HLS natively even when the HLS.js path fails.
+      // Attempt this once, only when WebKit advertises native HLS support.
+      if (!nativeFallbackAttempted && video.canPlayType('application/vnd.apple.mpegurl')) {
+        nativeFallbackAttempted = true;
+        const failedHls = state.hls;
+        state.hls = null;
+        failedHls.destroy();
+        $('playernote').textContent = 'Switching to the iOS native HLS player…';
+        video.src = parsed.href;
+        video.load();
+        video.play().then(() => {
+          $('playernote').textContent = 'Playing with the iOS native HLS player.';
+        }).catch(() => {
+          $('playernote').textContent = 'Native HLS could not start. Try another source.';
+        });
+        return;
+      }
+
+      $('playernote').textContent = data.type === Hls.ErrorTypes.NETWORK_ERROR
+        ? 'HLS network recovery failed. The source may be offline or blocking requests.'
+        : data.type === Hls.ErrorTypes.MEDIA_ERROR
+          ? 'HLS decoder recovery failed. Try another source or format.'
+          : 'HLS playback failed. Try another source.';
     });
   } else {
     video.src = parsed.href;
