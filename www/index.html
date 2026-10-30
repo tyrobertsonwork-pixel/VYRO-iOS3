@@ -1435,7 +1435,8 @@ const state = {
   searchTimer: null,
   saveTimer: null,
   discoverRequestId: 0,
-  streamRequestId: 0
+  streamRequestId: 0,
+  streamAbortController: null
 };
 
 const cache = new Map();
@@ -2286,7 +2287,7 @@ async function externalIds(item) {
   };
 }
 
-async function fetchStreams(item) {
+async function fetchStreams(item, signal) {
   const manifests = configuredManifests();
 
   if (!manifests.length) {
@@ -2314,7 +2315,7 @@ async function fetchStreams(item) {
           .replace(/\/+$/, '') + `/stream/${type}/${id}.json`;
         const response = await fetch(
           endpoint.toString(),
-          { headers: { Accept: 'application/json' } }
+          { headers: { Accept: 'application/json' }, signal }
         );
         if (!response.ok) {
           lastError = 'HTTP ' + response.status;
@@ -2366,6 +2367,10 @@ function streamUrl(stream) {
 }
 
 function openPlayer(item) {
+  if (state.streamAbortController) {
+    state.streamAbortController.abort();
+    state.streamAbortController = null;
+  }
   state.streamItem = item;
   state.streamRequestId += 1;
   $('player').classList.add('open');
@@ -2399,18 +2404,22 @@ async function startStream(item) {
   openPlayer(item);
   const requestId = state.streamRequestId;
 
+  const controller = new AbortController();
+  state.streamAbortController = controller;
+  let lookupTimer;
   try {
-    let lookupTimer;
+    lookupTimer = setTimeout(() => controller.abort(), 20000);
     let streams;
     try {
-      streams = await Promise.race([
-        fetchStreams(item),
-        new Promise((_, reject) => {
-          lookupTimer = setTimeout(() => reject(new Error('Stream lookup timed out after 20 seconds. Check your add-on URLs and connection, then try again.')), 20000);
-        })
-      ]);
+      streams = await fetchStreams(item, controller.signal);
+    } catch (error) {
+      if (controller.signal.aborted) {
+        throw new Error('Stream lookup was cancelled or timed out after 20 seconds. Check your add-on URLs and connection, then try again.');
+      }
+      throw error;
     } finally {
       clearTimeout(lookupTimer);
+      if (state.streamAbortController === controller) state.streamAbortController = null;
     }
     // Ignore results from a title that was closed or replaced while requests
     // were in flight; stale responses must not populate the current player.
@@ -2619,6 +2628,10 @@ function playStream(stream, item) {
 
 function closePlayer() {
   state.streamRequestId += 1;
+  if (state.streamAbortController) {
+    state.streamAbortController.abort();
+    state.streamAbortController = null;
+  }
   const video = $('video');
 
   video.pause();
@@ -2849,6 +2862,20 @@ function restore() {
     if (status) status.textContent = 'VYRO could not finish starting: ' + (error?.message || 'Unknown error') + '. Please reload the app.';
   }
 }
+
+// Flush the latest playback position when iOS backgrounds the WebView or
+// navigates it away; the regular five-second save remains the normal path.
+function flushWatchProgress() {
+  if (state.saveTimer) {
+    clearTimeout(state.saveTimer);
+    state.saveTimer = null;
+  }
+  write(KEYS.progress, state.progress);
+}
+window.addEventListener('pagehide', flushWatchProgress);
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden') flushWatchProgress();
+});
 
 window.addEventListener('error', event => {
   console.error('VYRO runtime error:', event.error || event.message);
