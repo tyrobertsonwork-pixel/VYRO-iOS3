@@ -68,6 +68,11 @@ jobs:
       - name: Sync web app
         run: npx cap sync ios
 
+      - name: Integrate native AetherEngine MKV player
+        run: |
+          gem install xcodeproj --no-document
+          ruby scripts/integrate-native-player.rb
+
       - name: Build unsigned iOS app
         run: |
           xcodebuild \
@@ -76,6 +81,7 @@ jobs:
             -configuration Release \
             -sdk iphoneos \
             -derivedDataPath build \
+            IPHONEOS_DEPLOYMENT_TARGET=18.0 \\
             CODE_SIGNING_ALLOWED=NO
 
       - name: Package IPA
