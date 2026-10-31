@@ -1660,9 +1660,10 @@ async function requestJsonWithRetry(url, options = {}, config = {}) {
       if (body) {
         try { data = JSON.parse(body); }
         catch {
-          const parseError = new Error('The server returned invalid JSON.');
-          parseError.status = response.status;
-          throw parseError;
+          // Error pages from proxies/providers are often HTML; keep the HTTP
+          // status so transient 5xx/429 responses can still be retried.
+          if (response.ok) throw new Error('The server returned invalid JSON.');
+          data = {};
         }
       }
 
