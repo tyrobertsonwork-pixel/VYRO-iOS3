@@ -2810,7 +2810,7 @@ async function playStream(stream, item) {
 
   const video = $('video');
   if (state.nativePlayerActive || state.nativePlugin) {
-    state.nativePlayer?.close?.();
+    state.nativePlugin?.close?.();
     state.nativePlayerActive = false;
     state.nativeProgressKey = null;
     state.nativeCurrentItem = null;
@@ -3053,6 +3053,21 @@ function closePlayer() {
     state.streamAbortController = null;
   }
   const video = $('video');
+  if (state.nativePlugin) {
+    state.nativePlugin.close();
+    state.nativePlayerActive = false;
+    state.nativeProgressKey = null;
+    state.nativeCurrentItem = null;
+    if (state.updateNativeFrame) {
+      window.removeEventListener('resize', state.updateNativeFrame);
+      window.removeEventListener('scroll', state.updateNativeFrame, true);
+      state.updateNativeFrame = null;
+    }
+    video.style.opacity = '';
+    video.style.pointerEvents = '';
+    $('native-controls').classList.remove('active');
+    $('native-controls').hidden = true;
+  }
 
   video.pause();
   video.removeAttribute('src');
