@@ -25,7 +25,6 @@ unless target.package_product_dependencies.any? { |dep| dep.product_name == 'Aet
   target.package_product_dependencies << dependency
   build_file = project.new(Xcodeproj::Project::Object::PBXBuildFile)
   build_file.product_ref = dependency
-  frameworks = target.frameworks_build_phase || target.new_product_ref
   target.frameworks_build_phase.files << build_file
 end
 
