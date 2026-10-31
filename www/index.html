@@ -12,6 +12,11 @@
 
 <style>
 /* VYRO — a restrained, editorial cinema interface */
+.native-controls { display:none; align-items:center; gap:12px; padding:12px 2px; }
+.native-controls.active { display:flex; }
+.native-controls input { flex:1; min-width:0; accent-color:var(--accent); }
+.native-controls span { color:var(--muted); font-size:11px; font-variant-numeric:tabular-nums; white-space:nowrap; }
+
 :root {
   color-scheme: dark;
   --bg: #090909;
@@ -1560,6 +1565,11 @@ video { border:1px solid rgba(255,255,255,.12); border-radius:14px; }
 <button id="closeplayer" class="btn">✕ Close</button>
 </div>
 <video id="video" controls playsinline webkit-playsinline preload="metadata"></video>
+<div id="native-controls" class="native-controls" hidden>
+  <button id="native-playpause" class="btn" type="button">Ⅱ Pause</button>
+  <input id="native-seek" type="range" min="0" max="1000" value="0" aria-label="Seek video">
+  <span id="native-time">00:00 / 00:00</span>
+</div>
 <div id="playernote" class="note">Choose a stream to begin.</div>
 <div id="streams" class="streams"></div>
 </div>
@@ -1597,6 +1607,12 @@ function write(k, value) {
 }
 
 const state = {
+  nativePlayerActive: false,
+  nativeProgressKey: null,
+  nativeCurrentItem: null,
+  nativePlugin: null,
+  nativeListenersReady: false,
+  nativeDuration: 0,
   settings: { key: '', manifest: '', manifests: [], xtream: { server: '', username: '', password: '' }, player: 'auto' },
   saved: read(KEYS.saved, []),
   progress: read(KEYS.progress, {}),
@@ -2761,7 +2777,17 @@ async function startStream(item) {
   }
 }
 
-function playStream(stream, item) {
+function formatPlayerTime(value) {
+  const seconds = Math.max(0, Math.floor(Number(value) || 0));
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const remainder = seconds % 60;
+  return hours > 0
+    ? String(hours).padStart(2, '0') + ':' + String(minutes).padStart(2, '0') + ':' + String(remainder).padStart(2, '0')
+    : String(minutes).padStart(2, '0') + ':' + String(remainder).padStart(2, '0');
+}
+
+async function playStream(stream, item) {
   const url = streamUrl(stream);
 
   if (!url) {
@@ -2783,6 +2809,21 @@ function playStream(stream, item) {
   }
 
   const video = $('video');
+  if (state.nativePlayerActive || state.nativePlugin) {
+    state.nativePlugin?.close?.();
+    state.nativePlayerActive = false;
+    state.nativeProgressKey = null;
+    state.nativeCurrentItem = null;
+    if (state.updateNativeFrame) {
+      window.removeEventListener('resize', state.updateNativeFrame);
+      window.removeEventListener('scroll', state.updateNativeFrame, true);
+      state.updateNativeFrame = null;
+    }
+    video.style.opacity = '';
+    video.style.pointerEvents = '';
+    $('native-controls').classList.remove('active');
+    $('native-controls').hidden = true;
+  }
 
   if (state.hls) {
     state.hls.destroy();
@@ -2798,6 +2839,85 @@ function playStream(stream, item) {
     /mpegurl/i.test(stream.mimeType || '');
   const extension = (parsed.pathname.split('.').pop() || '').toLowerCase();
   const likelyUnsupported = ['mkv', 'avi', 'wmv', 'flv', 'ts'].includes(extension);
+
+  const nativeFormats = ['mkv', 'avi', 'wmv', 'flv', 'ts'];
+  if (!isHls && nativeFormats.includes(extension) && window.Capacitor?.Plugins?.AetherPlayer) {
+    const nativePlayer = window.Capacitor.Plugins.AetherPlayer;
+    const key = identityType(item) + ':' + item.id;
+    state.nativePlugin = nativePlayer;
+    state.nativeProgressKey = key;
+    state.nativeCurrentItem = item;
+    state.nativePlayerActive = false;
+
+    if (!state.nativeListenersReady) {
+      state.nativeListenersReady = true;
+      nativePlayer.addListener('timeUpdate', event => {
+        if (!state.nativePlayerActive || !state.nativeProgressKey || !state.nativeCurrentItem) return;
+        const currentTime = Number(event.currentTime) || 0;
+        const duration = Number(event.duration) || 0;
+        state.nativeDuration = duration;
+        $('native-time').textContent = formatPlayerTime(currentTime) + ' / ' + formatPlayerTime(duration);
+        $('native-seek').value = duration > 0 ? String(Math.round(currentTime / duration * 1000)) : '0';
+        const stateText = String(event.state || '').toLowerCase();
+        $('native-playpause').textContent = stateText.includes('playing') ? 'Ⅱ Pause' : '▶ Play';
+        if (duration > 0) {
+          state.progress[state.nativeProgressKey] = {
+            item: state.nativeCurrentItem,
+            type: identityType(state.nativeCurrentItem),
+            time: currentTime,
+            duration,
+            updated: Date.now()
+          };
+          if (!state.saveTimer) {
+            state.saveTimer = setTimeout(() => {
+              write(KEYS.progress, state.progress);
+              state.saveTimer = null;
+              renderContinue();
+            }, 5000);
+          }
+        }
+      });
+      nativePlayer.addListener('ended', () => {
+        if (!state.nativeProgressKey) return;
+        delete state.progress[state.nativeProgressKey];
+        write(KEYS.progress, state.progress);
+        renderContinue();
+      });
+    }
+
+    const rect = video.getBoundingClientRect();
+    const frame = { x: rect.left, y: rect.top, width: rect.width, height: rect.height };
+    $('native-controls').hidden = false;
+    $('native-controls').classList.add('active');
+    video.style.opacity = '0';
+    video.style.pointerEvents = 'none';
+    $('playernote').textContent = 'Starting native MKV player…';
+    try {
+      await nativePlayer.load({
+        url: parsed.href,
+        startPosition: Number(state.progress[key]?.time) || 0,
+        frame
+      });
+      state.nativePlayerActive = true;
+      $('playernote').textContent = 'Playing with VYRO native video engine.';
+      const updateNativeFrame = () => {
+        if (!state.nativePlayerActive) return;
+        const box = video.getBoundingClientRect();
+        nativePlayer.setFrame({ frame: { x: box.left, y: box.top, width: box.width, height: box.height } });
+      };
+      window.addEventListener('resize', updateNativeFrame);
+      window.addEventListener('scroll', updateNativeFrame, true);
+      state.updateNativeFrame = updateNativeFrame;
+    } catch (error) {
+      state.nativePlayerActive = false;
+      video.style.opacity = '';
+      video.style.pointerEvents = '';
+      $('native-controls').classList.remove('active');
+      $('native-controls').hidden = true;
+      $('playernote').textContent = error?.message || 'Native playback failed. Try another source.';
+    }
+    return;
+  }
 
   // Don't claim playback started before the browser confirms it. iOS WebKit
   // often cannot decode MKV/AVI/TS even when the provider URL is valid.
@@ -2933,6 +3053,21 @@ function closePlayer() {
     state.streamAbortController = null;
   }
   const video = $('video');
+  if (state.nativePlugin) {
+    state.nativePlugin.close();
+    state.nativePlayerActive = false;
+    state.nativeProgressKey = null;
+    state.nativeCurrentItem = null;
+    if (state.updateNativeFrame) {
+      window.removeEventListener('resize', state.updateNativeFrame);
+      window.removeEventListener('scroll', state.updateNativeFrame, true);
+      state.updateNativeFrame = null;
+    }
+    video.style.opacity = '';
+    video.style.pointerEvents = '';
+    $('native-controls').classList.remove('active');
+    $('native-controls').hidden = true;
+  }
 
   video.pause();
   video.removeAttribute('src');
@@ -3101,6 +3236,15 @@ function bind() {
 
   $('closedetail').addEventListener('click', closeDetails);
   $('closeplayer').addEventListener('click', closePlayer);
+  $('native-playpause').addEventListener('click', () => {
+    if (!state.nativePlugin || !state.nativePlayerActive) return;
+    if ($('native-playpause').textContent.includes('Pause')) state.nativePlugin.pause();
+    else state.nativePlugin.play();
+  });
+  $('native-seek').addEventListener('change', () => {
+    if (!state.nativePlugin || !state.nativePlayerActive || !state.nativeDuration) return;
+    state.nativePlugin.seek({ seconds: Number($('native-seek').value) / 1000 * state.nativeDuration });
+  });
   $('detailcontent').addEventListener('click', event => {
     if (event.target.closest('#closedetailhero')) { closeDetails(); return; }
     const actor = event.target.closest('[data-person-id]');
