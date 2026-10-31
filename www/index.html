@@ -1565,7 +1565,7 @@ video { border:1px solid rgba(255,255,255,.12); border-radius:14px; }
 </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js"></script>
+<script src="lib/hls.min.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js'"></script>
 <script>
 (() => {
 'use strict';
@@ -1618,6 +1618,90 @@ const state = {
 
 const cache = new Map();
 const pending = new Map();
+
+/**
+ * JSON request helper for TMDB and Stremio add-ons.
+ * Each attempt has its own timeout controller while still respecting the
+ * caller's cancellation signal (used by the 20-second stream lookup limit).
+ * The timeout remains active until the response body has been read.
+ */
+async function requestJsonWithRetry(url, options = {}, config = {}) {
+  const timeoutMs = Number(config.timeoutMs) || 10000;
+  const maxRetries = Number.isInteger(config.maxRetries) ? config.maxRetries : 1;
+  const parentSignal = options.signal || null;
+  const requestOptions = { ...options };
+  delete requestOptions.signal;
+  const retryableStatuses = new Set([408, 425, 429, 500, 502, 503, 504]);
+
+  for (let attempt = 0; attempt <= maxRetries; attempt += 1) {
+    if (parentSignal?.aborted) {
+      const cancelled = new Error('Request cancelled.');
+      cancelled.name = 'AbortError';
+      throw cancelled;
+    }
+
+    const controller = new AbortController();
+    let timedOut = false;
+    const timeoutId = setTimeout(() => {
+      timedOut = true;
+      controller.abort();
+    }, timeoutMs);
+    const abortFromParent = () => controller.abort();
+
+    if (parentSignal) parentSignal.addEventListener('abort', abortFromParent, { once: true });
+
+    try {
+      const response = await fetch(url, {
+        ...requestOptions,
+        signal: controller.signal
+      });
+      const body = await response.text();
+      let data = {};
+      if (body) {
+        try { data = JSON.parse(body); }
+        catch {
+          const parseError = new Error('The server returned invalid JSON.');
+          parseError.status = response.status;
+          throw parseError;
+        }
+      }
+
+      if (response.ok || !retryableStatuses.has(response.status) || attempt >= maxRetries) {
+        return { response, data };
+      }
+
+      const retryAfter = Number(response.headers?.get?.('retry-after'));
+      const delayMs = Number.isFinite(retryAfter) && retryAfter > 0
+        ? Math.min(retryAfter * 1000, 2500)
+        : Math.min(500 * (2 ** attempt), 2000);
+      await new Promise(resolve => setTimeout(resolve, delayMs));
+    } catch (error) {
+      if (parentSignal?.aborted) {
+        const cancelled = new Error('Request cancelled.');
+        cancelled.name = 'AbortError';
+        throw cancelled;
+      }
+
+      const retryableNetworkError = timedOut ||
+        error?.name === 'AbortError' ||
+        error instanceof TypeError ||
+        /network|fetch|timeout/i.test(String(error?.message || ''));
+
+      if (!retryableNetworkError || attempt >= maxRetries) {
+        if (timedOut) throw new Error('Request timed out after ' + timeoutMs + 'ms.');
+        throw error;
+      }
+
+      await new Promise(resolve => setTimeout(resolve, Math.min(500 * (2 ** attempt), 2000)));
+    } finally {
+      clearTimeout(timeoutId);
+      if (parentSignal) parentSignal.removeEventListener('abort', abortFromParent);
+    }
+  }
+
+  throw new Error('Request failed after retry attempts.');
+}
+
 
 function esc(value) {
   return String(value ?? '').replace(/[&<>"']/g, char => ({
@@ -1714,8 +1798,9 @@ async function tmdb(path, params = {}) {
   if (pending.has(key)) return pending.get(key);
 
   const task = (async () => {
-    const response = await fetch(url);
-    const data = await response.json().catch(() => ({}));
+    const { response, data } = await requestJsonWithRetry(url, {
+      headers: { Accept: 'application/json' }
+    }, { timeoutMs: 10000, maxRetries: 2 });
 
     if (!response.ok) {
       throw new Error(data.status_message || `TMDB request failed (${response.status})`);
@@ -2226,9 +2311,10 @@ async function testManifest() {
   setStatus('Testing ' + urls.length + ' source' + (urls.length === 1 ? '' : 's') + '…');
   const results = await Promise.all(urls.map(async url => {
     try {
-      const response = await fetch(url, { headers: { Accept: 'application/json' } });
+      const { response, data: manifest } = await requestJsonWithRetry(url, {
+        headers: { Accept: 'application/json' }
+      }, { timeoutMs: 8000, maxRetries: 1 });
       if (!response.ok) throw new Error('HTTP ' + response.status);
-      const manifest = await response.json();
       if (!manifest.id || !manifest.resources) {
         throw new Error('Not a Stremio-compatible manifest');
       }
@@ -2490,15 +2576,15 @@ async function fetchStreams(item, signal) {
         endpoint.pathname = endpoint.pathname
           .replace(/\/manifest\.json\/?$/i, '')
           .replace(/\/+$/, '') + `/stream/${type}/${id}.json`;
-        const response = await fetch(
+        const { response, data } = await requestJsonWithRetry(
           endpoint.toString(),
-          { headers: { Accept: 'application/json' }, signal }
+          { headers: { Accept: 'application/json' }, signal },
+          { timeoutMs: 8000, maxRetries: 1 }
         );
         if (!response.ok) {
           lastError = 'HTTP ' + response.status;
           continue;
         }
-        const data = await response.json();
         const streams = Array.isArray(data.streams)
           ? data.streams
           : Array.isArray(data.streams?.streams) ? data.streams.streams : [];
@@ -2511,6 +2597,7 @@ async function fetchStreams(item, signal) {
         }
         lastError = 'No streams returned';
       } catch (error) {
+        if (signal?.aborted) throw error;
         lastError = error.message;
       }
     }
