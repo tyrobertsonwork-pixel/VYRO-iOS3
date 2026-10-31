@@ -151,8 +151,4 @@ public final class AetherPlayerPlugin: CAPPlugin, CAPBridgedPlugin {
         engine = nil
         endedSent = false
     }
-
-    deinit {
-        clockTimer?.invalidate()
-    }
 }
