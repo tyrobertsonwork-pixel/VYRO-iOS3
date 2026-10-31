@@ -3236,6 +3236,15 @@ function bind() {
 
   $('closedetail').addEventListener('click', closeDetails);
   $('closeplayer').addEventListener('click', closePlayer);
+  $('native-playpause').addEventListener('click', () => {
+    if (!state.nativePlugin || !state.nativePlayerActive) return;
+    if ($('native-playpause').textContent.includes('Pause')) state.nativePlugin.pause();
+    else state.nativePlugin.play();
+  });
+  $('native-seek').addEventListener('change', () => {
+    if (!state.nativePlugin || !state.nativePlayerActive || !state.nativeDuration) return;
+    state.nativePlugin.seek({ seconds: Number($('native-seek').value) / 1000 * state.nativeDuration });
+  });
   $('detailcontent').addEventListener('click', event => {
     if (event.target.closest('#closedetailhero')) { closeDetails(); return; }
     const actor = event.target.closest('[data-person-id]');
