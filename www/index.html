@@ -1792,7 +1792,7 @@ function setStatus(message) {
   if (/\b(error|failed|could not|invalid|unable)\b/i.test(message)) showToast(message, 'error');
 }
 
-async function tmdb(path, params = {}) {
+async function tmdb(path, params = {}, signal = null) {
   if (!apiKey()) {
     throw new Error('Add your TMDB API key in Settings first.');
   }
@@ -1816,8 +1816,9 @@ async function tmdb(path, params = {}) {
 
   const task = (async () => {
     const { response, data } = await requestJsonWithRetry(url, {
-      headers: { Accept: 'application/json' }
-    }, { timeoutMs: 10000, maxRetries: 2 });
+      headers: { Accept: 'application/json' },
+      ...(signal ? { signal } : {})
+    }, { timeoutMs: 10000, maxRetries: 1 });
 
     if (!response.ok) {
       throw new Error(data.status_message || `TMDB request failed (${response.status})`);
@@ -2557,9 +2558,12 @@ async function loadXtreamEpisodes(item) {
     }));
   } catch (error) { box.innerHTML = '<p class="note">' + esc(error.message) + '</p>'; }
 }
-async function externalIds(item) {
+async function externalIds(item, signal = null) {
   const type = typeOf(item);
-  const data = await tmdb(`/${type}/${item.id}/external_ids`);
+  // Keep external-ID lookup inside the stream lookup's cancellation budget.
+  // Previously this TMDB request ignored the caller's AbortSignal, so the
+  // player could remain on "Looking up streams…" after its 20-second timeout.
+  const data = await tmdb(`/${type}/${item.id}/external_ids`, {}, signal);
 
   return {
     imdb: data.imdb_id || item.imdb_id || null,
@@ -2574,7 +2578,12 @@ async function fetchStreams(item, signal) {
     throw new Error('Add one or more video-on-demand add-on manifest URLs in Settings first.');
   }
 
-  const ids = await externalIds(item);
+  const ids = await externalIds(item, signal);
+  if (signal?.aborted) {
+    const cancelled = new Error('Stream lookup cancelled.');
+    cancelled.name = 'AbortError';
+    throw cancelled;
+  }
   const type = typeOf(item) === 'tv' ? 'series' : 'movie';
   const idsToTry = [];
 
@@ -2772,7 +2781,10 @@ async function startStream(item) {
     };
   } catch (error) {
     if (requestId !== state.streamRequestId || !$('player').classList.contains('open')) return;
-    $('playernote').textContent = error.message;
+    const message = error?.name === 'AbortError'
+      ? 'Stream lookup timed out or was cancelled. Check the connection and try again.'
+      : (error?.message || 'Stream lookup failed. Try again.');
+    $('playernote').textContent = message;
     $('streams').innerHTML = '<button class="btn" type="button" data-retry-stream>Try stream lookup again</button>';
   }
 }
