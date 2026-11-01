@@ -1,8 +1,9 @@
 import UIKit
 import AVFoundation
+import AVKit
 import MobileVLCKit
 
-final class VyroPlayerViewController: UIViewController {
+final class VyroPlayerViewController: UIViewController, UIGestureRecognizerDelegate {
     var onProgress: ((Double, Double) -> Void)?
     var onClose: ((Double, Double, Bool, Bool) -> Void)?
 
@@ -36,6 +37,11 @@ final class VyroPlayerViewController: UIViewController {
     private var failed = false
     private var fitted = false
     private var controlsVisible = true
+    private let aspects = ["Fit", "Fill", "16:9", "4:3"]
+    private var aspectIdx = 0
+    private var panStartValue: CGFloat = 0
+    private var panIsVolume = false
+    private var volume: Int32 = 100
     private var lastCur = 0.0
     private var lastLen = 0.0
     private var lastReport = Date.distantPast
@@ -103,7 +109,12 @@ final class VyroPlayerViewController: UIViewController {
             videoView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             videoView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
         ])
-        view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(toggleControls)))
+        let single = UITapGestureRecognizer(target: self, action: #selector(toggleControls))
+        let double = UITapGestureRecognizer(target: self, action: #selector(doubleTapped(_:)))
+        double.numberOfTapsRequired = 2
+        single.require(toFail: double)
+        let pan = UIPanGestureRecognizer(target: self, action: #selector(panned(_:)))
+        for g in [single, double, pan] as [UIGestureRecognizer] { g.delegate = self; view.addGestureRecognizer(g) }
 
         spinner.color = .white
         spinner.translatesAutoresizingMaskIntoConstraints = false
@@ -120,7 +131,13 @@ final class VyroPlayerViewController: UIViewController {
         titleLabel.textColor = .white
         titleLabel.font = .systemFont(ofSize: 15, weight: .bold)
         titleLabel.lineBreakMode = .byTruncatingTail
-        let topStack = UIStackView(arrangedSubviews: [close, titleLabel])
+        let aspectBtn = iconButton("aspectratio", #selector(aspectTapped))
+        let route = AVRoutePickerView()
+        route.tintColor = .white
+        route.activeTintColor = .white
+        route.widthAnchor.constraint(equalToConstant: 44).isActive = true
+        route.heightAnchor.constraint(equalToConstant: 44).isActive = true
+        let topStack = UIStackView(arrangedSubviews: [close, titleLabel, aspectBtn, route])
         topStack.axis = .horizontal
         topStack.spacing = 6
         topStack.alignment = .center
@@ -262,6 +279,61 @@ final class VyroPlayerViewController: UIViewController {
     @objc private func toggleControls() {
         setControls(!controlsVisible)
         if controlsVisible { scheduleHide() }
+    }
+
+    func gestureRecognizer(_ g: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
+        guard let v = touch.view else { return true }
+        return !(v.isDescendant(of: topBar) || v.isDescendant(of: bottomBar))
+    }
+
+    @objc private func doubleTapped(_ g: UITapGestureRecognizer) {
+        let x = g.location(in: view).x
+        if x < view.bounds.midX { player.jumpBackward(10); flash("−10s") }
+        else { player.jumpForward(10); flash("+10s") }
+    }
+
+    @objc private func panned(_ g: UIPanGestureRecognizer) {
+        let h = max(view.bounds.height, 1)
+        switch g.state {
+        case .began:
+            panIsVolume = g.location(in: view).x > view.bounds.midX
+            panStartValue = panIsVolume ? CGFloat(volume) : UIScreen.main.brightness
+        case .changed:
+            let delta = -g.translation(in: view).y / (h * 0.6)
+            if panIsVolume {
+                let v = min(max(panStartValue + delta * 200, 0), 200)
+                volume = Int32(v)
+                player.audio.volume = volume
+                flash("Volume \(Int(v / 2))%")
+            } else {
+                let b = min(max(panStartValue + delta, 0.02), 1)
+                UIScreen.main.brightness = b
+                flash("Brightness \(Int(b * 100))%")
+            }
+        default: break
+        }
+    }
+
+    @objc private func aspectTapped() {
+        aspectIdx = (aspectIdx + 1) % aspects.count
+        applyAspect()
+        flash(aspects[aspectIdx])
+        scheduleHide()
+    }
+
+    private func applyAspect() {
+        player.videoAspectRatio = nil
+        player.videoCropGeometry = nil
+        switch aspects[aspectIdx] {
+        case "Fill":
+            let w = Int(view.bounds.width), h = Int(view.bounds.height)
+            player.videoCropGeometry = UnsafeMutablePointer<Int8>(mutating: ("\(w):\(h)" as NSString).utf8String)
+        case "16:9":
+            player.videoAspectRatio = UnsafeMutablePointer<Int8>(mutating: ("16:9" as NSString).utf8String)
+        case "4:3":
+            player.videoAspectRatio = UnsafeMutablePointer<Int8>(mutating: ("4:3" as NSString).utf8String)
+        default: break
+        }
     }
 
     @objc private func closeTapped() { finish(next: false) }
