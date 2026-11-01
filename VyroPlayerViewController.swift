@@ -303,7 +303,7 @@ final class VyroPlayerViewController: UIViewController, UIGestureRecognizerDeleg
             if panIsVolume {
                 let v = min(max(panStartValue + delta * 200, 0), 200)
                 volume = Int32(v)
-                player.audio.volume = volume
+                player.audio?.volume = volume
                 flash("Volume \(Int(v / 2))%")
             } else {
                 let b = min(max(panStartValue + delta, 0.02), 1)
