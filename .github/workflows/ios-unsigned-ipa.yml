@@ -18,23 +18,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install MKV playback files (manual runs only)
-        if: github.event_name == 'workflow_dispatch'
-        run: |
-          if [ ! -f install-mkv-support.sh ]; then
-            echo "::error::install-mkv-support.sh is missing from this branch."
-            exit 1
-          fi
-          bash install-mkv-support.sh
-          test -f src/services/stream/StreamDetector.ts
-          test -f src/services/plugins/AetherEngine.ts
-          test -f src/services/plugins/AetherEngineWeb.ts
-          test -f src/services/playback/PlaybackService.ts
-          test -f src/composables/useVideoPlayer.ts
-          test -f ios/App/App/AetherEnginePlugin.swift
-          test -f .github/workflows/build-ios.yml
-          echo "All seven installer output files verified."
-
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -85,10 +68,8 @@ jobs:
       - name: Sync web app
         run: npx cap sync ios
 
-      - name: Integrate native AetherEngine MKV player
-        run: |
-          gem install xcodeproj --no-document
-          ruby scripts/integrate-native-player.rb
+      - name: Install native MKV playback integration
+        run: bash install-mkv-support.sh
 
       - name: Build unsigned iOS app
         run: |
