@@ -3,16 +3,48 @@ on: workflow_dispatch
 jobs:
   build:
     runs-on: macos-latest
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: { node-version: 20 }
-      - name: Prepare web app
+      - name: Create VLC plugin package
+        run: |
+          mkdir -p vyro-vlc/ios/Sources/VyroVlcPlugin
+          cp VyroVlcPlugin.swift VyroPlayerViewController.swift vyro-vlc/ios/Sources/VyroVlcPlugin/
+          cat > vyro-vlc/package.json <<'EOF2'
+          {
+            "name": "vyro-vlc",
+            "version": "1.0.0",
+            "capacitor": { "ios": { "src": "ios" } }
+          }
+          EOF2
+          cat > vyro-vlc/VyroVlc.podspec <<'EOF2'
+          require 'json'
+          package = JSON.parse(File.read(File.join(__dir__, 'package.json')))
+          Pod::Spec.new do |s|
+            s.name = 'VyroVlc'
+            s.version = package['version']
+            s.summary = 'VYRO native VLC player'
+            s.license = 'MIT'
+            s.homepage = 'https://example.com'
+            s.author = 'VYRO'
+            s.source = { :git => 'https://example.com/vyro-vlc.git', :tag => s.version.to_s }
+            s.source_files = 'ios/Sources/**/*.{swift,h,m}'
+            s.ios.deployment_target = '14.0'
+            s.dependency 'Capacitor'
+            s.dependency 'MobileVLCKit', '~> 3.6.0'
+            s.swift_version = '5.1'
+          end
+          EOF2
+      - name: Prepare web app and iOS project
         run: |
           mkdir www && cp index.html www/
           npm install
+          npm install ./vyro-vlc
           npx cap add ios
           npx cap sync ios
+          cat ios/App/Podfile
       - name: Allow http playlist servers
         run: /usr/libexec/PlistBuddy -c "Add :NSAppTransportSecurity dict" -c "Add :NSAppTransportSecurity:NSAllowsArbitraryLoads bool true" ios/App/App/Info.plist
       - name: Build unsigned IPA
