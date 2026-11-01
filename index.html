@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="VYRO">
 <title>VYRO</title>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.15/dist/hls.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
@@ -140,6 +140,33 @@ nav a.on{background:rgba(255,255,255,.12);color:#fff}
 .sk{height:min(56dvh,500px);margin:0 0 24px;border-radius:0}
 .skr{display:flex;gap:12px;padding:0 20px;margin-bottom:26px}.skr i{flex:none;width:122px;aspect-ratio:2/3;border-radius:14px;background:linear-gradient(100deg,rgba(255,255,255,.04) 30%,rgba(255,255,255,.1) 50%,rgba(255,255,255,.04) 70%);background-size:200% 100%;animation:sh 1.2s linear infinite}
 .empty{font-weight:500;line-height:1.5}
+
+/* ===== v1.9 redesign ===== */
+:root{--bone:#f3efe8}
+body{color:var(--bone)}
+#app{position:relative;z-index:0}
+.serif,.hero h1,.top h1{font-family:'Instrument Serif',Georgia,'Times New Roman',serif;font-weight:400;letter-spacing:-.012em}
+.hero h1{font-size:50px;line-height:.95}.top h1{font-size:42px;line-height:1}
+.hero .meta{margin-top:12px}
+h2{font-size:15px;font-weight:700;letter-spacing:-.01em;color:rgba(243,239,232,.92)}
+.amb{position:absolute;left:0;right:0;top:0;height:85vh;z-index:-1;pointer-events:none;background:radial-gradient(100% 75% at 50% 0%,color-mix(in srgb,var(--amb,#6b5cff) 55%,transparent),transparent 74%)}
+.dh{position:relative;height:40dvh;max-height:380px;overflow:hidden}
+.dh .bd{width:100%;height:100%;object-fit:cover;display:block;transition:opacity .4s}
+.dh .bd{-webkit-mask-image:linear-gradient(#000 50%,transparent 100%);mask-image:linear-gradient(#000 50%,transparent 100%)}
+.dh .back{z-index:2}
+.dm{position:relative;display:flex;gap:16px;align-items:flex-end;padding:0 20px;margin-top:-92px}
+.dp{flex:none;width:112px;aspect-ratio:2/3;object-fit:cover;border-radius:14px;background:#14161f;box-shadow:0 20px 44px rgba(0,0,0,.65),0 0 0 1px rgba(255,255,255,.14)}
+.di{min-width:0;padding-bottom:4px}.di h1{font-size:38px;line-height:.98;margin-bottom:10px;text-shadow:0 2px 24px rgba(0,0,0,.5)}
+.di .meta{margin:0 0 4px}.di .dim{font-size:13px}
+.dm+.act{margin-top:22px;padding:0 20px}
+.ov{margin:2px 20px 0;color:rgba(243,239,232,.74);line-height:1.55;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.ov.x{-webkit-line-clamp:unset;display:block}
+.pi .rt{position:absolute;left:6px;bottom:6px;z-index:2;font-size:10.5px;font-weight:700;letter-spacing:0;padding:3px 7px;border-radius:99px;background:rgba(7,8,13,.62);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.12)}
+.sk,.skr i{background:linear-gradient(100deg,rgba(255,255,255,.04) 30%,rgba(255,255,255,.09) 50%,rgba(255,255,255,.04) 70%);background-size:220% 100%;animation:shm 1.4s linear infinite}
+@keyframes shm{to{background-position:-120% 0}}
+@media (prefers-reduced-motion:reduce){.sk,.skr i{animation:none}}
+.btn.p{box-shadow:0 10px 30px color-mix(in srgb,var(--amb,#fff) 35%,transparent)}
+.ep{border-radius:12px}
 </style></head><body>
 <div id="app"></div>
 <div class="fade"></div>
@@ -168,7 +195,7 @@ const seeAll=(cat,kind)=>{D.lib='p';D.pt=kind=='series'?'tv':'movie';D.cat=cat;D
 const SCR={};let BACK=0;addEventListener('popstate',()=>{BACK=1});
 let HC=[];const seeCat=i=>seeAll(HC[i][0],HC[i][1]);
 const PI={};let pic=0;
-const pos=(i,to,pct,cap,pk)=>{const id=++pic;PI[id]={i,pk};const m=i.type!='pl'&&match(i);return `<a class="pos" data-pi="${id}" href="${to||i.href||`#/title/${i.type}/${i.id}`}"><div class="pi" data-t="${esc(i.title)}">${m?'<span class="in">✓</span>':''}<img loading="lazy" src="${img(i.poster)}" alt="" onload="this.classList.add('l')" onerror="this.remove()">${pct!=null?`<div class="bar"><i style="width:${pct}%"></i></div>`:''}</div>${cap?`<div class="cap">${esc(i.title)}</div>`:''}</a>`};
+const pos=(i,to,pct,cap,pk)=>{const id=++pic;PI[id]={i,pk};const m=i.type!='pl'&&match(i);return `<a class="pos" data-pi="${id}" href="${to||i.href||`#/title/${i.type}/${i.id}`}"><div class="pi" data-t="${esc(i.title)}">${m?'<span class="in">✓</span>':''}${i.rating>0&&pct==null?`<span class="rt">★ ${(+i.rating).toFixed(1)}</span>`:''}<img loading="lazy" src="${img(i.poster)}" alt="" onload="this.classList.add('l')" onerror="this.remove()">${pct!=null?`<div class="bar"><i style="width:${pct}%"></i></div>`:''}</div>${cap?`<div class="cap">${esc(i.title)}</div>`:''}</a>`};
 const row=(t,items,act)=>items.length?`<h2>${t}${act?`<a class="more" onclick="${act}">See all</a>`:''}</h2><div class="row">${items.map(i=>pos(i)).join('')}</div>`:'';
 const grid=(items,empty)=>items.length?`<div class="grid">${items.map(i=>pos(i,null,null,1)).join('')}</div>`:`<p class="empty">${empty}</p>`;
 const tabs=[['','Home','M4 11l8-7 8 7v9h-5v-6H9v6H4z'],['discover','Discover','M12 3a9 9 0 100 18 9 9 0 000-18zm3.5 5.5l-2 5-5 2 2-5z'],['search','Search','M10 4a6 6 0 104 10.5l5 5 1.5-1.5-5-5A6 6 0 0010 4z'],['library','Library','M5 4h14v16l-7-4-7 4z'],['settings','Settings','M12 8a4 4 0 100 8 4 4 0 000-8zM11 2h2l.5 3 2 1 2.5-1.7 1.400 1.400L18 8.500l1 2 3 .5v2l-3 .5-1 2 1.700 2.500-1.400 1.400-2.500-1.700-2 1-.5 3h-2l-.5-3-2-1-2.500 1.700-1.400-1.400L6 15.500l-1-2-3-.5v-2l3-.5 1-2-1.700-2.500 1.400-1.400L8.500 6l2-1z']];
@@ -209,7 +236,8 @@ async search(){after=()=>$('#q').focus();return `<div class="top"><input id="q" 
 async title(t,id){
   const d=await api(`/${t}/${id}`,{append_to_response:'similar,credits,videos'}),i=cur=norm(d,t),sv=S.wl.some(w=>w.id==i.id&&w.type==i.type);
   const meta=[i.year,'★ '+i.rating.toFixed(1),(d.runtime||d.episode_run_time?.[0])?(d.runtime||d.episode_run_time[0])+' min':'',d.number_of_seasons?d.number_of_seasons+' seasons':''].filter(Boolean).join('  ·  ');
-  return `<div class="hero" style="height:55vh"><img src="${img(i.backdrop||i.poster,'w780')}" alt=""><a class="btn back" href="javascript:history.back()">Back</a></div><div style="position:relative;z-index:1;margin-top:-60px;padding:0 20px"><h1 style="font-size:38px">${esc(i.title)}</h1><p class="meta" style="margin:10px 0 8px">${meta}</p><p class="dim" style="margin:0 0 18px">${d.genres.map(g=>esc(g.name)).join('  ·  ')}</p><div class="act">${playBtn(i)}<a class="btn" onclick="toggle()">${sv?'Remove from list':'Add to list'}</a>${trailer(d)}</div><p style="margin-top:18px;color:rgba(255,255,255,.75)">${esc(i.overview)}</p></div>`+castRow(d)+row('More like this',d.similar.results.map(r=>norm(r,t)).filter(x=>x.poster));
+  after=()=>ambient(img(i.poster,'w185'));
+  return dhead({bd:img(i.backdrop||i.poster,'w780'),po:i.poster?img(i.poster,'w342'):'',title:i.title,meta:meta,sub:d.genres.map(g=>esc(g.name)).join('  ·  ')})+`<div class="act">${playBtn(i)}<a class="btn" onclick="toggle()">${sv?'Remove from list':'Add to list'}</a>${trailer(d)}</div>${dov(i.overview)}`+castRow(d)+row('More like this',d.similar.results.map(r=>norm(r,t)).filter(x=>x.poster));
 },
 async library(){
   const t=D.lib||'w',body=t=='p'?(S.lib.items.length?plView():`<p class="empty">No playlist yet.<br><br><a class="btn p" href="#/settings">Add playlist</a></p>`):grid(t=='w'?S.wl:Object.values(S.pr).sort((a,b)=>b.u-a.u).map(p=>p.item),t=='w'?'Your watchlist is empty. Tap “Add to list” on any title.':'Nothing watched yet.');
@@ -220,7 +248,7 @@ return `<div class="top"><h1>Settings</h1></div><h2>Playlists</h2><div class="gl
 <h2>Add a playlist</h2><div class="glass card" style="margin-top:0"><p class="dim" style="margin-bottom:10px">Movies and series only. Live channels are ignored.</p><input id="pn" class="input" placeholder="Name, e.g. Home"><select id="st" class="input" onchange="$('#xf').style.display=this.value=='xtream'?'block':'none';$('#mf').style.display=this.value=='xtream'?'none':'block'"><option value="xtream">Xtream Codes login</option><option value="m3u">M3U playlist URL</option></select><div id="xf"><input id="sv" class="input" placeholder="Server, e.g. https://host:8080"><input id="us" class="input" placeholder="Username"><input id="pw" class="input" type="password" placeholder="Password"></div><div id="mf" style="display:none"><input id="ul" class="input" placeholder="https://…/playlist.m3u"></div><a class="btn p" onclick="addSrc(this)">Add and sync</a></div>
 <h2>Parental controls</h2><div class="glass card" style="margin-top:0"><p class="dim" style="margin-bottom:10px">Adult categories are hidden everywhere. A PIN is needed to show them.</p><a class="chip" onclick="tgAdult()">${S.hideAdult?'Adult categories hidden':'Adult categories shown'}</a><a class="chip" onclick="setPin()">${S.pin?'Change or remove PIN':'Set PIN'}</a></div>
 <h2>Player</h2><div class="glass card" style="margin-top:0">${VLC()?`<p class="dim" style="margin-bottom:10px">Built-in player plays MKV, AVI, TS and more, with audio and subtitle tracks.</p><p id="vs" class="dim" style="margin-bottom:10px">${Capacitor.isPluginAvailable('VyroVlc')?'Status: ready':'Status: not found in this build'}</p><a class="chip" onclick="testVlc()">Test built-in player</a>${[['auto','Auto'],['always','Always built-in']].map(([k,l])=>`<a class="chip ${(S.vlc||'auto')==k?'on':''}" onclick="S.vlc='${k}';DB.set('kv','vlc',k);route()">${l}</a>`).join('')}`:`<p class="dim">The built-in player (MKV, AVI, subtitles, audio tracks) is only in the iPhone app version. The web version plays MP4 and HLS.</p>`}</div>
-<h2>TMDB</h2><div class="glass card" style="margin-top:0"><p class="dim">API key (v3)</p><input id="k" class="input" value="${esc(S.key)}"><p class="dim">Fallback stream URL template</p><input id="t" class="input" value="${esc(S.tpl)}"><a class="btn p" onclick="saveSet(this)">Save changes</a></div><div style="padding:0 20px;display:flex;gap:10px;flex-wrap:wrap"><a class="btn" onclick="clearHist()">Clear watch history</a><a class="btn" style="color:#fca5a5" onclick="wipe()">Erase all local data</a><p class="dim" style="text-align:center;margin-top:18px;width:100%">VYRO 1.8.1 · Metadata by TMDB</p></div>`},
+<h2>TMDB</h2><div class="glass card" style="margin-top:0"><p class="dim">API key (v3)</p><input id="k" class="input" value="${esc(S.key)}"><p class="dim">Fallback stream URL template</p><input id="t" class="input" value="${esc(S.tpl)}"><a class="btn p" onclick="saveSet(this)">Save changes</a></div><div style="padding:0 20px;display:flex;gap:10px;flex-wrap:wrap"><a class="btn" onclick="clearHist()">Clear watch history</a><a class="btn" style="color:#fca5a5" onclick="wipe()">Erase all local data</a><p class="dim" style="text-align:center;margin-top:18px;width:100%">VYRO 1.9 · Metadata by TMDB</p></div>`},
 async onboarding(){return `<div class="ob"><div class="logo">VYRO</div><p class="dim" style="margin:8px 0 28px;max-width:280px">Connect your TMDB account to fill the app with movies and shows.</p><div class="glass card" style="margin:0"><input id="k" class="input" placeholder="TMDB API key (v3)" autocapitalize="off" autocorrect="off"><div id="e" class="err"></div><a class="btn p" style="width:100%;text-align:center" onclick="connect(this)">Connect TMDB</a><p style="margin-top:14px;text-align:center"><a class="dim" href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener">Get a free key at themoviedb.org</a></p></div></div>`},
 async watch(t,id){const i=norm(await api(`/${t}/${id}`),t);return player(S.tpl.replace('{type}',t).replace('{id}',id).replace('{season}',1).replace('{episode}',1),K(t,id),{...i,href:`#/watch/${t}/${id}`},null)},
 async pl(k){
@@ -229,7 +257,8 @@ async pl(k){
   const tm=await api('/search/'+(it.kind=='series'?'tv':'movie'),{query:it.title}).then(r=>r.results[0]).catch(()=>null),sv=S.wl.some(w=>w.id==it.id&&w.type=='pl');
   let go=it.kind=='series'?(it.eps||[]).slice().sort((a,b)=>(S.pr[`pl:${k}:${b.id}`]?.u||0)-(S.pr[`pl:${k}:${a.id}`]?.u||0))[0]:null;
   const eps=Object.entries(Object.groupBy?Object.groupBy(it.eps||[],e=>e.s):(it.eps||[]).reduce((o,e)=>((o[e.s]=o[e.s]||[]).push(e),o),{}));
-  return `<div class="hero" style="height:50vh"><img src="${img(tm?.backdrop_path,'w780')||img(it.poster)}" alt=""><a class="btn back" href="javascript:history.back()">Back</a></div><div style="position:relative;z-index:1;margin-top:-60px;padding:0 20px"><h1 style="font-size:36px">${esc(it.title)}</h1><p class="dim" style="margin:8px 0 16px">${esc(it.cat)}${tm?.vote_average?'  ·  ★ '+tm.vote_average.toFixed(1):''}</p><div class="act">${it.kind=='movie'||go?`<a class="btn p play" href="#/play/${k}${go?'/'+go.id:''}">${S.pr['pl:'+k+(go?':'+go.id:'')]?'Resume':'Play'}</a>`:''}<a class="btn" onclick="toggle()">${sv?'Remove from list':'Add to list'}</a></div><p style="margin-top:18px;color:rgba(255,255,255,.75)">${esc(tm?.overview)}</p></div>`
+  after=()=>ambient(tm?.poster_path?img(tm.poster_path,'w185'):img(it.poster));
+  return dhead({bd:img(tm?.backdrop_path,'w780')||img(it.poster),po:(tm?.poster_path?img(tm.poster_path,'w342'):img(it.poster))||'',title:it.title,meta:[tm?.vote_average?'★ '+tm.vote_average.toFixed(1):'',(tm?.release_date||tm?.first_air_date||'').slice(0,4)].filter(Boolean).join('  ·  '),sub:esc(it.cat)})+`<div class="act">${it.kind=='movie'||go?`<a class="btn p play" href="#/play/${k}${go?'/'+go.id:''}">${S.pr['pl:'+k+(go?':'+go.id:'')]?'Resume':'Play'}</a>`:''}<a class="btn" onclick="toggle()">${sv?'Remove from list':'Add to list'}</a></div>${dov(tm?.overview)}`
    +eps.map(([n,a],i)=>`<details class="glass" ${i?'':'open'}><summary>Season ${n}</summary>${a.map(e=>{const p=S.pr[`pl:${k}:${e.id}`];return `<a class="ep" href="#/play/${k}/${e.id}">${e.n}. ${esc(e.t||'Episode '+e.n)}${p?`<div class="bar"><i style="width:${p.t/p.d*100}%"></i></div>`:''}</a>`}).join('')}</details>`).join('');
 },
 async play(k,e){
@@ -243,6 +272,9 @@ const nn=x=>x._n??(x._n=nm(x.title));
 const ADULT=/adult|xxx|18\+|porn|erotic|sex/i,nm=t=>(t||'').replace(/^\s*\|?[A-Z]{2,3}\|?\s*[-:|]\s+/,'').toLowerCase().replace(/\[.*?\]|\(.*?\)/g,'').replace(/[^a-z0-9]+/g,' ').trim().replace(/ (19|20)\d\d$/,''),yr=t=>(String(t||'').match(/(?:^|\D)((?:19|20)\d\d)(?:\D|$)/)||[])[1]||'';
 const mk=o=>{const k=PFX+o.k;return{type:'pl',rating:0,added:0,cat:'Other',overview:'',year:yr(o.title),...o,k,id:k,href:'#/pl/'+k}};
 const match=i=>{if(!S._m){S._m={};S.lib.items.forEach(x=>{const q=x.kind[0]+nn(x);(S._m[q]=S._m[q]||[]).push(x)})}const l=S._m[(i.type=='tv'?'s':'m')+nm(i.title)];if(!l)return;return l.length==1?l[0]:(l.find(x=>x.year&&x.year==i.year)||l[0])};
+const ambient=u=>{if(!u)return;const im=new Image();im.crossOrigin='anonymous';im.onload=()=>{try{const c=document.createElement('canvas');c.width=16;c.height=24;const x=c.getContext('2d');x.drawImage(im,0,0,16,24);const d=x.getImageData(0,0,16,24).data;let r=0,g=0,b=0,w=0;for(let i=0;i<d.length;i+=4){const mx=Math.max(d[i],d[i+1],d[i+2]),mn=Math.min(d[i],d[i+1],d[i+2]);if(mx<40)continue;const k=(mx-mn+8)*(1-Math.abs((mx+mn)/2-140)/180);if(k<=0)continue;r+=d[i]*k;g+=d[i+1]*k;b+=d[i+2]*k;w+=k}if(w>0)document.documentElement.style.setProperty('--amb',`rgb(${r/w|0},${g/w|0},${b/w|0})`)}catch{}};im.src=u};
+const dhead=(o)=>`<div class="amb"></div><div class="dh"><img class="bd" src="${o.bd}" alt="" onerror="this.style.opacity=0"><a class="btn back" href="javascript:history.back()">Back</a></div><div class="dm">${o.po?`<img class="dp" src="${o.po}" alt="" onerror="this.remove()">`:''}<div class="di"><h1 class="serif">${esc(o.title)}</h1>${o.meta?`<p class="meta">${o.meta}</p>`:''}${o.sub?`<p class="dim">${o.sub}</p>`:''}</div></div>`;
+const dov=t=>t?`<p class="ov" onclick="this.classList.toggle('x')">${esc(t)}</p>`:'';
 const playBtn=(i,hero)=>{const m=match(i);return m?`<a class="btn p play" href="${m.href}">Play from playlist</a>`:S.lib.items.length?(hero?'':`<span class="chip" style="margin:0 8px 0 0;cursor:default">Not in your playlist</span>`):`<a class="btn p play" href="#/watch/${i.type}/${i.id}">Play</a>`};
 const xapi=(a,q={})=>{const s=S.src;return fetch(`${s.server}/player_api.php?username=${encodeURIComponent(s.user)}&password=${encodeURIComponent(s.pass)}&action=${a}`+Object.entries(q).map(([k,v])=>`&${k}=${v}`).join('')).then(r=>r.json())};
 async function loadEps(it){if(it.kind!='series'||it.eps)return;const s=S.src,d=await xapi('get_series_info',{series_id:it.sid});it.eps=[];for(const n in d.episodes)for(const e of d.episodes[n])it.eps.push({id:e.id,s:+n,n:+e.episode_num,t:e.title,url:`${s.server}/series/${s.user}/${s.pass}/${e.id}.${e.container_extension||'mp4'}`})}
@@ -388,7 +420,7 @@ async function route(){
   document.body.classList.toggle('bare',a==='onboarding'||a==='watch'||a==='play');
   document.querySelectorAll('nav a').forEach(x=>x.classList.toggle('on',x.dataset.h===(a=='pl'?'library':a||'')));
   const hh=location.hash,same=route.h===hh,back=BACK;BACK=0;if(route.h!=null)SCR[route.h]=scrollY;
-  after=null;for(const k in PI)delete PI[k];pic=0;const rk=[a,b,c].join('/');if(rk!==route.k&&a!=='play'&&a!=='watch')app.innerHTML='<div class="sk"></div><div class="skr"><i></i><i></i><i></i></div>';route.k=rk;
+  document.documentElement.style.removeProperty('--amb');after=null;for(const k in PI)delete PI[k];pic=0;const rk=[a,b,c].join('/');if(rk!==route.k&&a!=='play'&&a!=='watch')app.innerHTML='<div class="sk"></div><div class="skr"><i></i><i></i><i></i></div>';route.k=rk;
   try{const fn=V[a||'home']||V.home;const h=await fn(b,c);app.className='page';app.innerHTML=h;scrollTo(0,(same||back)?(SCR[hh]||0):0);route.h=hh;after&&after()}
   catch(e){app.innerHTML=`<p class="empty">Couldn’t load this screen. Check your connection and your TMDB key in Settings.<br><br><a class="btn" href="#/settings">Open settings</a></p>`}
 }
