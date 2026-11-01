@@ -1,0 +1,6 @@
+{
+  "appId": "com.vyro.app",
+  "appName": "VYRO",
+  "webDir": "www",
+  "plugins": { "CapacitorHttp": { "enabled": true } }
+}
