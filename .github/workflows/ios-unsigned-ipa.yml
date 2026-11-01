@@ -9,10 +9,11 @@ on:
   push:
     branches:
       - main
+      - feature/native-mpv-mkv-player
 
 jobs:
   build:
-    runs-on: macos-15
+    runs-on: macos-26
 
     steps:
       - name: Checkout repository
@@ -68,21 +69,55 @@ jobs:
       - name: Sync web app
         run: npx cap sync ios
 
+      - name: Install native MKV playback integration
+        run: bash install-mkv-support.sh
+
+      - name: Select supported Xcode toolchain
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '26.6.0'
+
       - name: Build unsigned iOS app
         run: |
-          xcodebuild \
-            -workspace ios/App/App.xcworkspace \
-            -scheme App \
-            -configuration Release \
-            -sdk iphoneos \
-            -derivedDataPath build \
-            CODE_SIGNING_ALLOWED=NO
+          xcodebuild -workspace ios/App/App.xcworkspace -scheme App -configuration Release -sdk iphoneos -derivedDataPath build IPHONEOS_DEPLOYMENT_TARGET=18.0 CODE_SIGNING_ALLOWED=NO
 
       - name: Package IPA
         run: |
           mkdir -p Payload
           cp -R build/Build/Products/Release-iphoneos/App.app Payload/
-          /usr/bin/zip -r VYRO-unsigned.ipa Payload
+
+          # Normalize bundle permissions before archiving. Some third-party
+          # framework binaries otherwise arrive without readable mode bits,
+          # causing on-device signing tools to fail with EACCES.
+          find Payload -type d -exec chmod 755 {} +
+          find Payload -type f -exec chmod u+rw,go+r {} +
+
+          # Preserve framework symlinks rather than dereferencing them.
+          /usr/bin/zip -qry -y VYRO-unsigned.ipa Payload
+
+          # Fail the build if the IPA archive does not contain the native
+          # AetherEngine framework binary or if its archived mode is unreadable.
+          python3 - <<'PY'
+          import stat
+          import zipfile
+
+          ipa = "VYRO-unsigned.ipa"
+          with zipfile.ZipFile(ipa) as archive:
+              candidates = [
+                  item for item in archive.infolist()
+                  if item.filename.endswith("/AetherLibswresample")
+                  and "/Frameworks/" in item.filename
+              ]
+              if not candidates:
+                  raise SystemExit("AetherLibswresample framework binary missing from IPA")
+              for item in candidates:
+                  mode = (item.external_attr >> 16) & 0xFFFF
+                  if stat.S_ISLNK(mode):
+                      raise SystemExit("AetherLibswresample unexpectedly archived as a symlink")
+                  if mode and not (mode & stat.S_IRUSR):
+                      raise SystemExit("AetherLibswresample is not owner-readable in IPA")
+          print("IPA framework permissions verified.")
+          PY
 
       - name: Upload IPA artifact
         uses: actions/upload-artifact@v4

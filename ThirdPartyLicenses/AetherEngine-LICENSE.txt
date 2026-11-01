@@ -1,0 +1,5 @@
+AetherEngine is distributed under the GNU Lesser General Public License v3 with an App Store / DRM Exception.
+Copyright (C) 2026 Vincent Herbst.
+Upstream source and full license: https://github.com/superuser404notfound/AetherEngine/blob/7.0.0/LICENSE
+
+The complete license text is maintained by the upstream project at the URL above. VYRO must preserve the license notice and make the corresponding source and any modifications available as required by the license.
