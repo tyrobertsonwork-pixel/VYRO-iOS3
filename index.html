@@ -40,7 +40,22 @@ nav a svg{display:block;margin:0 auto 2px;width:20px;height:20px;fill:currentCol
 .err{color:#fca5a5;font-size:13px;margin-bottom:10px}.empty{text-align:center;padding:60px 20px;color:rgba(255,255,255,.5)}
 .pc{position:absolute;top:max(env(safe-area-inset-top),16px);right:12px;display:flex;border-radius:99px;padding:3px}.pc a{padding:8px 10px;font-weight:800;font-size:12px;border-radius:99px}.pc a:active{background:rgba(255,255,255,.2)}
 details{margin:0 20px 10px;border-radius:18px;padding:4px 14px}summary{padding:10px 0;font-weight:800}.ep{display:block;padding:10px 0;color:#fff;text-decoration:none;border-top:1px solid rgba(255,255,255,.1);position:relative}.ep .bar{left:0;right:0;bottom:2px}
-select.input{appearance:none}</style></head><body>
+select.input{appearance:none}
+/* v1.2 polish */
+.btn,.chip{font-family:inherit;font-weight:800;font-size:14px;letter-spacing:-.01em;line-height:1.2}
+.chip{font-size:12px;padding:8px 14px}
+.glass,.btn,.input,.chip,nav{box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 6px 24px rgba(0,0,0,.35)}
+#app{max-width:760px;margin:0 auto}nav{max-width:520px;margin:0 auto}
+h2{font-size:17px;margin:30px 20px 12px;letter-spacing:-.02em}
+.grid{grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:16px 10px}
+.pos{width:122px}.grid .pos{width:auto}
+.pi{position:relative;aspect-ratio:2/3;border-radius:14px;overflow:hidden;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;text-align:center;padding:8px}
+.pi::before{content:attr(data-t);font-size:11px;font-weight:700;color:rgba(255,255,255,.4)}
+.pi img{position:absolute;inset:0;width:100%;height:100%;aspect-ratio:auto;object-fit:cover;border:0;border-radius:0;background:none}
+.cap{font-size:12px;font-weight:700;margin-top:6px;line-height:1.25;color:rgba(255,255,255,.85);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.hero{height:62dvh}.hero .tx{text-shadow:0 2px 20px rgba(0,0,0,.55)}.ob{min-height:100dvh}
+.sk{height:60dvh;margin:20px;border-radius:24px;background:linear-gradient(100deg,rgba(255,255,255,.04) 30%,rgba(255,255,255,.11) 50%,rgba(255,255,255,.04) 70%);background-size:200% 100%;animation:sh 1.2s linear infinite}@keyframes sh{to{background-position:-200% 0}}
+</style></head><body>
 <div id="app"></div>
 <nav class="glass" id="nav"></nav>
 <script>
@@ -59,9 +74,9 @@ const norm=(r,t)=>({id:r.id,type:r.media_type||t,title:r.title||r.name||'',poste
 const list=async(p,t,q)=>(await api(p,q)).results.map(r=>norm(r,t)).filter(i=>(i.type=='movie'||i.type=='tv')&&i.poster);
 const img=(p,s='w342')=>p?(p[0]=='h'?p:`https://image.tmdb.org/t/p/${s}${p}`):'';
 /* UI bits */
-const pos=(i,to,pct)=>`<a class="pos" href="${to||i.href||`#/title/${i.type}/${i.id}`}"><img loading="lazy" src="${img(i.poster)}" alt="${esc(i.title)}">${pct!=null?`<div class="bar"><i style="width:${pct}%"></i></div>`:''}</a>`;
+const pos=(i,to,pct,cap)=>`<a class="pos" href="${to||i.href||`#/title/${i.type}/${i.id}`}"><div class="pi" data-t="${esc(i.title)}"><img loading="lazy" src="${img(i.poster)}" alt="" onerror="this.remove()">${pct!=null?`<div class="bar"><i style="width:${pct}%"></i></div>`:''}</div>${cap?`<div class="cap">${esc(i.title)}</div>`:''}</a>`;
 const row=(t,items)=>items.length?`<h2>${t}</h2><div class="row">${items.map(i=>pos(i)).join('')}</div>`:'';
-const grid=(items,empty)=>items.length?`<div class="grid">${items.map(i=>pos(i)).join('')}</div>`:`<p class="empty">${empty}</p>`;
+const grid=(items,empty)=>items.length?`<div class="grid">${items.map(i=>pos(i,null,null,1)).join('')}</div>`:`<p class="empty">${empty}</p>`;
 const tabs=[['','Home','M4 11l8-7 8 7v9h-5v-6H9v6H4z'],['discover','Discover','M12 3a9 9 0 100 18 9 9 0 000-18zm3.5 5.5l-2 5-5 2 2-5z'],['search','Search','M10 4a6 6 0 104 10.5l5 5 1.5-1.5-5-5A6 6 0 0010 4z'],['library','Library','M5 4h14v16l-7-4-7 4z'],['settings','Settings','M12 8a4 4 0 100 8 4 4 0 000-8zM11 2h2l.5 3 2 1 2.5-1.7 1.400 1.400L18 8.500l1 2 3 .5v2l-3 .5-1 2 1.700 2.500-1.400 1.400-2.500-1.700-2 1-.5 3h-2l-.5-3-2-1-2.500 1.700-1.400-1.400L6 15.500l-1-2-3-.5v-2l3-.5 1-2-1.700-2.500 1.400-1.400L8.500 6l2-1z']];
 $('#nav').innerHTML=tabs.map(([h,l,d])=>`<a href="#/${h}" data-h="${h}"><svg viewBox="0 0 24 24"><path d="${d}"/></svg>${l}</a>`).join('');
 /* Views */
@@ -69,7 +84,7 @@ const V={
 async home(){
   const [tr,mp,mt,tp,tt]=await Promise.all([list('/trending/all/week'),list('/movie/popular','movie'),list('/movie/top_rated','movie'),list('/tv/popular','tv'),list('/tv/top_rated','tv')]);
   const h=tr[0],c=Object.values(S.pr).filter(p=>p.t>10&&p.t<p.d-30).sort((a,b)=>b.u-a.u);
-  return `<div class="hero"><img src="${img(h.backdrop||h.poster,'w780')}" alt=""><div class="tx"><h1>${esc(h.title)}</h1><p class="dim" style="margin:8px 0 14px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${esc(h.overview)}</p>${playBtn(h)} <a class="btn" href="#/title/${h.type}/${h.id}">Details</a></div></div>`
+  return `<div class="hero"><img src="${img(h.backdrop||h.poster,'w780')}" alt=""><div class="tx"><h1>${esc(h.title)}</h1><p class="dim" style="margin:8px 0 14px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${esc(h.overview)}</p>${playBtn(h,1)} <a class="btn" href="#/title/${h.type}/${h.id}">Details</a></div></div>`
    +(c.length?`<h2>Continue watching</h2><div class="row">${c.map(p=>pos(p.item,p.item.href||`#/watch/${p.item.type}/${p.item.id}`,p.t/p.d*100)).join('')}</div>`:'')
    +row('From your playlist',[...S.lib.items].sort((a,b)=>b.added-a.added).slice(0,20))+row('Trending',tr.slice(1))+row('Popular movies',mp)+row('Top rated movies',mt)+row('Popular series',tp)+row('Top rated series',tt);
 },
@@ -94,7 +109,7 @@ return `<div class="top"><h1>Settings</h1></div><h2>Playlist</h2><div class="gla
 <div id="mf" style="display:${m?'block':'none'}"><input id="ul" class="input" placeholder="https://…/playlist.m3u" value="${esc(s.url)}"></div>
 <p id="sm" class="dim" style="margin-bottom:12px">${S.lib.items.length?`${n('movie')} movies · ${n('series')} series · synced ${new Date(S.lib.t).toLocaleDateString()}`:'No playlist synced yet.'}</p>
 <a class="btn p" onclick="addSrc(this)">Save and sync</a> <a class="chip" style="margin:8px 0 0" onclick="S.hideAdult=!S.hideAdult;DB.set('kv','adult',S.hideAdult);route()">${S.hideAdult?'Adult categories hidden':'Adult categories shown'}</a></div>
-<h2>TMDB</h2><div class="glass card" style="margin-top:0"><p class="dim">API key (v3)</p><input id="k" class="input" value="${esc(S.key)}"><p class="dim">Fallback stream URL template</p><input id="t" class="input" value="${esc(S.tpl)}"><a class="btn p" onclick="saveSet(this)">Save changes</a></div><div style="padding:0 20px"><a class="btn" style="color:#fca5a5" onclick="wipe()">Erase all local data</a><p class="dim" style="text-align:center;margin-top:24px">VYRO 1.1 · Metadata by TMDB</p></div>`},
+<h2>TMDB</h2><div class="glass card" style="margin-top:0"><p class="dim">API key (v3)</p><input id="k" class="input" value="${esc(S.key)}"><p class="dim">Fallback stream URL template</p><input id="t" class="input" value="${esc(S.tpl)}"><a class="btn p" onclick="saveSet(this)">Save changes</a></div><div style="padding:0 20px"><a class="btn" style="color:#fca5a5" onclick="wipe()">Erase all local data</a><p class="dim" style="text-align:center;margin-top:24px">VYRO 1.2 · Metadata by TMDB</p></div>`},
 async onboarding(){return `<div class="ob"><div class="logo">VYRO</div><p class="dim" style="margin:8px 0 28px;max-width:280px">Connect your TMDB account to fill the app with movies and shows.</p><div class="glass card" style="margin:0"><input id="k" class="input" placeholder="TMDB API key (v3)" autocapitalize="off" autocorrect="off"><div id="e" class="err"></div><a class="btn p" style="width:100%;text-align:center" onclick="connect(this)">Connect TMDB</a><p style="margin-top:14px;text-align:center"><a class="dim" href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener">Get a free key at themoviedb.org</a></p></div></div>`},
 async watch(t,id){const i=norm(await api(`/${t}/${id}`),t);return player(S.tpl.replace('{type}',t).replace('{id}',id).replace('{season}',1).replace('{episode}',1),K(t,id),{...i,href:`#/watch/${t}/${id}`},null)},
 async pl(k){
@@ -115,7 +130,7 @@ async play(k,e){
 const ADULT=/adult|xxx|18\+|porn|erotic|sex/i,nm=t=>(t||'').toLowerCase().replace(/\[.*?\]|\(.*?\)/g,'').replace(/[^a-z0-9]+/g,' ').trim();
 const mk=o=>({type:'pl',id:o.k,href:'#/pl/'+o.k,rating:0,added:0,cat:'Other',overview:'',year:'',...o});
 const match=i=>{if(!S._m){S._m={};S.lib.items.forEach(x=>S._m[x.kind[0]+nm(x.title)]=x)}return S._m[(i.type=='tv'?'s':'m')+nm(i.title)]};
-const playBtn=i=>{const m=match(i);return m?`<a class="btn p" href="${m.href}">Play from playlist</a>`:S.lib.items.length?`<span class="chip" style="margin:0 8px 0 0;cursor:default">Not in your playlist</span>`:`<a class="btn p" href="#/watch/${i.type}/${i.id}">Play</a>`};
+const playBtn=(i,hero)=>{const m=match(i);return m?`<a class="btn p" href="${m.href}">Play from playlist</a>`:S.lib.items.length?(hero?'':`<span class="chip" style="margin:0 8px 0 0;cursor:default">Not in your playlist</span>`):`<a class="btn p" href="#/watch/${i.type}/${i.id}">Play</a>`};
 const xapi=(a,q={})=>{const s=S.src;return fetch(`${s.server}/player_api.php?username=${encodeURIComponent(s.user)}&password=${encodeURIComponent(s.pass)}&action=${a}`+Object.entries(q).map(([k,v])=>`&${k}=${v}`).join('')).then(r=>r.json())};
 async function loadEps(it){if(it.kind!='series'||it.eps)return;const s=S.src,d=await xapi('get_series_info',{series_id:it.sid});it.eps=[];for(const n in d.episodes)for(const e of d.episodes[n])it.eps.push({id:e.id,s:+n,n:+e.episode_num,t:e.title,url:`${s.server}/series/${s.user}/${s.pass}/${e.id}.${e.container_extension||'mp4'}`})}
 async function sync(){
@@ -171,8 +186,8 @@ async function route(){
   const [a,b,c]=(location.hash.slice(2)||'').split('/');
   if(!S.key&&a!=='onboarding')return location.hash='#/onboarding';
   document.body.classList.toggle('bare',a==='onboarding'||a==='watch'||a==='play');
-  document.querySelectorAll('nav a').forEach(x=>x.classList.toggle('on',x.dataset.h===(a||'')));
-  after=null;
+  document.querySelectorAll('nav a').forEach(x=>x.classList.toggle('on',x.dataset.h===(a=='pl'?'library':a||'')));
+  after=null;const rk=[a,b,c].join('/');if(rk!==route.k&&a!=='play'&&a!=='watch')app.innerHTML='<div class="sk"></div>';route.k=rk;
   try{const fn=V[a||'home']||V.home;const h=await fn(b,c);app.className='page';app.innerHTML=h;if(a!=='discover'&&a!=='library')scrollTo(0,0);after&&after()}
   catch(e){app.innerHTML=`<p class="empty">Couldn’t load this screen. Check your connection and your TMDB key in Settings.<br><br><a class="btn" href="#/settings">Open settings</a></p>`}
 }
