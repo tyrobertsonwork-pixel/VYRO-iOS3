@@ -2929,9 +2929,17 @@ async function playStream(stream, item) {
     video.style.pointerEvents = 'none';
     $('playernote').textContent = 'Starting native MKV player…';
     try {
+      const providerHeaders =
+        stream?.behaviorHints?.proxyHeaders?.request ||
+        stream?.headers ||
+        {};
+      const nativeHeaders = providerHeaders && typeof providerHeaders === 'object' && !Array.isArray(providerHeaders)
+        ? providerHeaders
+        : {};
       await nativePlayer.load({
         url: parsed.href,
         startPosition: Number(state.progress[key]?.time) || 0,
+        headers: nativeHeaders,
         frame
       });
       state.nativePlayerActive = true;
