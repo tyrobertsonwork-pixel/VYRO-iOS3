@@ -81,7 +81,39 @@ jobs:
         run: |
           mkdir -p Payload
           cp -R build/Build/Products/Release-iphoneos/App.app Payload/
-          /usr/bin/zip -r VYRO-unsigned.ipa Payload
+
+          # Normalize bundle permissions before archiving. Some third-party
+          # framework binaries otherwise arrive without readable mode bits,
+          # causing on-device signing tools to fail with EACCES.
+          find Payload -type d -exec chmod 755 {} +
+          find Payload -type f -exec chmod u+rw,go+r {} +
+
+          # Preserve framework symlinks rather than dereferencing them.
+          /usr/bin/zip -qry -y VYRO-unsigned.ipa Payload
+
+          # Fail the build if the IPA archive does not contain the native
+          # AetherEngine framework binary or if its archived mode is unreadable.
+          python3 - <<'PY'
+          import stat
+          import zipfile
+
+          ipa = "VYRO-unsigned.ipa"
+          with zipfile.ZipFile(ipa) as archive:
+              candidates = [
+                  item for item in archive.infolist()
+                  if item.filename.endswith("/AetherLibswresample")
+                  and "/Frameworks/" in item.filename
+              ]
+              if not candidates:
+                  raise SystemExit("AetherLibswresample framework binary missing from IPA")
+              for item in candidates:
+                  mode = (item.external_attr >> 16) & 0xFFFF
+                  if stat.S_ISLNK(mode):
+                      raise SystemExit("AetherLibswresample unexpectedly archived as a symlink")
+                  if mode and not (mode & stat.S_IRUSR):
+                      raise SystemExit("AetherLibswresample is not owner-readable in IPA")
+          print("IPA framework permissions verified.")
+          PY
 
       - name: Upload IPA artifact
         uses: actions/upload-artifact@v4
