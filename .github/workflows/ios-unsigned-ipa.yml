@@ -71,6 +71,11 @@ jobs:
       - name: Install native MKV playback integration
         run: bash install-mkv-support.sh
 
+      - name: Select supported Xcode toolchain
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '27.0'
+
       - name: Build unsigned iOS app
         run: |
           xcodebuild -workspace ios/App/App.xcworkspace -scheme App -configuration Release -sdk iphoneos -derivedDataPath build IPHONEOS_DEPLOYMENT_TARGET=18.0 CODE_SIGNING_ALLOWED=NO
