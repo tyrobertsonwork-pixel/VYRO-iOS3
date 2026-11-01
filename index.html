@@ -64,7 +64,20 @@ h2{font-size:17px;margin:30px 20px 12px;letter-spacing:-.02em}
 .cast{width:76px;flex:none;text-align:center;font-size:11px;font-weight:700;line-height:1.25}.cast img,.cast i{width:64px;height:64px;border-radius:50%;object-fit:cover;display:block;margin:0 auto 6px;background:rgba(255,255,255,.08)}
 .btn{margin-bottom:8px}
 
-/* ===== v1.6 design system ===== */
+/* ===== v1.7 ===== */
+a:focus-visible,.input:focus-visible,.seg a:focus-visible{outline:2px solid var(--vy);outline-offset:2px}
+.pi img{opacity:0;transition:opacity .35s;animation:shw 0s 1.4s forwards}.pi img.l{opacity:1}@keyframes shw{to{opacity:1}}
+.hero::before,.hero::after{pointer-events:none}
+.hsc{display:flex;height:100%;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.hsc::-webkit-scrollbar{display:none}
+.hs{flex:none;width:100%;height:100%;position:relative;scroll-snap-align:center}
+.hs>img{width:100%;height:100%;object-fit:cover;display:block}
+.hero .hs .tx{bottom:44px}
+.dots{position:absolute;z-index:2;left:20px;bottom:22px;display:flex;gap:6px}
+.dots i{width:6px;height:6px;border-radius:3px;background:rgba(255,255,255,.32);transition:width .25s,background .25s}
+.dots i.on{width:20px;background:#fff}
+.rc{display:flex;flex-wrap:wrap;gap:8px;padding:0 20px}
+/* ===== v1.6 design system =====
 a{color:inherit;text-decoration:none}
 .row{scroll-padding:0 20px}
 .vr{flex:none;width:1px;background:var(--hair);margin:5px 4px}
@@ -130,12 +143,12 @@ nav a.on{background:rgba(255,255,255,.12);color:#fff}
 </style></head><body>
 <div id="app"></div>
 <div class="fade"></div>
-<nav class="glass" id="nav"></nav>
+<nav class="glass" id="nav" aria-label="Main"></nav>
 <script>
 const $=s=>document.querySelector(s),app=$('#app');
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const DEF='https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',ST=['kv','wl','pr'];
-const S={key:'',tpl:DEF,wl:[],pr:{},lib:{items:[],t:0},src:null,hideAdult:true,pls:[],act:'',pin:''},D={type:'movie',g:null};let cur=null,after=null;
+const S={key:'',tpl:DEF,wl:[],pr:{},lib:{items:[],t:0},src:null,hideAdult:true,pls:[],act:'',pin:'',recent:[]},D={type:'movie',g:null};let cur=null,after=null;
 /* IndexedDB */
 const open=()=>new Promise((res,rej)=>{const r=indexedDB.open('vyro',1);r.onupgradeneeded=()=>ST.forEach(s=>r.result.createObjectStore(s));r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)});
 const tx=async(s,m,f)=>{const d=await open();return new Promise((res,rej)=>{const q=f(d.transaction(s,m).objectStore(s));q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error)})};
@@ -143,15 +156,19 @@ const DB={get:(s,k)=>tx(s,'readonly',o=>o.get(k)),set:(s,k,v)=>tx(s,'readwrite',
 DB.entries=s=>open().then(d=>new Promise((res,rej)=>{const o=[],q=d.transaction(s).objectStore(s).openCursor();q.onsuccess=()=>{const c=q.result;if(c){o.push([c.key,c.value]);c.continue()}else res(o)};q.onerror=()=>rej(q.error)}));
 const K=(t,i)=>t+':'+i;
 /* TMDB */
-const api=async(p,q={},key=S.key)=>{const u=new URL('https://api.themoviedb.org/3'+p);u.searchParams.set('api_key',key);for(const k in q)if(q[k]!=null)u.searchParams.set(k,q[k]);const r=await fetch(u);if(!r.ok)throw Error(r.status);return r.json()};
+const AC=new Map();
+const api=async(p,q={},key=S.key)=>{const u=new URL('https://api.themoviedb.org/3'+p);u.searchParams.set('api_key',key);for(const k in q)if(q[k]!=null)u.searchParams.set(k,q[k]);
+  const ks=u.toString(),hit=AC.get(ks);if(hit&&Date.now()-hit.t<3e5)return hit.d;
+  const r=await fetch(u);if(!r.ok)throw Error(r.status);const d=await r.json();AC.set(ks,{t:Date.now(),d});if(AC.size>250)AC.delete(AC.keys().next().value);return d};
 const norm=(r,t)=>({id:r.id,type:r.media_type||t,title:r.title||r.name||'',poster:r.poster_path,backdrop:r.backdrop_path,overview:r.overview||'',rating:r.vote_average||0,year:(r.release_date||r.first_air_date||'').slice(0,4)});
 const list=async(p,t,q)=>(await api(p,q)).results.map(r=>norm(r,t)).filter(i=>(i.type=='movie'||i.type=='tv')&&i.poster);
 const img=(p,s='w342')=>p?(p[0]=='h'?p:`https://image.tmdb.org/t/p/${s}${p}`):'';
 /* UI bits */
 const seeAll=(cat,kind)=>{D.lib='p';D.pt=kind=='series'?'tv':'movie';D.cat=cat;D.n=90;D.q='';if(location.hash=='#/library')route();else location.hash='#/library'};
+const SCR={};let BACK=0;addEventListener('popstate',()=>{BACK=1});
 let HC=[];const seeCat=i=>seeAll(HC[i][0],HC[i][1]);
 const PI={};let pic=0;
-const pos=(i,to,pct,cap,pk)=>{const id=++pic;PI[id]={i,pk};const m=i.type!='pl'&&match(i);return `<a class="pos" data-pi="${id}" href="${to||i.href||`#/title/${i.type}/${i.id}`}"><div class="pi" data-t="${esc(i.title)}">${m?'<span class="in">✓</span>':''}<img loading="lazy" src="${img(i.poster)}" alt="" onerror="this.remove()">${pct!=null?`<div class="bar"><i style="width:${pct}%"></i></div>`:''}</div>${cap?`<div class="cap">${esc(i.title)}</div>`:''}</a>`};
+const pos=(i,to,pct,cap,pk)=>{const id=++pic;PI[id]={i,pk};const m=i.type!='pl'&&match(i);return `<a class="pos" data-pi="${id}" href="${to||i.href||`#/title/${i.type}/${i.id}`}"><div class="pi" data-t="${esc(i.title)}">${m?'<span class="in">✓</span>':''}<img loading="lazy" src="${img(i.poster)}" alt="" onload="this.classList.add('l')" onerror="this.remove()">${pct!=null?`<div class="bar"><i style="width:${pct}%"></i></div>`:''}</div>${cap?`<div class="cap">${esc(i.title)}</div>`:''}</a>`};
 const row=(t,items,act)=>items.length?`<h2>${t}${act?`<a class="more" onclick="${act}">See all</a>`:''}</h2><div class="row">${items.map(i=>pos(i)).join('')}</div>`:'';
 const grid=(items,empty)=>items.length?`<div class="grid">${items.map(i=>pos(i,null,null,1)).join('')}</div>`:`<p class="empty">${empty}</p>`;
 const tabs=[['','Home','M4 11l8-7 8 7v9h-5v-6H9v6H4z'],['discover','Discover','M12 3a9 9 0 100 18 9 9 0 000-18zm3.5 5.5l-2 5-5 2 2-5z'],['search','Search','M10 4a6 6 0 104 10.5l5 5 1.5-1.5-5-5A6 6 0 0010 4z'],['library','Library','M5 4h14v16l-7-4-7 4z'],['settings','Settings','M12 8a4 4 0 100 8 4 4 0 000-8zM11 2h2l.5 3 2 1 2.5-1.7 1.400 1.400L18 8.500l1 2 3 .5v2l-3 .5-1 2 1.700 2.500-1.400 1.400-2.500-1.700-2 1-.5 3h-2l-.5-3-2-1-2.500 1.700-1.400-1.400L6 15.500l-1-2-3-.5v-2l3-.5 1-2-1.700-2.500 1.400-1.400L8.500 6l2-1z']];
@@ -159,13 +176,19 @@ $('#nav').innerHTML=tabs.map(([h,l,d])=>`<a href="#/${h}" data-h="${h}"><svg vie
 /* Views */
 const V={
 async home(){
-  const [tr,mp,mt,tp,tt]=await Promise.all([list('/trending/all/week'),list('/movie/popular','movie'),list('/movie/top_rated','movie'),list('/tv/popular','tv'),list('/tv/top_rated','tv')]);
-  const h=tr.find(x=>match(x))||tr[0],c=Object.entries(S.pr).filter(([k,p])=>p.t>10&&p.t<p.d-30).sort((a,b)=>b[1].u-a[1].u);
+  const sf=p=>p.catch(()=>[]);
+  const [tr,mp,mt,tp,tt]=await Promise.all([sf(list('/trending/all/week')),sf(list('/movie/popular','movie')),sf(list('/movie/top_rated','movie')),sf(list('/tv/popular','tv')),sf(list('/tv/top_rated','tv'))]);
+  const c=Object.entries(S.pr).filter(([k,p])=>p.t>10&&p.t<p.d-30).sort((a,b)=>b[1].u-a[1].u);
   const pl=S.lib.items.filter(x=>!(S.hideAdult&&ADULT.test(x.cat))),rec=k=>pl.filter(x=>x.kind==k).sort((a,b)=>b.added-a.added).slice(0,20);
   const cats={};pl.forEach(x=>cats[x.cat]=(cats[x.cat]||0)+1);
   HC=Object.entries(cats).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([k])=>[k,pl.filter(x=>x.cat==k&&x.kind=='series').length>pl.filter(x=>x.cat==k&&x.kind=='movie').length?'series':'movie']);
   const top=HC.map(([k],i)=>row(k,pl.filter(x=>x.cat==k).sort((a,b)=>b.rating-a.rating||b.added-a.added).slice(0,20),`seeCat(${i})`)).join('');
-  return `<div class="hero"><img src="${img(h.backdrop||h.poster,'w780')}" alt=""><div class="wm">VYRO</div><div class="tx"><h1>${esc(h.title)}</h1><p class="meta">${[h.type=='tv'?'Series':'Movie',h.year,h.rating?'★ '+h.rating.toFixed(1):''].filter(Boolean).join('  ·  ')}</p><p class="dim" style="margin:0 0 16px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:14px;line-height:1.45">${esc(h.overview)}</p>${playBtn(h,1)} <a class="btn" href="#/title/${h.type}/${h.id}">Details</a></div></div>`
+  const pool=tr.length?[...tr.filter(x=>match(x)),...tr.filter(x=>!match(x))].slice(0,5):rec('movie').slice(0,5);
+  if(!pool.length)throw Error('nothing to show');
+  const slide=h=>{const own=h.type=='pl';return `<div class="hs"><img src="${img(h.backdrop||h.poster,'w780')}" alt="" onerror="this.style.opacity=.15"><div class="tx"><h1>${esc(h.title)}</h1><p class="meta">${[(own?h.kind=='series':h.type=='tv')?'Series':'Movie',h.year,h.rating?'★ '+Number(h.rating).toFixed(1):''].filter(Boolean).join('  ·  ')}</p><p class="dim" style="margin:0 0 16px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:14px;line-height:1.45">${esc(h.overview)}</p>${own?`<a class="btn p play" href="${h.href}">Play</a>`:playBtn(h,1)} <a class="btn" href="${own?h.href:`#/title/${h.type}/${h.id}`}">Details</a></div></div>`};
+  after=()=>{const e=$('#hsc'),d=document.querySelectorAll('#dots i');if(!e)return;e.addEventListener('scroll',()=>{const i=Math.round(e.scrollLeft/e.clientWidth);d.forEach((x,j)=>x.classList.toggle('on',i==j))},{passive:true})};
+  return `<div class="hero"><div class="wm">VYRO</div><div class="hsc" id="hsc">${pool.map(slide).join('')}</div>${pool.length>1?`<div class="dots" id="dots">${pool.map((_,i)=>`<i class="${i?'':'on'}"></i>`).join('')}</div>`:''}</div>`
+
    +(c.length?`<h2>Continue watching</h2><div class="row">${c.map(([k,p])=>pos(p.item,p.item.href||`#/watch/${p.item.type}/${p.item.id}`,p.t/p.d*100,0,k)).join('')}</div>`:'')
    +row('New movies in your playlist',rec('movie'),"seeAll(null,'movie')")+row('New series in your playlist',rec('series'),"seeAll(null,'series')")+top
    +row('Trending',tr.slice(1))+row('Popular movies',mp)+row('Top rated movies',mt)+row('Popular series',tp)+row('Top rated series',tt);
@@ -182,7 +205,7 @@ async discover(){
   const ch=(on,fn,l)=>`<a class="chip ${on?'on':''}" onclick="${fn}">${esc(l)}</a>`;
   return `<div class="top"><h1>Discover</h1><div class="seg" style="margin:16px 0 10px">${['movie','tv'].map(t=>`<a class="${D.type==t?'on':''}" onclick="setD('${t}')">${t=='tv'?'Series':'Movies'}</a>`).join('')}</div><div class="row" style="padding:0 0 16px;margin:0 -20px;padding-left:20px;padding-right:20px">${[['pop','Popular'],['top','Top rated'],['new','Newest']].map(([v,l])=>ch(D.sort2==v,`setSort('${v}')`,l)).join('')}<span class="vr"></span>${S.lib.items.length?ch(D.mine,'tgMine()','In my playlist'):''}${gs.genres.map(g=>ch(D.g==g.id,`setG(${g.id})`,g.name)).join('')}</div></div>${grid(items,D.mine?'Nothing here is in your playlist yet. Try Show more.':'Nothing found.')}<p style="text-align:center;margin-top:18px"><a class="btn" onclick="D.pg=(D.pg||1)+1;route()">Show more</a></p>`;
 },
-async search(){after=()=>$('#q').focus();return `<div class="top"><input id="q" class="input" placeholder="Movies, series" oninput="doSearch(this.value)"></div><div id="res"><p class="empty">Search by title to find something to watch.</p></div>`},
+async search(){after=()=>$('#q').focus();return `<div class="top"><input id="q" class="input" placeholder="Movies, series" oninput="doSearch(this.value)" onchange="pushRecent(this.value)" enterkeyhint="search" autocomplete="off" autocorrect="off"></div><div id="res">${recentHtml()}</div>`},
 async title(t,id){
   const d=await api(`/${t}/${id}`,{append_to_response:'similar,credits,videos'}),i=cur=norm(d,t),sv=S.wl.some(w=>w.id==i.id&&w.type==i.type);
   const meta=[i.year,'★ '+i.rating.toFixed(1),(d.runtime||d.episode_run_time?.[0])?(d.runtime||d.episode_run_time[0])+' min':'',d.number_of_seasons?d.number_of_seasons+' seasons':''].filter(Boolean).join('  ·  ');
@@ -197,7 +220,7 @@ return `<div class="top"><h1>Settings</h1></div><h2>Playlists</h2><div class="gl
 <h2>Add a playlist</h2><div class="glass card" style="margin-top:0"><p class="dim" style="margin-bottom:10px">Movies and series only. Live channels are ignored.</p><input id="pn" class="input" placeholder="Name, e.g. Home"><select id="st" class="input" onchange="$('#xf').style.display=this.value=='xtream'?'block':'none';$('#mf').style.display=this.value=='xtream'?'none':'block'"><option value="xtream">Xtream Codes login</option><option value="m3u">M3U playlist URL</option></select><div id="xf"><input id="sv" class="input" placeholder="Server, e.g. https://host:8080"><input id="us" class="input" placeholder="Username"><input id="pw" class="input" type="password" placeholder="Password"></div><div id="mf" style="display:none"><input id="ul" class="input" placeholder="https://…/playlist.m3u"></div><a class="btn p" onclick="addSrc(this)">Add and sync</a></div>
 <h2>Parental controls</h2><div class="glass card" style="margin-top:0"><p class="dim" style="margin-bottom:10px">Adult categories are hidden everywhere. A PIN is needed to show them.</p><a class="chip" onclick="tgAdult()">${S.hideAdult?'Adult categories hidden':'Adult categories shown'}</a><a class="chip" onclick="setPin()">${S.pin?'Change or remove PIN':'Set PIN'}</a></div>
 <h2>Player</h2><div class="glass card" style="margin-top:0">${VLC()?`<p class="dim" style="margin-bottom:10px">Built-in player plays MKV, AVI, TS and more, with audio and subtitle tracks.</p><p id="vs" class="dim" style="margin-bottom:10px">${Capacitor.isPluginAvailable('VyroVlc')?'Status: ready':'Status: not found in this build'}</p><a class="chip" onclick="testVlc()">Test built-in player</a>${[['auto','Auto'],['always','Always built-in']].map(([k,l])=>`<a class="chip ${(S.vlc||'auto')==k?'on':''}" onclick="S.vlc='${k}';DB.set('kv','vlc',k);route()">${l}</a>`).join('')}`:`<p class="dim">The built-in player (MKV, AVI, subtitles, audio tracks) is only in the iPhone app version. The web version plays MP4 and HLS.</p>`}</div>
-<h2>TMDB</h2><div class="glass card" style="margin-top:0"><p class="dim">API key (v3)</p><input id="k" class="input" value="${esc(S.key)}"><p class="dim">Fallback stream URL template</p><input id="t" class="input" value="${esc(S.tpl)}"><a class="btn p" onclick="saveSet(this)">Save changes</a></div><div style="padding:0 20px"><a class="btn" style="color:#fca5a5" onclick="wipe()">Erase all local data</a><p class="dim" style="text-align:center;margin-top:24px">VYRO 1.6 · Metadata by TMDB</p></div>`},
+<h2>TMDB</h2><div class="glass card" style="margin-top:0"><p class="dim">API key (v3)</p><input id="k" class="input" value="${esc(S.key)}"><p class="dim">Fallback stream URL template</p><input id="t" class="input" value="${esc(S.tpl)}"><a class="btn p" onclick="saveSet(this)">Save changes</a></div><div style="padding:0 20px;display:flex;gap:10px;flex-wrap:wrap"><a class="btn" onclick="clearHist()">Clear watch history</a><a class="btn" style="color:#fca5a5" onclick="wipe()">Erase all local data</a><p class="dim" style="text-align:center;margin-top:18px;width:100%">VYRO 1.7 · Metadata by TMDB</p></div>`},
 async onboarding(){return `<div class="ob"><div class="logo">VYRO</div><p class="dim" style="margin:8px 0 28px;max-width:280px">Connect your TMDB account to fill the app with movies and shows.</p><div class="glass card" style="margin:0"><input id="k" class="input" placeholder="TMDB API key (v3)" autocapitalize="off" autocorrect="off"><div id="e" class="err"></div><a class="btn p" style="width:100%;text-align:center" onclick="connect(this)">Connect TMDB</a><p style="margin-top:14px;text-align:center"><a class="dim" href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener">Get a free key at themoviedb.org</a></p></div></div>`},
 async watch(t,id){const i=norm(await api(`/${t}/${id}`),t);return player(S.tpl.replace('{type}',t).replace('{id}',id).replace('{season}',1).replace('{episode}',1),K(t,id),{...i,href:`#/watch/${t}/${id}`},null)},
 async pl(k){
@@ -216,9 +239,10 @@ async play(k,e){
 }};
 /* Playlist engine */
 let PFX='';
+const nn=x=>x._n??(x._n=nm(x.title));
 const ADULT=/adult|xxx|18\+|porn|erotic|sex/i,nm=t=>(t||'').replace(/^\s*\|?[A-Z]{2,3}\|?\s*[-:|]\s+/,'').toLowerCase().replace(/\[.*?\]|\(.*?\)/g,'').replace(/[^a-z0-9]+/g,' ').trim().replace(/ (19|20)\d\d$/,''),yr=t=>(String(t||'').match(/(?:^|\D)((?:19|20)\d\d)(?:\D|$)/)||[])[1]||'';
 const mk=o=>{const k=PFX+o.k;return{type:'pl',rating:0,added:0,cat:'Other',overview:'',year:yr(o.title),...o,k,id:k,href:'#/pl/'+k}};
-const match=i=>{if(!S._m){S._m={};S.lib.items.forEach(x=>{const q=x.kind[0]+nm(x.title);(S._m[q]=S._m[q]||[]).push(x)})}const l=S._m[(i.type=='tv'?'s':'m')+nm(i.title)];if(!l)return;return l.length==1?l[0]:(l.find(x=>x.year&&x.year==i.year)||l[0])};
+const match=i=>{if(!S._m){S._m={};S.lib.items.forEach(x=>{const q=x.kind[0]+nn(x);(S._m[q]=S._m[q]||[]).push(x)})}const l=S._m[(i.type=='tv'?'s':'m')+nm(i.title)];if(!l)return;return l.length==1?l[0]:(l.find(x=>x.year&&x.year==i.year)||l[0])};
 const playBtn=(i,hero)=>{const m=match(i);return m?`<a class="btn p play" href="${m.href}">Play from playlist</a>`:S.lib.items.length?(hero?'':`<span class="chip" style="margin:0 8px 0 0;cursor:default">Not in your playlist</span>`):`<a class="btn p play" href="#/watch/${i.type}/${i.id}">Play</a>`};
 const xapi=(a,q={})=>{const s=S.src;return fetch(`${s.server}/player_api.php?username=${encodeURIComponent(s.user)}&password=${encodeURIComponent(s.pass)}&action=${a}`+Object.entries(q).map(([k,v])=>`&${k}=${v}`).join('')).then(r=>r.json())};
 async function loadEps(it){if(it.kind!='series'||it.eps)return;const s=S.src,d=await xapi('get_series_info',{series_id:it.sid});it.eps=[];for(const n in d.episodes)for(const e of d.episodes[n])it.eps.push({id:e.id,s:+n,n:+e.episode_num,t:e.title,url:`${s.server}/series/${s.user}/${s.pass}/${e.id}.${e.container_extension||'mp4'}`})}
@@ -253,7 +277,7 @@ const addSrc=async b=>{const src=mkSrc(),prev={act:S.act,src:S.src,lib:S.lib},id
 const resync=async b=>{b.textContent='Syncing…';try{await sync();route()}catch{b.textContent='Re-sync';$('#sm').innerHTML=ERRHTML}};
 const switchPl=async id=>{S.act=id;await loadAct();savePls();D.cat=null;D.n=90;route()};
 const rmPl=async()=>{const p=actPl();if(!p||!confirm('Remove “'+p.name+'”? Your watch history stays.'))return;S.pls=S.pls.filter(x=>x.id!=p.id);DB.del('kv','lib:'+p.id);S.act=S.pls[0]?S.pls[0].id:'';await loadAct();savePls();route()};
-const libItems=()=>{const k=D.pt=='tv'?'series':'movie';let a=S.lib.items.filter(x=>x.kind==k&&!(S.hideAdult&&ADULT.test(x.cat)));if(D.cat)a=a.filter(x=>x.cat==D.cat);if(D.q)a=a.filter(x=>nm(x.title).includes(nm(D.q)));return a.sort(D.sort=='az'?(a,b)=>a.title.localeCompare(b.title):D.sort=='top'?(a,b)=>b.rating-a.rating:(a,b)=>b.added-a.added)};
+const libItems=()=>{const k=D.pt=='tv'?'series':'movie';let a=S.lib.items.filter(x=>x.kind==k&&!(S.hideAdult&&ADULT.test(x.cat)));if(D.cat)a=a.filter(x=>x.cat==D.cat);if(D.q){const qq=nm(D.q);a=a.filter(x=>nn(x).includes(qq))};return a.sort(D.sort=='az'?(a,b)=>a.title.localeCompare(b.title):D.sort=='top'?(a,b)=>b.rating-a.rating:(a,b)=>b.added-a.added)};
 const plGrid=()=>{const a=libItems(),n=D.n||90;return grid(a.slice(0,n),'No matches.')+(a.length>n?`<p style="text-align:center;margin-top:16px"><a class="btn" onclick="D.n=${n}+90;$('#pg').innerHTML=plGrid()">Show more</a></p>`:'')};
 const plView=()=>{const k=D.pt=='tv'?'series':'movie',c=D.cats=[...new Set(S.lib.items.filter(x=>x.kind==k&&!(S.hideAdult&&ADULT.test(x.cat))).map(x=>x.cat))].sort().slice(0,80),ch=(on,fn,l)=>`<a class="chip ${on?'on':''}" onclick="${fn}">${esc(l)}</a>`;
   return `<div style="padding:0 0"><div class="seg">${[['movie','movie','Movies'],['series','tv','Series']].map(([kk,v,l])=>`<a class="${k==kk?'on':''}" onclick="setPl('pt','${v}')">${l}</a>`).join('')}</div><div style="padding:0 20px"><input class="input" placeholder="Filter this list" value="${esc(D.q)}" oninput="D.q=this.value;D.n=90;$('#pg').innerHTML=plGrid()"></div><div class="row" style="padding-bottom:14px">${[['added','Recent'],['az','A–Z'],['top','Top rated']].map(([v,l])=>ch((D.sort||'added')==v,`setPl('sort','${v}')`,l)).join('')}<span class="vr"></span>${c.map((x,i)=>ch(D.cat==x,`setPl('cat',D.cats[${i}])`,x)).join('')}</div><div id="pg">${plGrid()}</div></div>`};
@@ -325,11 +349,15 @@ const castRow=d=>{const c=(d.credits?.cast||[]).slice(0,14);return c.length?`<h2
 const tgAdult=()=>{if(S.hideAdult){if(S.pin&&prompt('Enter PIN')!==S.pin)return;S.hideAdult=false}else S.hideAdult=true;DB.set('kv','adult',S.hideAdult);route()};
 const setPin=()=>{if(S.pin&&prompt('Enter current PIN')!==S.pin)return;const p=prompt('New 4-digit PIN. Leave empty to remove it.');if(p===null)return;if(p&&!/^\d{4}$/.test(p)){alert('PIN must be 4 digits.');return}S.pin=p;DB.set('kv','pin',p);route()};
 let st,sq=0;const doSearch=q=>{clearTimeout(st);st=setTimeout(async()=>{const el=$('#res'),my=++sq,n=nm(q);
-  if(!q.trim()){el.innerHTML='<p class="empty">Search by title to find something to watch.</p>';return}
-  const mine=n?S.lib.items.filter(x=>!(S.hideAdult&&ADULT.test(x.cat))&&nm(x.title).includes(n)).slice(0,60):[];
+  if(!q.trim()){el.innerHTML=recentHtml();return}
+  const mine=n?S.lib.items.filter(x=>!(S.hideAdult&&ADULT.test(x.cat))&&nn(x).includes(n)).slice(0,60):[];
   let t=[];try{t=await list('/search/multi',null,{query:q,include_adult:false})}catch{}
   if(my!==sq||!$('#res'))return;
   el.innerHTML=(mine.length?`<h2 style="margin-top:0">In your playlist</h2>${grid(mine,'')}`:'')+(t.length?`<h2>${mine.length?'More from TMDB':'Results'}</h2>${grid(t,'')}`:'')||`<p class="empty">No results for “${esc(q)}”.</p>`},350)};
+const recentHtml=()=>S.recent&&S.recent.length?`<h2 style="margin-top:6px">Recent<a class="more" onclick="S.recent=[];DB.set('kv','recent',[]);route()">Clear</a></h2><div class="rc">${S.recent.map((r,i)=>`<a class="chip" onclick="useRecent(${i})">${esc(r)}</a>`).join('')}</div>`:'<p class="empty">Search by title to find something to watch.</p>';
+const pushRecent=q=>{q=(q||'').trim();if(q.length<2)return;S.recent=[q,...(S.recent||[]).filter(x=>x.toLowerCase()!=q.toLowerCase())].slice(0,8);DB.set('kv','recent',S.recent)};
+const useRecent=i=>{const q=$('#q');q.value=S.recent[i];doSearch(q.value)};
+const clearHist=()=>{if(!confirm('Clear your watch history and Continue Watching?'))return;S.pr={};DB.clear('pr');route()};
 const toggleItem=i=>{const has=S.wl.some(w=>w.id==i.id&&w.type==i.type);S.wl=has?S.wl.filter(w=>!(w.id==i.id&&w.type==i.type)):[i,...S.wl];has?DB.del('wl',K(i.type,i.id)):DB.set('wl',K(i.type,i.id),i)};
 const toggle=()=>{toggleItem(cur);route()};
 /* Long-press menu on any poster */
@@ -356,15 +384,16 @@ async function route(){
   if(!S.key&&a!=='onboarding')return location.hash='#/onboarding';
   document.body.classList.toggle('bare',a==='onboarding'||a==='watch'||a==='play');
   document.querySelectorAll('nav a').forEach(x=>x.classList.toggle('on',x.dataset.h===(a=='pl'?'library':a||'')));
+  const hh=location.hash,same=route.h===hh,back=BACK;BACK=0;if(route.h!=null)SCR[route.h]=scrollY;
   after=null;for(const k in PI)delete PI[k];pic=0;const rk=[a,b,c].join('/');if(rk!==route.k&&a!=='play'&&a!=='watch')app.innerHTML='<div class="sk"></div><div class="skr"><i></i><i></i><i></i></div>';route.k=rk;
-  try{const fn=V[a||'home']||V.home;const h=await fn(b,c);app.className='page';app.innerHTML=h;if(a!=='discover'&&a!=='library')scrollTo(0,0);after&&after()}
+  try{const fn=V[a||'home']||V.home;const h=await fn(b,c);app.className='page';app.innerHTML=h;scrollTo(0,(same||back)?(SCR[hh]||0):0);route.h=hh;after&&after()}
   catch(e){app.innerHTML=`<p class="empty">Couldn’t load this screen. Check your connection and your TMDB key in Settings.<br><br><a class="btn" href="#/settings">Open settings</a></p>`}
 }
 addEventListener('hashchange',route);
 (async()=>{
   try{const[k,t,w,p]=await Promise.all([DB.get('kv','key'),DB.get('kv','tpl'),DB.all('wl'),DB.entries('pr')]);S.key=k||'';S.tpl=t||DEF;S.wl=w;S.pr=Object.fromEntries(p)}catch{}
   try{
-    S.hideAdult=(await DB.get('kv','adult'))!==false;S.vlc=(await DB.get('kv','vlc'))||'auto';S.pin=(await DB.get('kv','pin'))||'';
+    S.hideAdult=(await DB.get('kv','adult'))!==false;S.vlc=(await DB.get('kv','vlc'))||'auto';S.pin=(await DB.get('kv','pin'))||'';S.recent=(await DB.get('kv','recent'))||[];
     S.pls=(await DB.get('kv','pls'))||[];S.act=(await DB.get('kv','act'))||'';
     if(!S.pls.length){const old=await DB.get('kv','src');if(old){S.pls=[{id:'p0',name:'My playlist',src:old}];S.act='p0';const ol=await DB.get('kv','lib');if(ol)await DB.set('kv','lib:p0',ol);savePls()}}
     if(!actPl()&&S.pls.length)S.act=S.pls[0].id;
