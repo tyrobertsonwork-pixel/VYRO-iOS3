@@ -17,4 +17,11 @@ assert.match(html, /signal\?\.aborted\) throw error/, 'Stream lookup cancellatio
 assert.match(html, /window\.addEventListener\('pagehide', flushWatchProgress\)/, 'Progress must flush on pagehide');
 assert.match(html, /recoverMediaError\(\)/, 'HLS media recovery must remain present');
 assert.match(html, /nativeFallbackAttempted/, 'Native HLS fallback must remain single-attempt');
+assert.match(html, /window\.Capacitor\?\.Plugins\?\.AetherPlayer/, 'Unsupported containers must route through the registered native player');
+assert.match(html, /headers: nativeHeaders/, 'Provider request headers must be forwarded to native playback');
+const nativePlugin = fs.readFileSync('native/ios/AetherPlayerPlugin.swift', 'utf8');
+assert.match(nativePlugin, /options: \.init\(httpHeaders: httpHeaders\)/, 'AetherEngine must receive provider HTTP headers');
+assert.match(nativePlugin, /@objc func play\(_ call: CAPPluginCall\)/, 'Native play control must be implemented');
+const nativeBridge = fs.readFileSync('native/ios/VYROBridgeViewController.swift', 'utf8');
+assert.match(nativeBridge, /registerPluginType\(AetherPlayerPlugin\.self\)/, 'AetherPlayer must be registered with Capacitor');
 console.log('Streaming reliability smoke checks passed.');
