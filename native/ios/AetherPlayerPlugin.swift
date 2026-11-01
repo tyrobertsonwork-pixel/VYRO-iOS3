@@ -50,9 +50,11 @@ public final class AetherPlayerPlugin: CAPPlugin, CAPBridgedPlugin {
                     self.applyFrame(frame)
                 }
                 let startPosition = call.getDouble("startPosition") ?? 0
+                let httpHeaders = call.getObject("headers") as? [String: String] ?? [:]
                 try await player.load(
                     url: url,
-                    startPosition: max(0, startPosition)
+                    startPosition: max(0, startPosition),
+                    options: .init(httpHeaders: httpHeaders)
                 )
                 player.play()
                 self.startClock()
