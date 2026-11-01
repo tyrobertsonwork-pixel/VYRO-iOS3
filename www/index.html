@@ -2936,12 +2936,29 @@ async function playStream(stream, item) {
       const nativeHeaders = providerHeaders && typeof providerHeaders === 'object' && !Array.isArray(providerHeaders)
         ? providerHeaders
         : {};
-      await nativePlayer.load({
-        url: parsed.href,
-        startPosition: Number(state.progress[key]?.time) || 0,
-        headers: nativeHeaders,
-        frame
-      });
+      // Never leave the user on an endless spinner if the native engine
+      // cannot open a provider URL. Some providers accept the request but
+      // never complete the demuxer load (expired links, unsupported redirects,
+      // missing auth headers, or a stalled source).
+      let nativeLoadTimeout;
+      try {
+        await Promise.race([
+          nativePlayer.load({
+            url: parsed.href,
+            startPosition: Number(state.progress[key]?.time) || 0,
+            headers: nativeHeaders,
+            frame
+          }),
+          new Promise((_, reject) => {
+            nativeLoadTimeout = setTimeout(
+              () => reject(new Error('The MKV stream did not respond within 30 seconds. Try another source.')),
+              30000
+            );
+          })
+        ]);
+      } finally {
+        clearTimeout(nativeLoadTimeout);
+      }
       state.nativePlayerActive = true;
       $('playernote').textContent = 'Playing with VYRO native video engine.';
       const updateNativeFrame = () => {
@@ -2954,12 +2971,22 @@ async function playStream(stream, item) {
       state.updateNativeFrame = updateNativeFrame;
     } catch (error) {
       state.nativePlayerActive = false;
+      // A timed-out load may still have a native request running. Close it
+      // before restoring the WebView player so it cannot cover the UI later.
+      try { await nativePlayer.close(); } catch {}
       video.style.opacity = '';
       video.style.pointerEvents = '';
       $('native-controls').classList.remove('active');
       $('native-controls').hidden = true;
       $('playernote').textContent = error?.message || 'Native playback failed. Try another source.';
     }
+    return;
+  }
+
+  // If VYRO identified an unsupported container but the native bridge is
+  // missing, don't hand the file to iOS WebKit and leave an endless spinner.
+  if (!isHls && likelyUnsupported) {
+    $('playernote').textContent = 'VYRO native player is unavailable in this build. Rebuild the iOS app and try again.';
     return;
   }
 
