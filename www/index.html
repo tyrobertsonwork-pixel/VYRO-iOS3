@@ -2854,16 +2854,25 @@ async function playStream(stream, item) {
     stream.title,
     stream.description
   ].filter(value => typeof value === 'string').join(' ');
-  const formatMatch = (parsed.pathname + ' ' + filenameHint).match(/\.(mkv|avi|wmv|flv|ts)(?:$|[?#\\s])/i);
+  // Providers often hide the real filename behind a tokenised/extensionless
+  // URL. Check decoded URL + all Stremio display/filename hints, not only the
+  // final URL path segment.
+  let decodedUrl = parsed.href;
+  try { decodedUrl = decodeURIComponent(parsed.href); } catch {}
+  const formatText = decodedUrl + ' ' + filenameHint;
+  const formatMatch = formatText.match(/\.(mkv|avi|wmv|flv|ts)(?=$|[?#\s])/i)
+    || formatText.match(/\b(mkv|avi|wmv|flv|mpeg-?ts)\b/i);
   const mimeFormat = /matroska|x-mkv/.test(mimeType) ? 'mkv'
     : /x-msvideo|avi/.test(mimeType) ? 'avi'
     : /x-ms-wmv|wmv/.test(mimeType) ? 'wmv'
     : /flv/.test(mimeType) ? 'flv'
     : /mp2t|mpegts/.test(mimeType) ? 'ts'
     : '';
-  const extension = (formatMatch?.[1] || mimeFormat || (parsed.pathname.split('.').pop() || '')).toLowerCase();
+  const formatToken = String(formatMatch?.[1] || '').toLowerCase();
+  const extension = formatToken === 'mpeg-ts' || formatToken === 'mpegts' ? 'ts'
+    : (formatToken || mimeFormat);
   const isHls =
-    /\.m3u8($|\\?)/i.test(parsed.href) ||
+    /\.m3u8(?:$|\?)/i.test(decodedUrl) ||
     /mpegurl/.test(mimeType);
   const likelyUnsupported = ['mkv', 'avi', 'wmv', 'flv', 'ts'].includes(extension);
 
