@@ -1,5 +1,14 @@
 name: Build IPA
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['index.html','*.swift','package.json','capacitor.config.json','.github/workflows/build.yml']
+concurrency:
+  group: build-ipa
+  cancel-in-progress: true
+permissions:
+  contents: write
 jobs:
   build:
     runs-on: macos-latest
@@ -56,3 +65,25 @@ jobs:
           zip -qr VYRO.ipa Payload
       - uses: actions/upload-artifact@v4
         with: { name: VYRO-ipa, path: ios/App/VYRO.ipa }
+      - name: Publish release and update source
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          V=$(grep -o 'VYRO [0-9][0-9.]* · Metadata' index.html | head -1 | awk '{print $2}')
+          SIZE=$(stat -f%z ios/App/VYRO.ipa)
+          export V SIZE REPO
+          python3 - <<'PY'
+          import json,os,datetime
+          repo=os.environ['REPO'];v=os.environ['V'];size=int(os.environ['SIZE'])
+          base=f"https://github.com/{repo}/releases/download/latest/VYRO.ipa"
+          icon=f"https://raw.githubusercontent.com/{repo}/main/icon.png"
+          date=datetime.datetime.utcnow().strftime('%Y-%m-%d')
+          desc="A sleek movie and series player for your Xtream or M3U playlist, with TMDB artwork, resume, and a built-in player for MKV."
+          app={"name":"VYRO","bundleIdentifier":"com.vyro.app","developerName":"VYRO","subtitle":"Your movies and series","localizedDescription":desc,"iconURL":icon,"tintColor":"8b7bff","screenshotURLs":[],
+               "version":v,"versionDate":date,"downloadURL":base,"size":size,
+               "versions":[{"version":v,"date":date,"localizedDescription":"Latest build","downloadURL":base,"size":size}]}
+          json.dump({"name":"VYRO","identifier":"com.vyro.source","subtitle":"Latest VYRO builds","iconURL":icon,"apps":[app],"news":[]},open("altstore.json","w"),indent=2)
+          PY
+          gh release delete latest --yes --cleanup-tag --repo "$REPO" || true
+          gh release create latest ios/App/VYRO.ipa altstore.json --repo "$REPO" --title "VYRO $V" --notes "Latest build. Install link: https://github.com/$REPO/releases/download/latest/VYRO.ipa" --latest
